@@ -39,12 +39,27 @@ div#header ul.nav > li > a {
 }
 
 div#header ul.nav > li.active > a {
-	color: #fff;
+	color: #03a9f4;
 }
 
 div#header ul.nav > li > a:focus, 
 div#header ul.nav > li > a:hover {
 	color: #288ae2;
+}
+
+div#header ul.dropdown-menu {
+	left: auto;
+	right: 0;
+	z-index: 1024;
+}
+
+div#header li.dropdown img {
+	display: inline-block;
+	margin: 0 0 5px 5px;
+	max-height: 30px;
+	-webkit-border-radius: 50%;
+	   -moz-border-radius: 50%;
+	        border-radius: 50%;
 }
 
 div#footer {

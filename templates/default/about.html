@@ -1,0 +1,55 @@
+{% extends "../template.html" %}
+{% block title %}{{ _('About') }}{% end %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/default/style.css') }}">
+{% end %}
+{% block body %}
+<div id="ribbon"></div> <!-- #ribbon -->
+<div class="container">
+    <div class="col-sm-8">
+        <div id="main-content">
+            <div class="section">
+                <h3 id="about-project">{{ _('About the Project') }}</h3>
+                <div class="markdown">{{ _('Sharp-V is a powerful data mining and visualization tool designed for high-dimensional data.\n\nYou can get the source code on [GitHub](https://github.com/hzxie/Sharp-V), and help to improve it.') }}</div> <!-- .markdown -->
+            </div> <!-- .section -->
+            <div class="section">
+                <h3 id="contribute">{{ _('How to Contribute') }}</h3>
+                <div class="markdown">{{ _('We&acute;re glad that you want to improve this project.\n\n- You can report bugs [here](https://github.com/hzxie/Sharp-V/issues).\n- You can also create a pull request if you can fix the bug.\n- If you want to add features to the project, please tell us in the [issues](https://github.com/hzxie/Sharp-V/issues) page before developing.\n\nThanks for your corporation.') }}</div> <!-- .markdown -->
+            </div> <!-- .section -->
+            <div class="section">
+                <h3 id="license">{{ _('License') }}</h3>
+                <div class="markdown">{{ _('This project is open sourced under [GNU GPL v3](http://www.gnu.org/licenses/gpl-3.0.txt).\n\nYou can get more information in [terms of use](/terms) page.') }}</div> <!-- .markdown -->
+            </div> <!-- .section -->
+        </div> <!-- #main-content -->
+    </div> <!-- .col-sm-8 -->
+    <div class="col-sm-4">
+        <div id="sidebar-nav">
+            <h4>{{ _('About') }}</h4>
+            <ul class="contents">
+                <li><a href="#about-project">{{ _('About the Project') }}</a></li>
+                <li><a href="#contribute">{{ _('How to Contribute') }}</a></li>
+                <li><a href="#license">{{ _('License') }}</a></li>
+            </ul>
+        </div> <!-- #sidebar-nav -->
+    </div> <!-- .col-sm-4 -->
+</div> <!-- .container -->
+{% end %}
+{% block scripts %}
+<script type="text/javascript">
+    $(function() {
+        highlightNavigationItem('{{ _('About') }}')
+    });
+</script>
+<script type="text/javascript">
+    $.getScript('{{ static_url('js/markdown.min.js') }}', function() {
+        converter = Markdown.getSanitizingConverter();
+
+        $('.markdown').each(function() {
+            var plainContent    = $(this).text(),
+                markdownContent = converter.makeHtml(plainContent.replace(/\\\n/g, '\\n'));
+            
+            $(this).html(markdownContent);
+        });
+    });
+</script>
+{% end %}

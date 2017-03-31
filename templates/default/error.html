@@ -1,9 +1,9 @@
 {% extends "../template.html" %}
 {% block title %}
 {% if status_code in [500, 503] %}
-	{{ _('Internal Server Error') }}
+    {{ _('Internal Server Error') }}
 {% else %}
-	{{ _('Page Not Found') }}
+    {{ _('Page Not Found') }}
 {% end %}
 {% end %}
 {% block header %}
@@ -13,17 +13,17 @@
 <div class="container">
     <div class="row">
         <div class="col-md-6 text-center">
-        	<img src="{{ static_url('img/Error.png') }}" alt="">
+            <img src="{{ static_url('img/Error.png') }}" alt="">
         </div> <!-- .col-md-6 -->
         <div id="error-message" class="col-md-6">
-    	{% if status_code in [500, 503] %}
-    		<h2>{{ _('Internal Server Error') }}</h2>
-    		<p>{{ _('Whoops. It seems that there\'s something wrong with our server.') }}</p>
-    	{% else %}
-    		<h2>{{ _('Page Not Found') }}</h2>
-    		<p>{{ _('Whoops. Looks like what you\'re looking for can\'t be found.') }}</p>
-    	{% end %}
-    		<button class="btn btn-raised btn-primary" onclick="history.go(-1)">{{ _('Go back') }}</button>
+        {% if status_code in [500, 503] %}
+            <h2>{{ _('Internal Server Error') }}</h2>
+            <p>{{ _('Whoops. It seems that there\'s something wrong with our server.') }}</p>
+        {% else %}
+            <h2>{{ _('Page Not Found') }}</h2>
+            <p>{{ _('Whoops. Looks like what you\'re looking for can\'t be found.') }}</p>
+        {% end %}
+            <button class="btn btn-raised btn-primary" onclick="history.go(-1)">{{ _('Go back') }}</button>
         </div> <!-- .col-md-6 -->
     </div> <!-- .row -->
 </div> <!-- .container-fluid -->

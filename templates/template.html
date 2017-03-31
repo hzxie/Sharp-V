@@ -37,7 +37,19 @@
                 <div class="col-sm-8">
                     <ul class="nav navbar-nav pull-right">
                         <li><a href="/">{{ _('Home') }}</a></li>
-                        <li><a href="/about">{{ _('About') }}</a></li>
+                        <li class="dropdown">
+                            <a href="javascript:void(0);" data-target="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> Guest
+                            <img src="/static/img/avatar.jpg" alt="Avatar" />
+                            <ul class="dropdown-menu">
+                            {% if locals().get('is_logged_in', False) %}
+                                <li><a href="/accounts/profile">Profile</a></li>
+                            {% else %}
+                                <li><a href="/accounts/login">{{ _('Sign In') }}</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/accounts/register">{{ _('Sign Up') }}</a></li>
+                            {% end %}
+                            </ul>
+                        </li>
                     </ul>
                 </div> <!-- .col-md-8 -->
             </div> <!-- .row -->
@@ -52,8 +64,9 @@
                 <div class="col-md-3 col-sm-6">
                 </div> <!-- .col-sm-3 -->
                 <div class="col-md-3 col-sm-6">
-                    <h3>{{ _('Terms and Privacy') }}</h3>
+                    <h3>{{ _('Resources') }}</h3>
                     <ul>
+                        <li><a href="/about">{{ _('About') }}</a></li>
                         <li><a href="/terms">{{ _('Terms of Use') }}</a></li>
                         <li><a href="/privacy">{{ _('Privacy & Cookie') }}</a></li>
                     </ul>
