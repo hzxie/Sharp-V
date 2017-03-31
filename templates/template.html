@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title>{% block title %}{% end %} | Sharp-V</title>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Icon -->
+    <link href="{{ static_url('img/favicon.ico') }}" rel="shortcut icon" type="image/x-icon">
+    <!-- StyleSheets -->
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/google-fonts.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/bootstrap.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/bootstrap-material-design.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/fontawesome.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/ripples.min.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ static_url('css/style.css') }}">
+    <!-- JavaScript -->
+    <script type="text/javascript" src="{{ static_url('js/jquery-2.1.4.min.js') }}"></script>
+    <!--[if lte IE 9]>
+        <script type="text/javascript">
+            window.location.href='/not-supported';
+        </script>
+    <![endif]-->
+    {% block header %}{% end %}
+</head>
+<body>
+    <div id="header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-4">
+                    <div id="logo">
+                        <a href="/">
+                            <img src="{{ static_url('img/Sharp-V.png') }}" alt="Logo">
+                        </a>
+                    </div> <!-- #logo -->
+                </div> <!-- .col-md-4 -->
+                <div class="col-sm-8">
+                    <ul class="nav navbar-nav pull-right">
+                        <li><a href="/">{{ _('Home') }}</a></li>
+                        <li><a href="/about">{{ _('About') }}</a></li>
+                    </ul>
+                </div> <!-- .col-md-8 -->
+            </div> <!-- .row -->
+        </div> <!-- .container-fluid -->
+    </div> <!-- #header -->
+    <div id="content">
+        {% block body %}{% end %}
+    </div> <!-- #content -->
+    <div id="footer">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-3 col-sm-6">
+                </div> <!-- .col-sm-3 -->
+                <div class="col-md-3 col-sm-6">
+                    <h3>{{ _('Terms and Privacy') }}</h3>
+                    <ul>
+                        <li><a href="/terms">{{ _('Terms of Use') }}</a></li>
+                        <li><a href="/privacy">{{ _('Privacy & Cookie') }}</a></li>
+                    </ul>
+                </div> <!-- .col-sm-3 -->
+                <div class="col-md-3 col-sm-6">
+                    <h3>{{ _('Contact Us') }}</h3>
+                    <ul>
+                        <li><i class="fa fa-envelope"></i> support@sharp-v.org</li>
+                        <li><i class="fa fa-map-marker"></i> {{ _('Harbin Institute of Technology, Harbin, China') }}</li>
+                    </ul>
+                </div> <!-- .col-sm-3 -->
+                <div class="col-md-3 col-sm-6">
+                    <h3>{{ _('Languages') }}</h3>
+                    <ul id="locales">
+                        <li><a href="javascript:void(0);" data-value="en_US">English</a></li>
+                        <li><a href="javascript:void(0);" data-value="zh_CN">简体中文</a></li>
+                    </ul>
+                </div> <!-- .col-sm-3 -->
+            </div> <!-- .row -->
+            <div id="footer-bottom" class="row">
+            	<div class="col-sm-8">
+            		{{ _('Copyright') }}&copy;
+                    <script type="text/javascript">document.write((new Date()).getFullYear());</script>
+                    <a href="/">Sharp-V</a>. {{ _('All rights reserved') }}.
+            	</div> <!-- .col-sm-8 -->
+            	<div class="col-sm-4 text-right">
+            		<i class="fa fa-code"></i> with <a id="github-link" href="https://github.com/hzxie/Sharp-V" target="_blank"><i class="fa fa-heart"></i></a>
+            	</div> <!-- .col-sm-4 -->
+            </div> <!-- .row -->
+        </div> <!-- .container-fluid -->
+    </div> <!-- #footer -->
+    <!-- JavaScript -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script type="text/javascript" src="{{ static_url('js/bootstrap.min.js') }}"></script>
+    <script type="text/javascript" src="{{ static_url('js/material.min.js') }}"></script>
+    <script type="text/javascript" src="{{ static_url('js/ripples.min.js') }}"></script>
+    <script type="text/javascript" src="{{ static_url('js/site.js') }}"></script>
+    <script type="text/javascript">
+        $.material.init();
+    </script>
+    <script type="text/javascript">
+        function highlightNavigationItem(itemName) {
+            $('li > a', '.navbar-nav').each(function() {
+                if ( $(this).html() == itemName ) {
+                    $(this).parent().addClass('active');
+                }
+            });
+        }
+    </script>
+    <script type="text/javascript">
+        $('a', '#locales').click(function() {
+            var userLocale = $(this).attr('data-value'),
+                postData = {
+                    'user_locale': userLocale
+                };
+            $.ajax({
+                type: 'GET',
+                url: '/set-locale',
+                data: postData,
+                dataType: 'JSON',
+                success: function(result) {
+                    if ( result['is_successful'] ) {
+                        window.location.reload();
+                    }
+                }
+            });
+        });
+    </script>
+    {% block scripts %}{% end %}
+</body>
+</html>

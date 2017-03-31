@@ -1,0 +1,118 @@
+html, body {
+	background-color: #fff;
+	margin: 0;
+	padding: 0;
+	font: 14px/24px Roboto, sans-serif;
+}
+
+a {
+	text-decoration: none;
+}
+
+div#header {
+	background-color: #fff;
+	height: 60px;
+	position: relative;
+	z-index: 4;
+    box-shadow: 0 0 6px 0 rgba(0, 0, 0, .3);
+}
+
+div#header div#logo {
+	font-size: 24px;
+	padding: 6px 0;
+}
+
+div#header div#logo a {
+	text-decoration: none;
+}
+
+div#header div#logo img {
+	max-height: 48px;
+}
+
+div#header ul.nav > li > a {
+	color: #4c4c4c;
+	font-size: 16px;
+	font-weight: 500;
+	line-height: 40px;
+	padding: 10px 20px;
+}
+
+div#header ul.nav > li.active > a {
+	color: #fff;
+}
+
+div#header ul.nav > li > a:focus, 
+div#header ul.nav > li > a:hover {
+	color: #288ae2;
+}
+
+div#footer {
+	background-color: #474747;
+	color: #fff;
+	padding: 15px 0 0;
+	position: relative;
+	z-index: 4;
+}
+
+div#footer a {
+	color: #fff;
+}
+
+div#footer ul {
+	list-style: none;
+	padding-left: 2px;
+}
+
+div#footer i.fa {
+	display: inline-block;
+	width: 20px;
+}
+
+div#footer-bottom {
+	border-top: 1px solid #999;
+    font-size: 12px;
+    margin: 20px 0 0;
+    padding: 15px 0;
+}
+
+div#footer a#github-link:hover {
+	color: #e53935;
+}
+
+/* Smaller than standard 960 (devices and browsers) */
+@media only screen and (max-width: 959px) {
+}
+
+/* Tablet Portrait size to standard 960 (devices and browsers) */
+@media only screen and (min-width: 768px) and (max-width: 959px) {
+}
+
+/* All Mobile Sizes (devices and browser) */
+@media only screen and (max-width: 767px) {
+	div#header {
+		height: auto;
+	}
+
+	div#header div#logo {
+		text-align: center;
+	}
+
+	div#header ul.nav {
+		float: none !important;
+		margin-top: 0;
+		text-align: center;
+	}
+
+	div#footer div {
+		text-align: center;
+	}
+}
+
+/* Mobile Landscape Size to Tablet Portrait (devices and browsers) */
+@media only screen and (min-width: 480px) and (max-width: 767px) {
+}
+
+/* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
+@media only screen and (max-width: 479px) {
+}
