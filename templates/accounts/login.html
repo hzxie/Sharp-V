@@ -1,0 +1,84 @@
+{% extends "../template.html" %}
+{% block title %}{{ _('Welcome back') }}{% end %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/accounts/login.css') }}">
+<script type="text/javascript" src="{{ static_url('js/md5.min.js') }}"></script>
+{% end %}
+{% block body %}
+<div id="login">
+    <h2>{{ _('Sign in') }}</h2>
+    <div class="alert alert-danger hide"></div> <!-- .alert-danger -->
+    {% if is_logged_out %}
+    <div class="alert alert-info">{{ _('You are now logged out.') }}</div> <!-- .alert-info -->
+    {% end %}
+    <form id="login-form" onSubmit="onSubmit(); return false;">
+        <div class="form-group form-group-lg">
+            <label class="control-label" for="username">Username or Email</label>
+            <input id="username" class="form-control" type="text">
+        </div> <!-- .form-group -->
+        <div class="form-group form-group-lg">
+            <label class="control-label" for="username">
+                Password
+                <span class="pull-right">
+                    <a href="/accounts/reset-password">Forgot password?</a>
+                </span>
+            </label>
+            <input id="password" class="form-control" type="password">
+        </div> <!-- .form-group -->
+        <div class="form-group">
+            <div class="checkbox">
+                <label><input id="keep-signed-in" type="checkbox"> {{ _('Keep me signed in') }}</label>
+            </div> <!-- .checkbox -->
+        </div> <!-- .form-group -->
+        {% module xsrf_form_html() %}
+        <button class="btn btn-raised btn-primary btn-block" type="submit">{{ _('Sign in') }}</button>
+    </form> <!-- #login-form -->
+    <p class="text-center">
+        {{ _('Don´t have an account?') }}<br>
+        <a href="/accounts/register">{{ _('Create an account') }}</a>
+    </p>
+</div> <!-- #login -->
+{% end %}
+{% block scripts %}
+<script type="text/javascript">
+    function onSubmit() {
+        $('.alert').addClass('hide');
+        $('button[type=submit]').attr('disabled', 'disabled');
+        $('button[type=submit]').html('{{ _('Please wait...') }}');
+
+        var username        = $('#username').val(),
+            password        = md5($('#password').val()),
+            keepSignedIn    = $('#keep-signed-in').is(':checked'),
+            xsrfToken       = getCookie("_xsrf");
+
+        $('#password').val(password);
+        return doLoginAction(username, password, keepSignedIn, xsrfToken);
+    }
+</script>
+<script type="text/javascript">
+    function doLoginAction(username, password, keepSignedIn, xsrfToken) {
+        var postData = {
+            'username': username,
+            'password': password,
+            'keepSignedIn': keepSignedIn,
+            '_xsrf': xsrfToken
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/accounts/login',
+            data: postData,
+            dataType: 'JSON',
+            success: function(result){
+                return processLoginResult(result);
+            }
+        });
+    }
+</script>
+<script type="text/javascript">
+    function processLoginResult(result) {
+        $('button[type=submit]').html('{{ _('Sign in') }}');
+        $('button[type=submit]').removeAttr('disabled');
+    }
+</script>
+{% end %}

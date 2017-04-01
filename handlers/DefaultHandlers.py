@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-from BaseHandler import BaseHandler
+from handlers.BaseHandler import BaseHandler
 
 class HomeHandler(BaseHandler):
     """The default handler for the application."""

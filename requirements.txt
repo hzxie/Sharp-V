@@ -1,0 +1,5 @@
+# Requirements of Share-V
+
+tornado
+mysql-python
+sqlalchemy
