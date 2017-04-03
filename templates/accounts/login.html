@@ -77,6 +77,20 @@
 </script>
 <script type="text/javascript">
     function processLoginResult(result) {
+        if ( result['is_successful'] ) {
+            window.location.href = '/';
+        } else {
+            var errorMessage = '';
+
+            if ( !result['is_allow_to_access'] ) {
+                errorMessage = 'You are not allowed to sign in.<br>';
+            } else if ( !result['is_account_valid'] ) {
+                errorMessage = 'Incorrect username or password.<br>';
+            }
+            $('#password').val('');
+            $('.alert-danger').html(errorMessage);
+            $('.alert-danger').removeClass('hide');
+        }
         $('button[type=submit]').html('{{ _('Sign in') }}');
         $('button[type=submit]').removeAttr('disabled');
     }

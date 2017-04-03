@@ -30,17 +30,23 @@ class LoginHandler(BaseHandler):
         password        = self.get_argument("password", default=None, strip=False)
         keep_signed_in  = self.get_argument("keepSignedIn", default=False, strip=False)
 
-        user           = None
+        is_account_valid    = False
+        is_allow_to_access  = True
         if username and password:
             user    = self.get_logged_in_user(username, password)
 
+            if user and user.user_group_slug == 'forbidden':
+                is_allow_to_access  = False
             if user and user.user_group_slug != 'forbidden':
+                is_account_valid    = True
                 self.set_secure_cookie('username', username)
 
         self.write(dump_json({
+            'is_successful': is_account_valid and is_allow_to_access,
             'is_username_empty': False if username else True,
             'is_password_empty': False if password else True,
-            'is_account_valid': True if user else False
+            'is_account_valid': is_account_valid,
+            'is_allow_to_access': is_allow_to_access,
         }))
         self.finish()
 
