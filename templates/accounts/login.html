@@ -83,9 +83,9 @@
             var errorMessage = '';
 
             if ( !result['is_allow_to_access'] ) {
-                errorMessage = 'You are not allowed to sign in.<br>';
+                errorMessage = '{{ _('You are not allowed to sign in.') }}<br>';
             } else if ( !result['is_account_valid'] ) {
-                errorMessage = 'Incorrect username or password.<br>';
+                errorMessage = '{{ _('Incorrect username or password.') }}<br>';
             }
             $('#password').val('');
             $('.alert-danger').html(errorMessage);

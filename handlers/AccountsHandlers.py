@@ -72,3 +72,10 @@ class RegisterHandler(BaseHandler):
             self.render('accounts/register.html')
         else:
             self.redirect('/')
+
+    @asynchronous
+    def post(self):
+        username        = self.get_argument("username", default=None, strip=False)
+        password        = self.get_argument("password", default=None, strip=False)
+        
+        self.finish()

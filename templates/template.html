@@ -42,7 +42,7 @@
                             <img src="/static/img/avatar.jpg" alt="Avatar" />
                             <ul class="dropdown-menu">
                             {% if current_user != 'Guest' %}
-                                <li><a href="/accounts/profile">Profile</a></li>
+                                <li><a href="/accounts/profile">{{ _('Profile') }}</a></li>
                                 <li class="divider"></li>
                                 <li><a href="/accounts/login?logout=true">{{ _('Sign Out') }}</a></li>
                             {% else %}
@@ -92,7 +92,7 @@
             	<div class="col-sm-8">
             		{{ _('Copyright') }}&copy;
                     <script type="text/javascript">document.write((new Date()).getFullYear());</script>
-                    <a href="/">Sharp-V</a>. {{ _('All rights reserved') }}.
+                    <a href="/">Sharp-V</a>. {{ _('All rights reserved.') }}
             	</div> <!-- .col-sm-8 -->
             	<div class="col-sm-4 text-right">
             		<i class="fa fa-code"></i> with <a id="github-link" href="https://github.com/hzxie/Sharp-V" target="_blank"><i class="fa fa-heart"></i></a>
