@@ -7,23 +7,38 @@ from tornado.web import RequestHandler
 from tornado.locale import get as get_locale
 
 class BaseHandler(RequestHandler):
-    # def _handle_request_exception(self, exception):
-    #     """ Error handler of the application.
+    def _handle_request_exception(self, exception):
+        """ Error handler of the application.
 
-    #     Args:
-    #         self: the BaseHandler itself
-    #         exception: the exception pass to this handler
-    #     """
-    #     exception_type_name = type(exception).__name__
-    #     if exception_type_name == 'HTTPError':
-    #         self.set_status(exception.status_code)
-    #         logging.warn('HTTPError[Code=%d] occurred: %s.' % \
-    #             (exception.status_code, exception.log_message))
-    #     else:
-    #         self.set_status(500)
-    #         logging.error('Exception occurred: %s' % exception)
+        Args:
+            self: the BaseHandler itself
+            exception: the exception pass to this handler
+        """
+        exception_type_name = type(exception).__name__
+        if exception_type_name == 'HTTPError':
+            self.set_status(exception.status_code)
+            logging.warn('HTTPError[Code=%d] occurred: %s.' % \
+                (exception.status_code, exception.log_message))
+        else:
+            self.set_status(500)
+            logging.error('Exception occurred: %s' % exception)
         
-    #     self.render('default/error.html', status_code=self.get_status())
+        self.render('default/error.html', status_code=self.get_status())
+
+    def get_current_user(self):
+        """ Get username of current user logged in.
+
+        Args:
+            self: the BaseHandler itself
+
+        Returns:
+            the username of current user logged in
+        """
+        username = self.get_secure_cookie('user')
+        if not username:
+            username = 'Guest'
+        
+        return username
 
     def get_user_locale(self):
         """Get language settings of users.

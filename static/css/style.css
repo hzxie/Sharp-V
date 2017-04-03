@@ -9,12 +9,26 @@ a {
 	text-decoration: none;
 }
 
+div.alert.alert-danger {
+	background-color: #f2dede;
+	border-color: #eed3d7;
+	color: #b94a48;
+}
+
+div.alert.alert-info {
+	background-color: #dff0d8;
+	border-color: #d6e9c6;
+	color: #468847;
+}
+
 div#header {
 	background-color: #fff;
 	height: 60px;
 	position: relative;
 	z-index: 4;
-    box-shadow: 0 0 6px 0 rgba(0, 0, 0, .3);
+	-webkit-box-shadow: 0 0 6px 0 rgba(0, 0, 0, .3);
+	   -moz-box-shadow: 0 0 6px 0 rgba(0, 0, 0, .3);
+	        box-shadow: 0 0 6px 0 rgba(0, 0, 0, .3);
 }
 
 div#header div#logo {

@@ -1,0 +1,193 @@
+# Chinese translations for PACKAGE package.
+# Copyright (C) 2017 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Haozhe Xie <cshzxie@gmail.com>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-04-03 19:33+0800\n"
+"PO-Revision-Date: 2017-04-03 16:40+0800\n"
+"Last-Translator: Haozhe Xie <cshzxie@gmail.com>\n"
+"Language-Team: Chinese (simplified)\n"
+"Language: zh_CN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../templates/accounts/login.html:2 ../templates/accounts/register.html:2
+msgid "Welcome back"
+msgstr "欢迎回来"
+
+#: ../templates/accounts/login.html:9 ../templates/accounts/login.html:34
+msgid "Sign in"
+msgstr "登录"
+
+#: ../templates/accounts/login.html:12
+msgid "You are now logged out."
+msgstr "您已注销."
+
+#: ../templates/accounts/login.html:30
+msgid "Keep me signed in"
+msgstr "保持登录状态"
+
+#: ../templates/accounts/login.html:37
+msgid "Don´t have an account?"
+msgstr "没有账户?"
+
+#: ../templates/accounts/login.html:38
+msgid "Create an account"
+msgstr "创建账户"
+
+#: ../templates/default/about.html:2 ../templates/default/about.html:27
+#: ../templates/template.html:71
+msgid "About"
+msgstr "关于"
+
+#: ../templates/default/about.html:12 ../templates/default/about.html:29
+msgid "About the Project"
+msgstr "关于本项目"
+
+#: ../templates/default/about.html:13
+msgid ""
+"Sharp-V is a powerful data mining and visualization tool designed for high-dimensional data.\n"
+"\n"
+"You can get the source code on [GitHub](https://github.com/hzxie/Sharp-V), and help to improve it."
+msgstr ""
+"Sharp-V 是一个强大的高维数据数据挖掘及可视化工具.\n"
+"您可以在[GitHub](https://github.com/hzxie/Sharp-V)上获取它的源代码, 并帮助完善它."
+
+#: ../templates/default/about.html:16 ../templates/default/about.html:30
+msgid "How to Contribute"
+msgstr "如何贡献"
+
+#: ../templates/default/about.html:17
+msgid ""
+"We&acute;re glad that you want to improve this project.\n"
+"\n"
+"- You can report bugs [here](https://github.com/hzxie/Sharp-V/issues).\n"
+"- You can also create a pull request if you can fix the bug.\n"
+"- If you want to add features to the project, please tell us in the [issues](https://github.com/hzxie/Sharp-V/issues) page before developing.\n"
+"\n"
+"Thanks for your corporation."
+msgstr ""
+"您愿意帮助改进本项目我们为此感到非常高兴.\n"
+"\n"
+"- 您可以在[此处](https://github.com/hzxie/Sharp-V/issues)报告Bug.\n"
+"- 如果您可以修复此Bug, 您可以创建一个Pull Request.\n"
+"- 如果您想为本项目添加新的特性, 请在开发前在[Issues](https://github.com/hzxie/Sharp-V/issues)页面告知我们.\n"
+"\n"
+"感谢您的配合."
+
+#: ../templates/default/about.html:20 ../templates/default/about.html:31
+msgid "License"
+msgstr "许可证"
+
+#: ../templates/default/about.html:21
+msgid ""
+"This project is open sourced under [GNU GPL v3](http://www.gnu.org/licenses/gpl-3.0.txt).\n"
+"\n"
+"You can get more information in [terms of use](/terms) page."
+msgstr ""
+"该项目是开源的, 并且遵循[GNU GPL v3](http://www.gnu.org/licenses/gpl-3.0.txt)协议.\n"
+"\n"
+"您可以在[使用条款](/terms)页面了解更多信息."
+
+#: ../templates/default/error.html:4 ../templates/default/error.html:20
+msgid "Internal Server Error"
+msgstr "内部服务器错误"
+
+#: ../templates/default/error.html:6 ../templates/default/error.html:23
+msgid "Page Not Found"
+msgstr "页面未找到"
+
+#: ../templates/default/error.html:21
+msgid "Whoops. It seems that there's something wrong with our server."
+msgstr "我们的服务器似乎发生了故障."
+
+#: ../templates/default/error.html:24
+msgid "Whoops. Looks like what you're looking for can't be found."
+msgstr "您所浏览的内容似乎无法被找到."
+
+#: ../templates/default/error.html:26
+msgid "Go back"
+msgstr "返回"
+
+#: ../templates/default/home.html:2 ../templates/template.html:39
+msgid "Home"
+msgstr "首页"
+
+#: ../templates/default/upgrade-browser.html:5
+msgid "Browser Not Supported"
+msgstr "浏览器不再支持"
+
+#: ../templates/default/upgrade-browser.html:37
+msgid "Your Browser is no longer supported."
+msgstr "您的浏览器已不再被支持."
+
+#: ../templates/default/upgrade-browser.html:38
+msgid "Sharp-V no longer supports your browser. Please upgrade your browser."
+msgstr "Sharp-V 已不再支持您的浏览器. 请升级您的浏览器."
+
+#: ../templates/default/upgrade-browser.html:69
+#: ../templates/default/upgrade-browser.html:70
+#: ../templates/default/upgrade-browser.html:71
+#: ../templates/default/upgrade-browser.html:72
+#: ../templates/default/upgrade-browser.html:73
+msgid "Download"
+msgstr "下载"
+
+#: ../templates/template.html:45
+msgid "Profile"
+msgstr "个人资料"
+
+#: ../templates/template.html:47
+msgid "Sign Out"
+msgstr "注销"
+
+#: ../templates/template.html:49
+msgid "Sign In"
+msgstr "登录"
+
+#: ../templates/template.html:51
+msgid "Sign Up"
+msgstr "注册"
+
+#: ../templates/template.html:69
+msgid "Resources"
+msgstr "资源"
+
+#: ../templates/template.html:72
+msgid "Terms of Use"
+msgstr "使用条款"
+
+#: ../templates/template.html:73
+msgid "Privacy & Cookie"
+msgstr "隐私和Cookie"
+
+#: ../templates/template.html:77
+msgid "Contact Us"
+msgstr "联系我们"
+
+#: ../templates/template.html:80
+msgid "Harbin Institute of Technology, Harbin, China"
+msgstr "黑龙江省哈尔滨市西大直街92号哈尔滨工业大学"
+
+#: ../templates/template.html:84
+msgid "Languages"
+msgstr "语言"
+
+#: ../templates/template.html:93
+msgid "Copyright"
+msgstr "版权所有"
+
+#: ../templates/template.html:95
+msgid "All rights reserved."
+msgstr "保留所有权利."
+
+msgid "You are not allowed to sign in."
+msgstr "您已被禁止登录."
+
+msgid "Incorrect username or password."
+msgstr "用户名或密码不正确."

@@ -36,7 +36,8 @@ class Application(tornado.web.Application):
         """
         handlers = [
             (r"/", HomeHandler),
-            (r"/accounts/login", LoginHandler),
+            (r"/accounts/login", LoginHandler, dict(db_session=db_session)),
+            (r"/accounts/register", RegisterHandler, dict(db_session=db_session)),
             (r"/about", AboutHandler),
             (r"/terms", TermsHandler),
             (r"/privacy", PrivacyHandler),
@@ -54,7 +55,6 @@ class Application(tornado.web.Application):
             'compress_response': True,
         }
         tornado.web.Application.__init__(self, handlers, **settings)
-        self.db_session = db_session
 
 def main():
     """ The entrance of the application."""

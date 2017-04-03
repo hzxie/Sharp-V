@@ -20,7 +20,7 @@
             <label class="control-label" for="username">
                 Password
                 <span class="pull-right">
-                    <a href="/accounts/reset-password">Forgot password?</a>
+                    <a href="/accounts/forgot-password">Forgot password?</a>
                 </span>
             </label>
             <input id="password" class="form-control" type="password">
@@ -77,6 +77,20 @@
 </script>
 <script type="text/javascript">
     function processLoginResult(result) {
+        if ( result['is_successful'] ) {
+            window.location.href = '/';
+        } else {
+            var errorMessage = '';
+
+            if ( !result['is_allow_to_access'] ) {
+                errorMessage = '{{ _('You are not allowed to sign in.') }}<br>';
+            } else if ( !result['is_account_valid'] ) {
+                errorMessage = '{{ _('Incorrect username or password.') }}<br>';
+            }
+            $('#password').val('');
+            $('.alert-danger').html(errorMessage);
+            $('.alert-danger').removeClass('hide');
+        }
         $('button[type=submit]').html('{{ _('Sign in') }}');
         $('button[type=submit]').removeAttr('disabled');
     }

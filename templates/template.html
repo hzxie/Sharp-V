@@ -38,11 +38,13 @@
                     <ul class="nav navbar-nav pull-right">
                         <li><a href="/">{{ _('Home') }}</a></li>
                         <li class="dropdown">
-                            <a href="javascript:void(0);" data-target="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> Guest
+                            <a href="javascript:void(0);" data-target="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> {{ current_user }}
                             <img src="/static/img/avatar.jpg" alt="Avatar" />
                             <ul class="dropdown-menu">
-                            {% if locals().get('is_logged_in', False) %}
-                                <li><a href="/accounts/profile">Profile</a></li>
+                            {% if current_user != 'Guest' %}
+                                <li><a href="/accounts/profile">{{ _('Profile') }}</a></li>
+                                <li class="divider"></li>
+                                <li><a href="/accounts/login?logout=true">{{ _('Sign Out') }}</a></li>
                             {% else %}
                                 <li><a href="/accounts/login">{{ _('Sign In') }}</a></li>
                                 <li class="divider"></li>
@@ -90,7 +92,7 @@
             	<div class="col-sm-8">
             		{{ _('Copyright') }}&copy;
                     <script type="text/javascript">document.write((new Date()).getFullYear());</script>
-                    <a href="/">Sharp-V</a>. {{ _('All rights reserved') }}.
+                    <a href="/">Sharp-V</a>. {{ _('All rights reserved.') }}
             	</div> <!-- .col-sm-8 -->
             	<div class="col-sm-4 text-right">
             		<i class="fa fa-code"></i> with <a id="github-link" href="https://github.com/hzxie/Sharp-V" target="_blank"><i class="fa fa-heart"></i></a>
