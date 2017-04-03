@@ -3,9 +3,9 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Apr 01, 2017 at 07:03 AM
--- Server version: 10.1.19-MariaDB
--- PHP Version: 7.0.9
+-- Generation Time: Apr 03, 2017 at 08:35 AM
+-- Server version: 10.1.10-MariaDB
+-- PHP Version: 7.0.3
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
@@ -28,11 +28,11 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `sharpv_users` (
   `user_id` bigint(20) NOT NULL,
-  `username` varchar(32) NOT NULL,
-  `password` varchar(32) NOT NULL,
-  `email` varchar(64) NOT NULL,
+  `username` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `password` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `email` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,
   `user_group_id` int(4) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `sharpv_users`
@@ -50,9 +50,9 @@ INSERT INTO `sharpv_users` (`user_id`, `username`, `password`, `email`, `user_gr
 
 CREATE TABLE `sharpv_user_groups` (
   `user_group_id` int(4) NOT NULL,
-  `user_group_slug` varchar(32) NOT NULL,
-  `user_group_name` varchar(32) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+  `user_group_slug` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `user_group_name` varchar(32) COLLATE utf8mb4_unicode_ci NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Dumping data for table `sharpv_user_groups`
