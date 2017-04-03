@@ -74,7 +74,7 @@ def main():
                         encoding='utf-8', echo=False, pool_size=options.mysql_pool_size, 
                         pool_recycle=options.mysql_pool_recycle)
     db_session  = scoped_session(sessionmaker(bind=db_engine,
-                        autocommit=False, autoflush=True, expire_on_commit=False))
+                        autocommit=True, autoflush=True, expire_on_commit=False))
 
     # Load translations for different locale
     load_gettext_translations(join(dirname(__file__), 'locales'), 'messages')

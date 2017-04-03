@@ -60,7 +60,7 @@ CREATE TABLE `sharpv_user_groups` (
 
 INSERT INTO `sharpv_user_groups` (`user_group_id`, `user_group_slug`, `user_group_name`) VALUES
 (1, 'forbidden', 'Forbidden'),
-(2, 'users', 'Administrators'),
+(2, 'users', 'Users'),
 (3, 'administrators', 'Administrators');
 
 --

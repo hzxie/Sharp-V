@@ -14,10 +14,15 @@ class LoginHandler(BaseHandler):
 
     def get(self):
         is_logged_out   = self.get_argument("logout", default=False, strip=False)
+        username        = self.get_secure_cookie('username')
 
-        if not self.get_secure_cookie('username'):
+        if username and is_logged_out:
+            self.clear_cookie('username')
+        
+        if not username:
             self.render('accounts/login.html', is_logged_out=is_logged_out)
-        self.redirect('/')
+        else:
+            self.redirect('/')
 
     @asynchronous
     def post(self):
@@ -29,8 +34,7 @@ class LoginHandler(BaseHandler):
         if username and password:
             user    = self.get_logged_in_user(username, password)
 
-            # TODO: Check user group
-            if user:
+            if user and user.user_group_slug != 'forbidden':
                 self.set_secure_cookie('username', username)
 
         self.write(dump_json({
