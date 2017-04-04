@@ -40,6 +40,10 @@ class BaseHandler(RequestHandler):
         
         return username
 
+    def get_user_ip_addr(self):
+        x_real_ip = self.request.headers.get('X-Real-IP')
+        return x_real_ip or self.request.remote_ip
+
     def get_user_locale(self):
         """Get language settings of users.
 

@@ -1,8 +1,108 @@
 {% extends "../template.html" %}
-{% block title %}{{ _('Welcome back') }}{% end %}
+{% block title %}{{ _('Create Account') }}{% end %}
 {% block header %}
-<link rel="stylesheet" type="text/css" href="{{ static_url('css/accounts/login.css') }}">
-<script type="text/javascript" src="{{ static_url('js/md5.min.js') }}"></script>
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/accounts/register.css') }}">
 {% end %}
 {% block body %}
+<div id="register">
+	<h2>{{ _('Sign up') }}</h2>
+    <div class="alert alert-danger hide"></div> <!-- .alert-danger -->
+    <form id="register-form" onSubmit="onSubmit(); return false;">
+        <div class="form-group form-group-lg">
+            <label class="control-label" for="username">{{ _('Username') }}</label>
+            <input id="username" class="form-control" type="text" maxlength="16">
+        </div> <!-- .form-group -->
+        <div class="form-group form-group-lg">
+            <label class="control-label" for="email">{{ _('Email') }}</label>
+            <input id="email" class="form-control" type="text" maxlength="64">
+        </div> <!-- .form-group -->
+        <div class="form-group form-group-lg">
+            <label class="control-label" for="password">{{ _('Password') }}</label>
+            <input id="password" class="form-control" type="password" maxlength="16">
+        </div> <!-- .form-group -->
+        {% module xsrf_form_html() %}
+        <p>By clicking Create Account, I agree to the <a href="/terms">Terms of Service</a> and <a href="/privacy">Privacy Policy</a>.</p>
+        <button class="btn btn-raised btn-primary btn-block" type="submit">{{ _('Sign up') }}</button>
+    </form> <!-- #register-form -->
+    <p class="text-center">
+        {{ _('Already have an account?') }}<br>
+        <a href="/accounts/login">{{ _('Sign in') }}</a>
+    </p>
+</div> <!-- #register -->
+{% end %}
+{% block scripts %}
+<script type="text/javascript">
+    function onSubmit() {
+        $('.alert').addClass('hide');
+        $('button[type=submit]').attr('disabled', 'disabled');
+        $('button[type=submit]').html('{{ _('Please wait...') }}');
+
+        var username        = $('#username').val(),
+            email           = $('#email').val(),
+            password        = $('#password').val(),
+            xsrfToken       = getCookie("_xsrf");
+        return doRegisterAction(username, email, password, xsrfToken);
+    }
+</script>
+<script type="text/javascript">
+	function doRegisterAction(username, email, password, xsrfToken) {
+		var postData = {
+			'username': username,
+            'email': email,
+            'password': password,
+            '_xsrf': xsrfToken
+		};
+
+		$.ajax({
+			type: 'POST',
+            url: '/accounts/register',
+            data: postData,
+            dataType: 'JSON',
+            success: function(result){
+                return processRegisterResult(result);
+            }
+		});
+	}
+</script>
+<script type="text/javascript">
+	function processRegisterResult(result) {
+		if ( result['isSuccessful'] ) {
+			window.location.href = '/accounts/login';
+		} else {
+            var errorMessage  = '';
+
+            if ( result['isUsernameEmpty'] ) {
+                errorMessage += '{{ _('You cannot leave username empty.') }}<br>';
+            } else if ( !result['isUsernameLegal'] ) {
+                var username = $('#username').val();
+
+                if ( username.length < 6 || username.length > 16 ) {
+                    errorMessage += '{{ _('The length of Username must between 6 and 16 characters.') }}<br>';
+                } else if ( !username[0].match(/[a-z]/i) ) {
+                    errorMessage += '{{ _('Username must start with a letter(a-z).') }}<br>';
+                } else {
+                    errorMessage += '{{ _('Username can only contain letters(a-z), numbers, and underlines(_).') }}<br>';
+                }
+            } else if ( result['isUsernameExists'] ) {
+                errorMessage += '{{ _('Someone already has that username.') }}<br>';
+            }
+            if ( result['isEmailEmpty'] ) {
+                errorMessage += '{{ _('You cannot leave email empty.') }}<br>';
+            } else if ( !result['isEmailLegal'] ) {
+                errorMessage += '{{ _('The email seems invalid.') }}<br>';
+            } else if ( result['isEmailExists'] ) {
+                errorMessage += '{{ _('Someone already use that email.') }}<br>';
+            }
+            if ( result['isPasswordEmpty'] ) {
+                errorMessage += '{{ _('You cannot leave password empty.') }}<br>';
+            } else if ( !result['isPasswordLegal'] ) {
+                errorMessage += '{{ _('The length of password must between 6 and 16 characters.') }}<br>';
+            }
+            $('.alert-danger').html(errorMessage);
+            $('.alert-danger').removeClass('hide');
+		}
+        $('button[type=submit]').html('{{ _('Sign up') }}');
+        $('button[type=submit]').removeAttr('disabled');
+	}
+</script>
 {% end %}
