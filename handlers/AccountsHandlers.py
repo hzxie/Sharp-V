@@ -21,7 +21,7 @@ class LoginHandler(BaseHandler):
 
         if username and is_logged_out:
             self.clear_cookie('user')
-        
+
         if not username or is_logged_out:
             self.render('accounts/login.html', is_logged_out=is_logged_out)
         else:

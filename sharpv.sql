@@ -39,9 +39,10 @@ CREATE TABLE `sharpv_users` (
 --
 
 INSERT INTO `sharpv_users` (`user_id`, `username`, `password`, `email`, `user_group_id`) VALUES
-(0, 'Guest', '', 'noreply@sharp-v.org', 3),
+(0, 'Guest', '', 'noreply@sharp-v.org', 2),
 (1, 'root', 'e118b111376cffc0fcfb10e9dc43884b', 'webmaster@sharp-v.org', 3),
-(2, 'hzxie', '785ee107c11dfe36de668b1ae7baacbb', 'cshzxie@gmail.com', 2);
+(2, 'hzxie', '785ee107c11dfe36de668b1ae7baacbb', 'cshzxie@gmail.com', 2),
+(3, 'sunce', 'e10adc3949ba59abbe56e057f20f883e', 'spatriotc@gmail.com', 2);
 
 -- --------------------------------------------------------
 

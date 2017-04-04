@@ -31,3 +31,10 @@ class UserMapper(object):
             'user_group_id': user_group_id
         }).rowcount
         return rows_affected
+
+    def update_password(self, user_id, password):
+        rows_affected = self.db_session.execute('UPDATE sharpv_users SET password = :password WHERE user_id = :user_id', {
+            'password': password,
+            'user_id': user_id
+        }).rowcount
+        return rows_affected
