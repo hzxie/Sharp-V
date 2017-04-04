@@ -5,7 +5,7 @@
 {% end %}
 {% block body %}
 <div id="register">
-	<h2>{{ _('Sign up') }}</h2>
+    <h2>{{ _('Sign up') }}</h2>
     <div class="alert alert-danger hide"></div> <!-- .alert-danger -->
     <form id="register-form" onSubmit="onSubmit(); return false;">
         <div class="form-group form-group-lg">
@@ -45,30 +45,30 @@
     }
 </script>
 <script type="text/javascript">
-	function doRegisterAction(username, email, password, xsrfToken) {
-		var postData = {
-			'username': username,
+    function doRegisterAction(username, email, password, xsrfToken) {
+        var postData = {
+            'username': username,
             'email': email,
             'password': password,
             '_xsrf': xsrfToken
-		};
+        };
 
-		$.ajax({
-			type: 'POST',
+        $.ajax({
+            type: 'POST',
             url: '/accounts/register',
             data: postData,
             dataType: 'JSON',
             success: function(result){
                 return processRegisterResult(result);
             }
-		});
-	}
+        });
+    }
 </script>
 <script type="text/javascript">
-	function processRegisterResult(result) {
-		if ( result['isSuccessful'] ) {
-			window.location.href = '/accounts/login';
-		} else {
+    function processRegisterResult(result) {
+        if ( result['isSuccessful'] ) {
+            window.location.href = '/accounts/login';
+        } else {
             var errorMessage  = '';
 
             if ( result['isUsernameEmpty'] ) {
@@ -100,9 +100,9 @@
             }
             $('.alert-danger').html(errorMessage);
             $('.alert-danger').removeClass('hide');
-		}
+        }
         $('button[type=submit]').html('{{ _('Sign up') }}');
         $('button[type=submit]').removeAttr('disabled');
-	}
+    }
 </script>
 {% end %}

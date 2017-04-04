@@ -3,3 +3,4 @@
 tornado
 mysql-python
 sqlalchemy
+git+https://github.com/equeny/tornadomail.git

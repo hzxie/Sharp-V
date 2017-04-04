@@ -2,12 +2,16 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from datetime import datetime
+from datetime import timedelta
 from hashlib import md5
-from json import dumps as dump_json
+from tornado.escape import json_encode as dump_json
+from tornadomail.message import EmailFromTemplate
 from re import match as match_regx
-from tornado.web import asynchronous
+from uuid import uuid4
 
 from handlers.BaseHandler import BaseHandler
+from mappers.EmailVerificationMapper import EmailVerificationMapper
 from mappers.UserMapper import UserMapper
 from mappers.UserGroupMapper import UserGroupMapper
 
@@ -16,18 +20,17 @@ class LoginHandler(BaseHandler):
         self.user_mapper = UserMapper(db_session)
 
     def get(self):
-        is_logged_out   = self.get_argument("logout", default=False, strip=False)
-        username        = self.get_secure_cookie('user')
+        is_logging_out  = self.get_argument("logout", default=False, strip=False)
+        is_logged_in    = self.get_secure_cookie('user')
 
-        if username and is_logged_out:
+        if is_logged_in and is_logging_out:
             self.clear_cookie('user')
 
-        if not username or is_logged_out:
-            self.render('accounts/login.html', is_logged_out=is_logged_out)
+        if not is_logged_in or is_logging_out:
+            self.render('accounts/login.html', is_logged_out=is_logging_out)
         else:
             self.redirect('/')
 
-    @asynchronous
     def post(self):
         username        = self.get_argument("username", default=None, strip=False)
         password        = self.get_argument("password", default=None, strip=False)
@@ -39,7 +42,6 @@ class LoginHandler(BaseHandler):
             logging.info('User [Username=%s] logged in at %s.' % (username, self.get_user_ip_addr()))
 
         self.write(dump_json(result))
-        self.finish()
 
     def is_allow_to_access(self, username, password):
         is_account_valid    = False
@@ -78,14 +80,13 @@ class RegisterHandler(BaseHandler):
         self.user_group_mapper  = UserGroupMapper(db_session)
 
     def get(self):
-        username        = self.get_secure_cookie('user')
+        is_logged_in = self.get_secure_cookie('user')
 
-        if not username:
+        if not is_logged_in:
             self.render('accounts/register.html')
         else:
             self.redirect('/')
 
-    @asynchronous
     def post(self):
         username        = self.get_argument("username", default=None, strip=False)
         password        = self.get_argument("password", default=None, strip=False)
@@ -96,7 +97,6 @@ class RegisterHandler(BaseHandler):
             logging.info('New user [Username=%s] was created at %s' % (username, self.get_user_ip_addr()))
         
         self.write(dump_json(result))
-        self.finish()
 
     def create_user(self, username, password, email):
         user_group      = self.user_group_mapper.get_user_group_using_slug('users')
@@ -126,3 +126,56 @@ class RegisterHandler(BaseHandler):
 
     def is_email_exists(self, email):
         return True if self.user_mapper.get_user_using_email(email) else False
+
+class ForgotPasswordHandler(BaseHandler):
+    def initialize(self, db_session, mail_sender, base_url):
+        self.base_url = base_url
+        self.mail_sender = mail_sender
+        self.user_mapper = UserMapper(db_session)
+        self.email_verification_mapper = EmailVerificationMapper(db_session)
+
+    def get(self):
+        is_logged_in    = self.get_secure_cookie('user')
+
+        if not is_logged_in:
+            self.render('accounts/forgot-password.html')
+        else:
+            self.redirect('/')
+
+    def post(self):
+        username        = self.get_argument("username", default=None, strip=False)
+        email           = self.get_argument("email", default=None, strip=False)
+        is_user_exists  = self.is_user_exists(username, email)
+
+        if is_user_exists:
+            token       = str(uuid4())
+            expire_time = str(datetime.now() + timedelta(days=1))
+            self.email_verification_mapper.delete_email_verification(email)
+            self.email_verification_mapper.create_email_verification(email, token, expire_time)
+
+            mail  = EmailFromTemplate(
+                'Password Reset Request',
+                'reset-password.html',
+                params={
+                    'base_url': self.base_url,
+                    'username': username,
+                    'email': email,
+                    'token': token
+                },
+                from_email='noreply@sharp-v.org',
+                to=[email],
+                connection=self.mail_sender
+            )
+            mail.send()
+
+        self.write(dump_json({
+            'isSuccessful': is_user_exists,
+            'isUserExists': is_user_exists
+        }))
+
+    def is_user_exists(self, username, email):
+        user = self.user_mapper.get_user_using_username(username)
+
+        if user and user.email == email:
+            return True
+        return False

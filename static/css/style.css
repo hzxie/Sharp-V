@@ -25,7 +25,7 @@ div#header {
 	background-color: #fff;
 	height: 60px;
 	position: relative;
-	z-index: 4;
+	z-index: 16;
 	-webkit-box-shadow: 0 0 6px 0 rgba(0, 0, 0, .3);
 	   -moz-box-shadow: 0 0 6px 0 rgba(0, 0, 0, .3);
 	        box-shadow: 0 0 6px 0 rgba(0, 0, 0, .3);
@@ -64,7 +64,7 @@ div#header ul.nav > li > a:hover {
 div#header ul.dropdown-menu {
 	left: auto;
 	right: 0;
-	z-index: 1024;
+	z-index: 32;
 }
 
 div#header li.dropdown img {
