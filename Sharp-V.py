@@ -22,6 +22,7 @@ from handlers.BaseHandler import BaseHandler
 from handlers.AccountsHandlers import ForgotPasswordHandler
 from handlers.AccountsHandlers import LoginHandler
 from handlers.AccountsHandlers import RegisterHandler
+from handlers.AccountsHandlers import ResetPasswordHandler
 from handlers.DefaultHandlers import AboutHandler
 from handlers.DefaultHandlers import TermsHandler
 from handlers.DefaultHandlers import PrivacyHandler
@@ -44,6 +45,7 @@ class Application(tornado.web.Application):
                 dict(db_session=db_session, mail_sender=mail_sender, base_url=base_url)),
             (r"/accounts/login", LoginHandler, dict(db_session=db_session)),
             (r"/accounts/register", RegisterHandler, dict(db_session=db_session)),
+            (r"/accounts/reset-password", ResetPasswordHandler, dict(db_session=db_session)),
             (r"/about", AboutHandler),
             (r"/terms", TermsHandler),
             (r"/privacy", PrivacyHandler),
