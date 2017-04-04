@@ -145,11 +145,12 @@ class ForgotPasswordHandler(BaseHandler):
     def post(self):
         username        = self.get_argument("username", default=None, strip=False)
         email           = self.get_argument("email", default=None, strip=False)
-        is_user_exists  = self.is_user_exists(username, email)
+        is_user_exists  = False
 
-        if is_user_exists:
-            token       = str(uuid4())
-            expire_time = str(datetime.now() + timedelta(days=1))
+        if username and email:
+            is_user_exists  = self.is_user_exists(username, email)
+            token           = str(uuid4())
+            expire_time     = str(datetime.now() + timedelta(days=1))
             self.email_verification_mapper.delete_email_verification(email)
             self.email_verification_mapper.create_email_verification(email, token, expire_time)
 
@@ -177,5 +178,56 @@ class ForgotPasswordHandler(BaseHandler):
         user = self.user_mapper.get_user_using_username(username)
 
         if user and user.email == email:
+            return True
+        return False
+
+class ResetPasswordHandler(BaseHandler):
+    def initialize(self, db_session):
+        self.user_mapper = UserMapper(db_session)
+        self.email_verification_mapper = EmailVerificationMapper(db_session)
+
+    def get(self):
+        is_logged_in    = self.get_secure_cookie('user')
+        email           = self.get_argument("email", default=None, strip=False)
+        token           = self.get_argument("token", default=None, strip=False)
+
+        if not is_logged_in:
+            is_token_valid  = self.is_token_valid(email, token)
+            self.render('accounts/reset-password.html', email=email, 
+                token=token, is_token_valid=is_token_valid)
+        else:
+            self.redirect('/')
+
+    def post(self):
+        email               = self.get_argument("email", default=None, strip=False)
+        token               = self.get_argument("token", default=None, strip=False)
+        new_password        = self.get_argument("newPassword", default=None, strip=False)
+        confirm_password    = self.get_argument("confirmPassword", default=None, strip=False)
+        result              = self.reset_password(email, token, new_password, confirm_password)
+
+        if result['isSuccessful']:
+            logging.info('User [Email=%s] reset password at %s' % (email, self.get_user_ip_addr()))
+        self.write(dump_json(result))
+
+    def reset_password(self, email, token, new_password, confirm_password):
+        result = {
+            'isTokenValid': self.is_token_valid(email, token),
+            'isPasswordEmpty': False if new_password else True,
+            'isPasswordLegal': len(new_password) >= 6 and len(new_password) <= 16,
+            'isPasswordMatched': new_password == confirm_password
+        }
+        result['isSuccessful'] = result['isTokenValid']    and not result['isPasswordEmpty'] and \
+                                 result['isPasswordLegal'] and     result['isPasswordMatched']
+        if result['isSuccessful']:
+            rows_affected = self.user_mapper.update_password_using_email(email, md5(new_password).hexdigest())
+            rows_affected = self.email_verification_mapper.delete_email_verification(email)
+            if not rows_affected:
+                result['isSuccessful'] = False
+        return result
+
+    def is_token_valid(self, email, token):
+        ticket = self.email_verification_mapper.get_email_and_token_using_email(email)
+
+        if ticket and ticket.token == token and ticket.expire_time >= datetime.now():
             return True
         return False
