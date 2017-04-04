@@ -10,7 +10,7 @@ class HomeHandler(BaseHandler):
         Args:
             self: The HomeHandler itself.
         """
-        self.render('default/home.html')
+        self.render('default/homepage.html')
 
 class AboutHandler(BaseHandler):
     """The handler redirect to about page."""

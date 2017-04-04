@@ -1,0 +1,18 @@
+{% extends "../template.html" %}
+{% block title %}{{ _('Home') }}{% end %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/default/homepage.css') }}">
+{% end %}
+{% block body %}
+<div id="hero">
+    <div id="particles-js"></div> <!-- #particles-js -->
+	<div id="introduction">
+		<img src="{{ static_url('img/Logo.png') }}" alt="Logo">
+		<h3>{{ _('Visualize everything with Sharp-V') }}</h3>
+		<button class="btn btn-raised">{{ _('Get Started') }}</button>
+	</div> <!-- #introduction -->
+</div> <!-- #hero -->
+{% end %}
+{% block scripts %}
+<script type="text/javascript" src="{{ static_url('js/particles-2.0.0.min.js') }}"></script>
+{% end %}

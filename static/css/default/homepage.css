@@ -1,0 +1,34 @@
+div#hero {
+	background-color: #474747;
+	color: #fff;
+	height: 480px;
+	position: relative;
+	text-align: center;
+}
+
+div#hero div#particles-js {
+	background-size: cover;
+	background-position: 50% 50%;
+	background-repeat: no-repeat;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+}
+
+div#hero div#particles-js canvas{
+  display:block;
+  vertical-align:bottom;
+}
+
+div#hero div#introduction {
+	padding-top: 120px;
+	position: relative;
+	z-index: 4;
+}
+
+div#hero div#introduction img {
+	max-height: 128px;
+	max-width: 128px;
+}
