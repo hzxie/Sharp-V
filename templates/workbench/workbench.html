@@ -1,0 +1,214 @@
+{% extends "../template.html" %}
+{% block title %}{{ _('Workbench') }}{% end %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/workbench/style.css') }}">
+{% end %}
+{% block body %}
+<div class="hero">
+    <div class="container">
+        <h2>{{ _('Workbench'); }}</h2>
+        <p>{{ _('In this page, you can upload and customize the process flow of your data.') }}</p>
+    </div> <!-- .container -->
+</div> <!-- .hero -->
+<div id="main-content">
+    <div class="container">
+        <div id="sidebar-mask"></div> <!-- #sidebar-mask -->
+        <div id="sidebar" class="col-md-4">
+            <ul id="process-flow">
+                <li class="active"><a href="javascript:void(0);" data-value="customize">Customize Process Flow</a></li>
+                <li><a href="javascript:void(0);" data-value="upload">Upload Data</a></li>
+            </ul>
+        </div> <!-- .col-md-4 -->
+        <div class="col-md-8">
+            <div class="section" workbench-name="customize">
+                <h2>Scatter diagram</h2>
+                <div id="scatter-diagram"></div> <!-- #scatter-diagram -->
+            </div> <!-- .section -->
+            <div class="section" workbench-name="upload">
+            </div> <!-- .section -->
+        </div> <!-- .col-md-8 -->
+    </div> <!-- .container -->
+</div> <!-- #main-content -->
+{% end %}
+{% block scripts %}
+<script type="text/javascript">
+    $(function() {
+        // Highlight navigation item
+        highlightNavigationItem('{{ _('Workbench') }}');
+        // Adjust sidebar height
+        adjustSidebarHeight();
+    });
+
+    $(window).resize(function() {
+        adjustSidebarHeight();
+    });
+</script>
+<script type="text/javascript">
+    function adjustSidebarHeight() {
+        var sidebarHeight       = $('#sidebar').height(),
+            sidebarLeftOffset   = parseFloat($('.container').css('margin-left')) + parseFloat($('.container').css('padding-left')),
+            contentHeight       = $('#main-content').height();
+
+        if ( sidebarHeight < contentHeight ) {
+            $('#sidebar').height(contentHeight);
+        }
+        $('#sidebar-mask').css('width', sidebarLeftOffset);
+    }
+</script>
+<script type="text/javascript">
+    $('a', '#process-flow').click(function() {
+        $('.active').removeClass('active');
+        $(this).parent().addClass('active');
+
+        var sectionName = $(this).attr('data-value');
+        $('html, body').animate({
+            scrollTop: $('div.section[workbench-name=%s]'.format(sectionName)).offset().top
+        }, 500);
+    });
+</script>
+<script type="text/javascript" src="{{ static_url('js/d3.min.js') }}"></script>
+<script type="text/javascript">
+    $(function() {
+        var numberOfClusters = 4;
+            clusterColors    = ['red', 'green', 'blue', 'orange'],
+            clusters         = getClusters(numberOfClusters, 50),
+            maxMinPoint      = getPointsStatistics(clusters),
+            svgOptions       = {
+                height: 500,
+                width: 500,
+                margin: {
+                    'top': 20,
+                    'right': 20,
+                    'bottom': 30,
+                    'left': 30,
+                }
+            },
+            svgComponents    = setUpScatterSvg(clusters, svgOptions, maxMinPoint);
+
+        for ( var i = 0; i < numberOfClusters; ++ i ) {
+            addPointsToSvg(svgComponents, clusters[i], clusterColors[i]);
+        }
+        adjustSidebarHeight();
+    });
+</script>
+<script type="text/javascript">
+    function getClusters(numberOfClusters, numberOfPoints) {
+        var clusters = [];
+        for ( var i = 0; i < numberOfClusters; ++ i ) {
+            var points = [];
+
+            for ( var j = 0; j < numberOfPoints; ++ j ) {
+                points.push({
+                    'x': Math.random() * 200 - 100,
+                    'y': Math.random() * 200 - 100
+                });
+            }
+            clusters.push(points);
+        }
+        return clusters;
+    }
+</script>
+<script type="text/javascript">
+    function getPointsStatistics(clusters) {
+        var xMax = Number.MIN_VALUE, xMin = Number.MAX_VALUE,
+            yMax = Number.MIN_VALUE, yMin = Number.MAX_VALUE;
+
+        clusters.forEach(function(points) {
+            points.forEach(function(point) {
+                if ( point.x > xMax ) {
+                    xMax = point.x;
+                } else if ( point.x < xMin ) {
+                    xMin = point.x;
+                }
+                if ( point.y > yMax ) {
+                    yMax = point.y;
+                } else if ( point.y < yMin ) {
+                    yMin = point.y;
+                }
+            });
+        });
+        return {
+            'xMax': xMax,
+            'xMin': xMin,
+            'yMax': yMax,
+            'yMin': yMin
+        }
+    }
+</script>
+<script type="text/javascript">
+    function setUpScatterSvg(points, svgOptions, maxMinPoint) {
+        var margin      = svgOptions.margin,
+            width       = svgOptions.width - margin.left - margin.right,
+            height      = svgOptions.height - margin.top - margin.bottom,
+            xMax        = maxMinPoint.xMax * 1.05,
+            xMin        = maxMinPoint.xMin * 1.05,
+            yMax        = maxMinPoint.yMax * 1.05,
+            yMin        = maxMinPoint.yMin * 1.05;
+
+        // Setup X axis and Y axis
+        var x       = d3.scaleLinear().range([0, width]).nice(),
+            y       = d3.scaleLinear().range([height, 0]).nice(),
+            xAxis   = d3.axisBottom(x).ticks(12),
+            yAxis   = d3.axisLeft(y).ticks(12 * height / width);
+
+        x.domain([xMin, xMax]).nice();
+        y.domain([yMin, yMax]).nice();
+
+        // Create SVG object
+        var svg = d3.select('#scatter-diagram').append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g')
+                    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+        // Create sensing area to detect zoom and drag operations
+        var view = svg.append('rect')
+                      .attr('class', 'view').attr('x', 0).attr('y', 0)
+                      .attr('width', width - 1).attr('height', height - 1)
+                      .style('fill', 'transparent');
+        
+        // Plot X axis and Y axis in SVG
+        svg.append('g').attr('id', 'axis-x').attr('class', 'x axis')
+           .attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        svg.append('g').attr('id', 'axis-y').attr('class', 'y axis').call(yAxis);
+
+        // Handling zoom operations
+        var zoom = d3.zoom()
+                     .scaleExtent([1, 96])
+                     .translateExtent([[-100, -100], [width + 90, height + 100]])
+                     .on('zoom', function() {
+                          view.attr('transform', d3.event.transform);
+                          svg.select('#axis-x').call(xAxis.scale(d3.event.transform.rescaleX(x)));
+                          svg.select('#axis-y').call(yAxis.scale(d3.event.transform.rescaleY(y)));
+                          svg.selectAll('circle')
+                                  .attr('transform', 'translate(%s, %s) scale(%s)'
+                                    .format(d3.event.transform.x, d3.event.transform.y, d3.event.transform.k));
+                     });
+        svg.call(zoom);
+
+        return {
+            'svg': svg,
+            'x': x,
+            'y': y
+        };
+    }
+</script>
+<script type="text/javascript">
+    function addPointsToSvg(svgComponents, points, pointColor) {
+        // Plot points in SVG
+        svgComponents.svg.append('g')
+           .attr('id', 'scatter-plot')
+           .selectAll('.dot').data(points)
+           .enter().append('circle')
+           .attr('class', 'dot').attr('r', 4)
+           .attr('cx', function (p) { return svgComponents.x(p.x); })
+           .attr('cy', function (p) { return svgComponents.y(p.y); })
+           .style('fill', pointColor);
+
+        // Add event listeners to points
+        svgComponents.svg.selectAll('circle').on('click', function(data, index) {
+            console.log(data);
+        });
+    }
+</script>
+{% end %}

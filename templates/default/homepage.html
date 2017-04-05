@@ -14,5 +14,10 @@
 </div> <!-- #hero -->
 {% end %}
 {% block scripts %}
-<script type="text/javascript" src="{{ static_url('js/particles-2.0.0.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('js/particles.min.js') }}"></script>
+<script type="text/javascript">
+    $(function() {
+        highlightNavigationItem('{{ _('Home') }}');
+    });
+</script>
 {% end %}
