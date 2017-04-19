@@ -1,3 +1,19 @@
+html, body {
+	overflow-x: hidden;
+}
+
+body.dragging, body.dragging * {
+	cursor: move !important;
+}
+
+.form-group {
+	margin-top: 15px;
+}
+
+.form-group label {
+	color: #333;
+}
+
 div.hero {
 	background-color: #474747;
 	color: #fff;
@@ -99,8 +115,80 @@ div#main-content div#sidebar-mask {
 	left: 0;
 }
 
+div#main-content div.section {
+	margin-top: 40px;
+}
+
 div#main-content div.section h2 {
 	font-family: 'Roboto Slab', sans-serif;
+}
+
+div#main-content div.section ul.search-suggestions {
+	background-color: #fff;
+	position: absolute;
+	top: 65px;
+	left: 0;
+	right: 0;
+	list-style: none;
+	padding: 0;
+	z-index: 1024;
+	-webkit-box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, .08);
+	   -moz-box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, .08);
+	        box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, .08);
+}
+
+div#main-content div.section ul.search-suggestions li {
+	cursor: pointer;
+	margin: 5px 10px;
+}
+
+div#main-content div.section span.fileinput-button {
+	margin: 1px;
+}
+
+div#main-content div.section ol#process-flow-configurator {
+	list-style: none;
+	padding: 20px 0 0;
+}
+
+div#main-content div.section ol#process-flow-configurator li div.panel-heading {
+	cursor: move;
+}
+
+div#main-content div.section ol#process-flow-configurator li.dragged {
+	position: absolute;
+	opacity: 0.5;
+	z-index: 2000;
+}
+
+div#main-content div.section ol#process-flow-configurator li.placeholder {
+	position: relative;
+}
+
+div#main-content div.section ol#process-flow-configurator li.placeholder:before {
+	border: 5px solid transparent;
+	border-left-color: #03a9f4;
+	border-right: none;
+	content: "";
+	height: 0;
+	position: absolute;
+	margin-top: -5px;
+	left: -5px;
+	top: -4px;
+	width: 0;
+}
+
+div#main-content div.section li.algorithm {
+
+}
+
+div#main-content div.section li.algorithm div.panel-body div.form-group {
+	margin: 0;
+}
+
+div#main-content div.section li.algorithm div.panel-body label {
+	color: #333;
+	margin: 10px 0 0;
 }
 
 @media only screen and (max-width: 767px) {

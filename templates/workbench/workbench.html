@@ -1,6 +1,7 @@
 {% extends "../template.html" %}
 {% block title %}{{ _('Workbench') }}{% end %}
 {% block header %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/jquery.dropdown.min.css') }}">
 <link rel="stylesheet" type="text/css" href="{{ static_url('css/workbench/style.css') }}">
 {% end %}
 {% block body %}
@@ -15,22 +16,100 @@
         <div id="sidebar-mask"></div> <!-- #sidebar-mask -->
         <div id="sidebar" class="col-md-4">
             <ul id="process-flow">
-                <li class="active"><a href="javascript:void(0);" data-value="customize">Customize Process Flow</a></li>
-                <li><a href="javascript:void(0);" data-value="upload">Upload Data</a></li>
+                <li class="active"><a href="javascript:void(0);" data-value="upload">{{ _('Upload Data') }}</a></li>
+                <li><a href="javascript:void(0);" data-value="customize">{{ _('Customize Process Flow') }}</a></li>
             </ul>
         </div> <!-- .col-md-4 -->
         <div class="col-md-8">
-            <div class="section" workbench-name="customize">
-                <h2>Scatter diagram</h2>
-                <div id="scatter-diagram"></div> <!-- #scatter-diagram -->
-            </div> <!-- .section -->
             <div class="section" workbench-name="upload">
+                <h2>{{ _('Upload Data') }}</h2>
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="data-source">{{ _('Data Source') }}</label>
+                            <select id="data-source" class="form-control dropdown">
+                                <option value="existing-data">{{ _('Use existing data') }}</option>
+                                <option value="new-data">{{ _('Upload new data') }}</option>
+                            </select>
+                        </div> <!-- .form-group -->
+                    </div> <!-- .col-md-4 -->
+                    <div class="col-md-4 existing-data">
+                        <div class="form-group">
+                            <label for="existing-data-source">&nbsp;</label>
+                            <select id="existing-data-source" class="form-control dropdown">
+                                <option value="ncbi">{{ _('NCBI Database') }}</option>
+                            {% if current_user != 'Guest' %}
+                                <option value="previous">{{ _('Previous Uploaded') }}</option>
+                            {% end %}
+                            </select>
+                        </div> <!-- .form-group -->
+                    </div> <!-- .col-md-4 -->
+                    <div class="col-md-4 existing-data">
+                        <div class="form-group label-static">
+                            <label for="existing-dataset-name">{{ _('Dataset Name') }}</label>
+                            <input id="existing-dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} GSE25066">
+                            <ul class="search-suggestions"></ul> <!-- .search-suggestions -->
+                        </div> <!-- .form-group -->    
+                    </div> <!-- .col-md-4 -->
+                    <div class="col-md-4 new-data hide">
+                        <div class="form-group label-static">
+                            <label for="new-dataset-name">{{ _('Dataset Name') }}</label>
+                            <input id="new-dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My Dataset #1">
+                        </div> <!-- .form-group -->
+                    </div> <!-- .col-md-4 -->
+                    <div class="col-md-4 new-data hide">
+                        <div class="form-group label-static">
+                            <label for="file-upload">{{ _('Upload File') }} (<a href="javascript:void(0);">{{ _('File Format') }}</a>)</label>
+                            <span class="btn btn-raised btn-primary fileinput-button">
+                                <i class="glyphicon glyphicon-plus"></i>
+                                <span>{{ _('Select files...') }}</span>
+                                <input id="file-upload" type="file" name="files[]" multiple>
+                            </span>
+                        </div> <!-- .form-group -->
+                    </div> <!-- .col-md-4 -->
+                </div> <!-- .row -->
+            </div> <!-- .section -->
+            <!-- 显示数据的概况 -->
+            <!-- 要求用户确认 分类的Label -->
+            <div class="section" workbench-name="customize">
+                <h2>
+                    {{ _('Customize Process Flow') }} 
+                    <a href="javascript:void(0);" class="pull-right"><i class="fa fa-plus-circle"></i></a>
+                </h2>
+                <ol id="process-flow-configurator">
+                {% for i in range(3) %}
+                    <li class="algorithm panel panel-default">
+                        <div class="panel-heading">{{ _('Fix Missing Value') }}</div> <!-- .panel-heading -->
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-sm-4"><label>{{ _('Algorithm') }}</label></div> <!-- .col-sm-4 -->
+                                <div class="col-sm-8">
+                                    <select class="algorithm-name form-control dropdown">
+                                        <option value="impute-missing-values">{{ _('Impute missing values') }}</option>
+                                        <option value="normalization">{{ _('Normalization') }}</option>
+                                        <option value="pca">{{ _('Principle Component Analysis') }}</option>
+                                    </select>
+                                </div> <!-- .col-sm-8 -->
+                            </div> <!-- .row -->
+                        </div> <!-- .panel-body -->
+                    </li>
+                {% end %}
+                </ol>
             </div> <!-- .section -->
         </div> <!-- .col-md-8 -->
     </div> <!-- .container -->
 </div> <!-- #main-content -->
 {% end %}
 {% block scripts %}
+<script type="text/javascript" src="{{ static_url('js/jquery.dropdown.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('js/jquery.sortable.min.js') }}"></script>
+<script type="text/javascript">
+    $('.dropdown').dropdown();
+    $('ol#process-flow-configurator').sortable({
+        group: 'no-drop',
+        handle: '.panel-heading'
+    });
+</script>
 <script type="text/javascript">
     $(function() {
         // Highlight navigation item
@@ -64,6 +143,72 @@
         $('html, body').animate({
             scrollTop: $('div.section[workbench-name=%s]'.format(sectionName)).offset().top
         }, 500);
+    });
+</script>
+<script type="text/javascript">
+    $('#data-source').change(function() {
+        var dataSource = $(this).val();
+
+        if ( dataSource == 'new-data' ) {
+            $('.existing-data').addClass('hide');
+            $('.new-data').removeClass('hide');
+        } else {
+            $('.new-data').addClass('hide');
+            $('.existing-data').removeClass('hide');
+        }
+    });
+</script>
+<script type="text/javascript">
+    $('#existing-dataset-name').keyup(function() {
+        var currentValue        = $(this).val().toLowerCase(),
+            dataSource          = $('#existing-data-source').val(),
+            suggestionsControl  = $('.search-suggestions', $(this).parent());
+
+        suggestionsControl.empty();
+        suggestionsControl.addClass('hide');
+        return getSearchSuggestions(currentValue, dataSource, suggestionsControl);
+    });
+</script>
+<script type="text/javascript">
+    function getSearchSuggestions(currentValue, dataSource, suggestionsControl) {
+        var currentValues       = currentValue.split(/[\s,;\+]+/),
+            prefixValues        = currentValues.slice(0, currentValues.length - 1),
+            prefixValue         = prefixValues.join(' '),
+            lastValue           = currentValues[currentValues.length - 1],
+            request = {
+                'dataSource': dataSource,
+                'currentValue': lastValue
+            };
+        
+        $.ajax({
+            type: 'GET',
+            url: '/datasets',
+            data: request,
+            dataType: 'JSON',
+            success: function(suggestions){
+                if ( suggestions.length == 0 ) {
+                    return;                    
+                }
+                for ( var i = 0; i < suggestions.length; ++ i ) {
+                    var suggestionWords = suggestions[i].split(' ');
+
+                    if ( suggestionWords[0] == prefixValues[prefixValues.length - 1] ) {
+                        suggestionWords = suggestionWords.slice(1, suggestionWords.length);
+                    }
+                    suggestionsControl.append('<li>%s <strong>%s</strong></li>'
+                        .format(prefixValue, suggestionWords.join(' ')));
+                }
+                suggestionsControl.removeClass('hide');
+            }
+        });
+    }
+</script>
+<script type="text/javascript">
+    $('#process-flow-configurator').on('change', 'select.algorithm-name', function() {
+        var algorithmPanelHeader = $('.panel-heading', $(this).parent().parent().parent().parent().parent()),
+            algorithmName        = $('option:selected', this).text();
+        
+        $(algorithmPanelHeader).html(algorithmName);
     });
 </script>
 <script type="text/javascript" src="{{ static_url('js/d3.min.js') }}"></script>
