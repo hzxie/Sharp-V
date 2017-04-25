@@ -76,25 +76,7 @@
                     {{ _('Customize Process Flow') }} 
                     <a href="javascript:void(0);" class="pull-right"><i class="fa fa-plus-circle"></i></a>
                 </h2>
-                <ol id="process-flow-configurator">
-                {% for i in range(3) %}
-                    <li class="algorithm panel panel-default">
-                        <div class="panel-heading">{{ _('Fix Missing Value') }}</div> <!-- .panel-heading -->
-                        <div class="panel-body">
-                            <div class="row">
-                                <div class="col-sm-4"><label>{{ _('Algorithm') }}</label></div> <!-- .col-sm-4 -->
-                                <div class="col-sm-8">
-                                    <select class="algorithm-name form-control dropdown">
-                                        <option value="impute-missing-values">{{ _('Impute missing values') }}</option>
-                                        <option value="normalization">{{ _('Normalization') }}</option>
-                                        <option value="pca">{{ _('Principle Component Analysis') }}</option>
-                                    </select>
-                                </div> <!-- .col-sm-8 -->
-                            </div> <!-- .row -->
-                        </div> <!-- .panel-body -->
-                    </li>
-                {% end %}
-                </ol>
+                <ol id="process-flow-configurator"></ol>
             </div> <!-- .section -->
         </div> <!-- .col-md-8 -->
     </div> <!-- .container -->
@@ -107,7 +89,7 @@
     $('.dropdown').dropdown();
     $('ol#process-flow-configurator').sortable({
         group: 'no-drop',
-        handle: '.panel-heading'
+        handle: '.panel-heading h5'
     });
 </script>
 <script type="text/javascript">
@@ -204,11 +186,66 @@
     }
 </script>
 <script type="text/javascript">
+    $('.fa-plus-circle').click(function() {
+        $('#process-flow-configurator').append(
+            '<li class="algorithm panel panel-default">' + 
+            '    <div class="panel-heading">' + 
+            '        <h5>{{ _('Impute missing values') }}</h5>' + 
+            '        <ul class="list-inline">' + 
+            '            <li><a href="javascript:void(0);"><i class="fa fa-edit"></i></a></li>' + 
+            '            <li><a href="javascript:void(0);"><i class="fa fa-trash"></i></a></li>' + 
+            '        </ul>' + 
+            '    </div> <!-- .panel-heading -->' + 
+            '    <div class="panel-body">' + 
+            '        <div class="row">' + 
+            '            <div class="col-sm-4"><label>{{ _('Algorithm') }}</label></div> <!-- .col-sm-4 -->' + 
+            '            <div class="col-sm-8">' + 
+            '                <select class="algorithm-name form-control dropdown">' + 
+            '                    <option value="impute-missing-values">{{ _('Impute missing values') }}</option>' + 
+            '                    <option value="normalization">{{ _('Normalization') }}</option>' + 
+            '                    <option value="feature-selection">{{ _('Feature Selection') }}</option>' + 
+            '                    <option value="pca">{{ _('Principle Component Analysis') }}</option>' + 
+            '                    <option value="random-projection">{{ _('Random Projection') }}</option>' + 
+            '                    <option value="kmeans">{{ _('KMeans') }}</option>' + 
+            '                    <option value="knn">{{ _('K Nearest Neightbors') }}</option>' + 
+            '                    <option value="svm">{{ _('Support Vector Machine') }}</option>' + 
+            '                    <option value="random-forest">{{ _('Random Forest') }}</option>' + 
+            '                </select>' + 
+            '            </div> <!-- .col-sm-8 -->' + 
+            '        </div> <!-- .row -->' + 
+            '    </div> <!-- .panel-body -->' + 
+            '</li>'
+        );
+        $('.dropdown').dropdown();
+        adjustSidebarHeight();
+    });
+</script>
+<script type="text/javascript">
     $('#process-flow-configurator').on('change', 'select.algorithm-name', function() {
-        var algorithmPanelHeader = $('.panel-heading', $(this).parent().parent().parent().parent().parent()),
+        var algorithmPanelHeader = $('.panel-heading h5', $(this).parent().parent().parent().parent()),
             algorithmName        = $('option:selected', this).text();
         
-        $(algorithmPanelHeader).html(algorithmName);
+        algorithmPanelHeader.html(algorithmName);
+    });
+</script>
+<script type="text/javascript">
+    $('#process-flow-configurator').on('click', '.fa-edit', function() {
+        var algorithmPanelBody =  $('.panel-body', $(this).parent().parent().parent().parent().parent());
+
+        if ( algorithmPanelBody.is(':visible') ) {
+            algorithmPanelBody.addClass('hide');
+        } else {
+            algorithmPanelBody.removeClass('hide');
+        }
+    });
+</script>
+<script type="text/javascript">
+    $('#process-flow-configurator').on('click', '.fa-trash', function() {
+        var algorithmPanel =  $(this).parent().parent().parent().parent().parent();
+        
+        if ( confirm('{{ _('Are you sure to continue?') }}') ) {
+            algorithmPanel.remove();
+        }
     });
 </script>
 <script type="text/javascript" src="{{ static_url('js/d3.min.js') }}"></script>
