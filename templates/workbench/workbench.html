@@ -213,19 +213,170 @@
             '                </select>' + 
             '            </div> <!-- .col-sm-8 -->' + 
             '        </div> <!-- .row -->' + 
+            '        <div class="impute-missing-values parameters">' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Missing Values') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="missing-values" class="form-control" type="text" placeholder="{{ _('All occurrences of this field will be imputed. (Default: NaN)') }}">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Imputation Strategy') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <select parameter-name="impute-strategy" class="form-control dropdown">' + 
+            '                        <option value="mean">{{ _('Use the mean value') }}</option>' + 
+            '                        <option value="median">{{ _('Use the median value') }}</option>' + 
+            '                        <option value="most_frequent">{{ _('Use the most frequent value') }}</option>' + 
+            '                    </select>' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '        </div> <!-- .impute-missing-values.parameters -->' + 
+            '        <div class="feature-selection parameters hide">' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Select Strategy') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <select parameter-name="select-strategy" class="form-control dropdown">' + 
+            '                        <option value="chi2">{{ _('Compute chi-squared stats') }}</option>' + 
+            '                        <option value="f_classif">{{ _('Compute the ANOVA F-value') }}</option>' + 
+            '                        <option value="mutual_info_classif">{{ _('Estimate mutual information') }}</option>' + 
+            '                    </select>' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Number of Components') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="n-components" class="form-control" type="number" min="1" placeholder="{{ _('Number of top features to select.') }}">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '        </div> <!-- .feature-selection.parameters -->' + 
+            '        <div class="pca parameters hide">' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Number of Components') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="n-components" class="form-control" type="number" min="1" placeholder="{{ _('Dimensionality of the target projection space.') }}">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '        </div> <!-- .pca.parameters -->' + 
+            '        <div class="random-projection parameters hide">' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Number of Components') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="n-components" class="form-control" type="number" min="1" placeholder="{{ _('Dimensionality of the target projection space.') }}">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '        </div> <!-- .random-projection.parameters -->' + 
+            '        <div class="kmeans parameters hide">' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Number of clusters') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="n-clusters" class="form-control" type="number" min="1">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '        </div> <!-- .kmeans.parameters -->' + 
+            '        <div class="knn parameters hide">' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Number of neighbors') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="n-neighbors" class="form-control" type="number" min="1">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Distance metric') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <select parameter-name="distance-metric" class="form-control dropdown">' + 
+            '                        <option value="0">{{ _('Minkowski distance') }}</option>' + 
+            '                        <option value="1">{{ _('Manhattan distance') }}</option>' + 
+            '                        <option value="2">{{ _('Euclidean distance') }}</option>' + 
+            '                    </select>' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '        </div> <!-- .knn.parameters -->' + 
+            '        <div class="svm parameters hide">' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Kernel function') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <select parameter-name="kernel" class="kernel form-control dropdown">' + 
+            '                        <option value="rbf">{{ _('Radius base function (RBF)') }}</option>' + 
+            '                        <option value="linear">{{ _('Linear function') }}</option>' + 
+            '                        <option value="poly">{{ _('Poly function') }}</option>' + 
+            '                        <option value="sigmoid">{{ _('Sigmoid function') }}</option>' + 
+            '                        <option value="precomputed">{{ _('Precomputed function') }}</option>' + 
+            '                    </select>' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Penalty parameter') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="penalty-parameter" class="form-control" type="number" step="any">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '            <div class="gamma row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Gamma') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="gamma" class="form-control" type="number" step="any" placeholder="{{ _('Kernel coefficient. Leave empty to determine automatically.') }}">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '            <div class="degree row hide">' + 
+            '                <div class="col-sm-4"><label>{{ _('Degree') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="degree" class="form-control" type="number" step="any" placeholder="{{ _('Degree of the polynomial kernel function.') }}">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '        </div> <!-- .svm.parameters -->' + 
+            '        <div class="random-forest parameters hide">' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Number of estimators') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <input parameter-name="n-estimators" class="form-control" type="number" step="any" placeholder="The number of trees in the forest.">' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '            <div class="row">' + 
+            '                <div class="col-sm-4"><label>{{ _('Criterion') }}</label></div> <!-- .col-sm-4 -->' + 
+            '                <div class="col-sm-8">' + 
+            '                    <select parameter-name="criterion" class="form-control dropdown">' + 
+            '                        <option value="geni">{{ _('Gini impurity') }}</option>' + 
+            '                        <option value="entropy">{{ _('Information gain') }}</option>' + 
+            '                    </select>' + 
+            '                </div> <!-- .col-sm-8 -->' + 
+            '            </div> <!-- .row -->' + 
+            '        </div> <!-- .random-forest.parameters -->' + 
             '    </div> <!-- .panel-body -->' + 
             '</li>'
         );
+        
         $('.dropdown').dropdown();
         adjustSidebarHeight();
     });
 </script>
 <script type="text/javascript">
     $('#process-flow-configurator').on('change', 'select.algorithm-name', function() {
-        var algorithmPanelHeader = $('.panel-heading h5', $(this).parent().parent().parent().parent()),
-            algorithmName        = $('option:selected', this).text();
-        
+        var alrotithmBox         = $(this).parent().parent().parent().parent(),
+            algorithmPanelHeader = $('.panel-heading h5', alrotithmBox),
+            algorithmName        = $('option:selected', this).text(),
+            algorithmValue       = $(this).val();
+
+        $('.parameters', alrotithmBox).addClass('hide');
+        $('.%s'.format(algorithmValue), alrotithmBox).removeClass('hide');
         algorithmPanelHeader.html(algorithmName);
+        
+        adjustSidebarHeight();
+    });
+</script>
+<script type="text/javascript">
+    $('#process-flow-configurator').on('change', 'select.kernel', function() {
+        var kernel              = $(this).val(),
+            parametersContainer = $(this).parent().parent().parent();
+
+        if ( kernel == 'poly' ) {
+            $('.degree').removeClass('hide');
+        } else {
+            $('.degree').addClass('hide');
+        }
+        if ( kernel == 'rbf' || kernel == 'poly' || kernel == 'sigmoid' ) {
+            $('.gamma').removeClass('hide');
+        } else {
+            $('.gamma').addClass('hide');
+        }
     });
 </script>
 <script type="text/javascript">
