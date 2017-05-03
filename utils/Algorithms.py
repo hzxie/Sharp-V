@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+
 import numpy as np
+
 from sklearn import preprocessing       # Imputer, Scale
 from sklearn import neighbors           # KNeighborsClassifier
 from sklearn import svm                 # SVC

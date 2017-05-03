@@ -45,78 +45,8 @@ div#main-content {
 	position: relative;
 }
 
-div#main-content div#sidebar {
-	background-color: #f2f2f2;
-	min-height: 320px;
-}
-
-div#main-content div#sidebar ul#process-flow {
-	list-style: none;
-	margin: 40px 0;
-	padding: 0;
-}
-
-div#main-content div#sidebar ul#process-flow li {
-	position: relative;
-}
-
-div#main-content div#sidebar ul#process-flow li::before {
-	content: "[]";
-    height: 30px;
-    left: -9px;
-    position: absolute;
-    text-indent: -9999px;
-    top: -14px;
-    width: 4px;
-    background-color: #fff;
-}
-
-div#main-content div#sidebar ul#process-flow li:first-child::before {
-    background-color: #f2f2f2;
-}
-
-div#main-content div#sidebar ul#process-flow li a {
-	color: #1f1f1f;
-	display: block;
-	padding: 10px 15px;
-	text-decoration: none;
-}
-
-div#main-content div#sidebar ul#process-flow li a::before {
-	content: "o";
-    height: 15px;
-    top: 15px;
-    left: -4px;
-    position: absolute;
-    text-indent: -9999px;
-    width: 15px;
-    background-color: rgb(242, 242, 242);
-    border-width: 4px;
-    border-style: solid;
-    border-color: white;
-    border-image: initial;
-    border-radius: 50%;
-    margin: 0px 0px 0px -11px;
-}
-
-div#main-content div#sidebar ul#process-flow li.active a {
-	color: #40a3e7;
-}
-
-div#main-content div#sidebar ul#process-flow li.active a::before {
-	border-color: #40a3e7;
-}
-
-div#main-content div#sidebar-mask {
-	background-color: #f2f2f2;
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-}
-
 div#main-content div.section {
-	margin-top: 40px;
+	margin: 40px 0;
 }
 
 div#main-content div.section h2 {
@@ -146,22 +76,46 @@ div#main-content div.section span.fileinput-button {
 	margin: 1px;
 }
 
-div#main-content div.section ol#process-flow-configurator {
+div#main-content div.section ul#datasets {
+	list-style: none;
+	padding: 0;
+}
+
+div#main-content div.section ul#datasets li.dataset {
+	color: #fff;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+}
+
+div#main-content div.section ul#datasets li.dataset h5 {
+	margin: 0;
+}
+
+div#main-content div.section div#task-form-group {
+	margin-top: 10px;
+}
+
+div#main-content div.section div.togglebutton {
+	color: #666;
+	padding: 14px 0;
+}
+
+div#main-content div.section ol#process-flow {
 	list-style: none;
 	padding: 20px 0 0;
 }
 
-div#main-content div.section ol#process-flow-configurator li.dragged {
+div#main-content div.section ol#process-flow li.dragged {
 	position: absolute;
 	opacity: 0.5;
 	z-index: 2000;
 }
 
-div#main-content div.section ol#process-flow-configurator li.placeholder {
+div#main-content div.section ol#process-flow li.placeholder {
 	position: relative;
 }
 
-div#main-content div.section ol#process-flow-configurator li.placeholder:before {
+div#main-content div.section ol#process-flow li.placeholder:before {
 	border: 5px solid transparent;
 	border-left-color: #03a9f4;
 	border-right: none;
@@ -204,8 +158,7 @@ div#main-content div.section li.algorithm div.panel-body label {
 		background: transparent;
 	}
 
-	div#sidebar,
-	div#sidebar-mask {
-		display: none;
+	div#main-content div.section div#existing-data-source-form-group {
+		margin: 0;
 	}
 }

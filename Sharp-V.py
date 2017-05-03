@@ -30,6 +30,7 @@ from handlers.DefaultHandlers import HomeHandler
 from handlers.DefaultHandlers import SetLocaleHandler
 from handlers.DefaultHandlers import UpgradeBrowserHandler
 from handlers.WorkbenchHandlers import WorkbenchHandler
+from handlers.WorkbenchHandlers import DatasetUploadHandler
 
 class Application(tornado.web.Application):
     def __init__(self, base_url, db_session, mail_sender):
@@ -47,6 +48,7 @@ class Application(tornado.web.Application):
             (r"/accounts/login", LoginHandler, dict(db_session=db_session)),
             (r"/accounts/register", RegisterHandler, dict(db_session=db_session)),
             (r"/accounts/reset-password", ResetPasswordHandler, dict(db_session=db_session)),
+            (r"/datasets/upload", DatasetUploadHandler),
             (r"/workbench", WorkbenchHandler),
             (r"/about", AboutHandler),
             (r"/terms", TermsHandler),
