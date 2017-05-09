@@ -16,20 +16,20 @@ from sklearn import manifold            # TSNE, MDS
 class Algorithms(object):
     def unpack_samples(self, data):
         samples          = data['samples']
-        training_samples = None if samples['training'] else np.array(samples['training'])
-        testing_samples  = None if samples['testing']  else np.array(samples['testing'])
+        training_samples = np.array(samples['training']) if 'training' in samples else None
+        testing_samples  = np.array(samples['testing']) if 'testing' in samples else None
         return training_samples, testing_samples
 
     def unpack_labels(self, data):
         labels          = data['labels']
-        training_labels = None if labels['training']  else np.array(labels['training'])
-        testing_labels  = None if labels['testing']   else np.array(labels['testing'])
+        training_labels = np.array(labels['training']) if 'training' in labels else None
+        testing_labels  = np.array(labels['testing']) if 'testing' in labels else None
         return training_labels, testing_labels
 
     def unpack_ids(self, data):
         ids          = data['ids']
-        training_ids = None if ids['training']  else np.array(ids['training'])
-        testing_ids  = None if ids['testing']   else np.array(ids['testing'])
+        training_ids = np.array(ids['training']) if 'training' in ids else None
+        testing_ids  = np.array(ids['testing']) if 'testing' in ids else None
         return training_ids, testing_ids
 
     def pack_data(self, training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels, predicted_labels = None, cluster_centers = None):
@@ -94,7 +94,7 @@ class Algorithms(object):
 
         return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels)
 
-    def k_nearest_neighbors(self, data, params):
+    def knn(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
@@ -139,7 +139,7 @@ class Algorithms(object):
         return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, \
                 training_labels, testing_labels, predicted_labels)
 
-    def k_means(self, data, params):
+    def kmeans(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
@@ -169,8 +169,6 @@ class Algorithms(object):
         training_ids, testing_ids           = self.unpack_ids(data)
         training_samples, testing_samples   = self.unpack_samples(data)
         training_labels, testing_labels     = self.unpack_labels(data)
-
-        print training_ids
 
         n_components     = 100 if not 'n-components' in params else params['n-components']
         pca              = decomposition.PCA(n_components = n_components)

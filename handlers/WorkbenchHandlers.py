@@ -120,7 +120,7 @@ class DatasetProcessHandler(BaseHandler):
             algorithm      =  self.algorithms.get_algorithm(algorithm_name)
 
             if algorithm:
-                logging.debug('Executing algorithm %s' % algorithm_name)
+                logging.info('Executing algorithm %s' % algorithm_name)
                 dataset    = algorithm(dataset, parameters)
             else:
                 logging.warn('Algorithm [Name=%s] not found.' % algorithm_name)
