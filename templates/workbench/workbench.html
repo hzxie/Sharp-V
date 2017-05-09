@@ -7,136 +7,195 @@
 {% block body %}
 <div class="hero">
     <div class="container">
-        <h2>{{ _('Workbench'); }}</h2>
-        <p>{{ _('In this page, you can upload and customize the process flow of your data.') }}</p>
+        <div class="col-md-12">
+            <h2>{{ _('Workbench'); }}</h2>
+            <p>{{ _('In this page, you can upload and customize the process flow of your data.') }}</p>
+        </div> <!-- .col-xs-12 -->
     </div> <!-- .container -->
 </div> <!-- .hero -->
 <div id="main-content">
     <div class="container">
-        <div id="sidebar-mask"></div> <!-- #sidebar-mask -->
-        <div id="sidebar" class="col-md-4">
-            <ul id="process-flow">
-                <li class="active"><a href="javascript:void(0);" data-value="upload">{{ _('Upload Data') }}</a></li>
-                <li><a href="javascript:void(0);" data-value="customize">{{ _('Customize Process Flow') }}</a></li>
-            </ul>
-        </div> <!-- .col-md-4 -->
-        <div class="col-md-8">
-            <div class="section" workbench-name="upload">
-                <h2>{{ _('Upload Data') }}</h2>
+        <div class="col-sm-12 col-md-9">
+            <div class="section">
                 <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="data-source">{{ _('Data Source') }}</label>
-                            <select id="data-source" class="form-control dropdown">
-                                <option value="existing-data">{{ _('Use existing data') }}</option>
-                                <option value="new-data">{{ _('Upload new data') }}</option>
-                            </select>
-                        </div> <!-- .form-group -->
-                    </div> <!-- .col-md-4 -->
-                    <div class="col-md-4 existing-data">
-                        <div class="form-group">
-                            <label for="existing-data-source">&nbsp;</label>
-                            <select id="existing-data-source" class="form-control dropdown">
-                                <option value="ncbi">{{ _('NCBI Database') }}</option>
-                            {% if current_user != 'Guest' %}
-                                <option value="previous">{{ _('Previous Uploaded') }}</option>
-                            {% end %}
-                            </select>
-                        </div> <!-- .form-group -->
-                    </div> <!-- .col-md-4 -->
-                    <div class="col-md-4 existing-data">
+                    <div class="col-md-6">
+                        <h2>{{ _('Select Dataset') }}</h2>
+                    </div> <!-- .col-md-6 -->
+                    <div class="col-md-6">
+                        <div class="togglebutton">
+                            <label>
+                                <input id="chkbox-upload-dataset" type="checkbox"> {{ _('Upload new dataset') }}
+                            </label>
+                        </div> <!-- .togglebutton -->
+                    </div> <!-- .col-md-6 -->
+                </div> <!-- .row -->
+                <div class="row">
+                    <div class="col-md-8">
                         <div class="form-group label-static">
-                            <label for="existing-dataset-name">{{ _('Dataset Name') }}</label>
-                            <input id="existing-dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} GSE25066">
+                            <label for="dataset-name">{{ _('Dataset name') }}</label>
+                            <input id="dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My Dataset #0">
                             <ul class="search-suggestions"></ul> <!-- .search-suggestions -->
-                        </div> <!-- .form-group -->    
-                    </div> <!-- .col-md-4 -->
-                    <div class="col-md-4 new-data hide">
-                        <div class="form-group label-static">
-                            <label for="new-dataset-name">{{ _('Dataset Name') }}</label>
-                            <input id="new-dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My Dataset #1">
                         </div> <!-- .form-group -->
-                    </div> <!-- .col-md-4 -->
-                    <div class="col-md-4 new-data hide">
+                    </div> <!-- .col-md-8 -->
+                    <div class="col-md-4 upload-dataset hide">
                         <div class="form-group label-static">
-                            <label for="file-upload">{{ _('Upload File') }} (<a href="javascript:void(0);">{{ _('File Format') }}</a>)</label>
+                            <label for="file-upload">{{ _('Upload file') }} (<a href="javascript:void(0);">{{ _('File Format') }}</a>)</label>
                             <span class="btn btn-raised btn-primary fileinput-button">
-                                <i class="glyphicon glyphicon-plus"></i>
+                                <i class="fa fa-plus"></i>
                                 <span>{{ _('Select files...') }}</span>
                                 <input id="file-upload" type="file" name="files[]" multiple>
                             </span>
                         </div> <!-- .form-group -->
                     </div> <!-- .col-md-4 -->
                 </div> <!-- .row -->
+                <div class="progress progress-striped active upload-dataset hide">
+                    <div class="progress-bar"></div> <!-- .progress-bar" -->
+                </div> <!-- .progress -->
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul id="datasets"></ul>
+                    </div> <!-- .col-md-12 -->
+                </div> <!-- .row -->
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="dataset-file">{{ _('Dataset File Name') }}</label>
+                            <select id="dataset-file" class="form-control dropdown"></select>
+                        </div> <!-- .form-group -->
+                    </div> <!-- .col-md-4 -->
+                    <div class="col-md-4">
+                        <div class="form-group">
+                            <label for="metaset-file">{{ _('Metaset File Name') }} <i>({{ _('Optional') }})</i></label>
+                            <select id="metaset-file" class="form-control dropdown"></select>
+                        </div> <!-- .form-group -->
+                    </div> <!-- .col-md-4 -->
+                </div> <!-- .row -->
             </div> <!-- .section -->
-            <!-- 显示数据的概况 -->
-            <!-- 要求用户确认 分类的Label -->
-            <div class="section" workbench-name="customize">
+            <div class="section">
                 <h2>
                     {{ _('Customize Process Flow') }} 
                     <a href="javascript:void(0);" class="pull-right"><i class="fa fa-plus-circle"></i></a>
                 </h2>
-                <ol id="process-flow-configurator"></ol>
+                <ol id="process-flow"></ol>
+                <div class="row">
+                    <div class="col-md-12 text-right">
+                        {% module xsrf_form_html() %}
+                        <button id="btn-process" class="btn btn-raised btn-primary">{{ _('Process') }}</button>
+                    </div> <!-- .col-md-12 -->
+                </div> <!-- .row -->
             </div> <!-- .section -->
-        </div> <!-- .col-md-8 -->
+            <div class="section">
+                <h2>{{ _('Visualization') }}</h2>
+                <div class="row">
+                    <div class="col-md-8">
+                        <div id="d3-diagram"></div> <!-- #d3-diagram -->
+                    </div> <!-- .col-md-8 -->
+                    <div class="col-md-4">
+                    </div> <!-- .col-md-4 -->
+                </div> <!-- .row -->
+            </div> <!-- .section -->
+        </div> <!-- .col-md-9 -->
     </div> <!-- .container -->
 </div> <!-- #main-content -->
 {% end %}
 {% block scripts %}
 <script type="text/javascript" src="{{ static_url('js/jquery.dropdown.min.js') }}"></script>
 <script type="text/javascript" src="{{ static_url('js/jquery.sortable.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('js/jquery.fileupload.min.js') }}"></script>
+<script type="text/javascript" src="{{ static_url('js/d3.min.js') }}"></script>
 <script type="text/javascript">
     $('.dropdown').dropdown();
-    $('ol#process-flow-configurator').sortable({
+    $('ol#process-flow').sortable({
         group: 'no-drop',
         handle: '.panel-heading h5'
     });
-</script>
-<script type="text/javascript">
-    $(function() {
-        // Highlight navigation item
-        highlightNavigationItem('{{ _('Workbench') }}');
-        // Adjust sidebar height
-        adjustSidebarHeight();
-    });
+    
+    $('#file-upload').fileupload({
+        url: '/datasets/upload',
+        dataType: 'JSON',
+        add: function(e, data) {
+            $('.progress .progress-bar').css('width', '0');
+            
+            var datasetName = $('#dataset-name').val();
+            if ( !datasetName ) {
+                alert('{{ _('Please name your datasets.') }}');
+                return;
+            }
+            var acceptFileTypes = /.*\.(csv)$/i;
+            if ( !acceptFileTypes.test(data.originalFiles[0]['name']) ) {
+                alert('{{ _('You are allow to upload comma seperated CSV files only.') }}');
+                return;
+            }
+            data.submit();
+        },
+        progressall: function (e, data) {
+            var progress = parseInt(data.loaded / data.total * 100, 10);
+            $('.progress .progress-bar').css(
+                'width',
+                progress + '%'
+            );
+        },
+        done: function(e, data) {
+            var response       = data['jqXHR']['responseJSON'],
+                isSuccessful   = response['isSuccessful'],
+                message        = getFileUploadMessage(response),
+                alertClassName = isSuccessful ? 'success' : 'danger',
+                fileName       = data['files'][0]['name'],
+                datasetName    = $('#dataset-name').val();
 
-    $(window).resize(function() {
-        adjustSidebarHeight();
-    });
-</script>
-<script type="text/javascript">
-    function adjustSidebarHeight() {
-        var sidebarHeight       = $('#sidebar').height(),
-            sidebarLeftOffset   = parseFloat($('.container').css('margin-left')) + parseFloat($('.container').css('padding-left')),
-            contentHeight       = $('#main-content').height();
-
-        if ( sidebarHeight < contentHeight ) {
-            $('#sidebar').height(contentHeight);
+            if ( isSuccessful ) {
+                $('select#dataset-file, select#metaset-file').append($('<option>', {
+                    value: fileName,
+                    text : fileName
+                }));
+                $('select#dataset-file, select#metaset-file').val('');
+            }
+            $('ul#datasets').append(
+                '<li class="dataset alert alert-%s">'.format(alertClassName) + 
+                '    <h5>%s</h5>'.format(fileName) + 
+                '    <p>%s</p>'.format(message) + 
+                '</li>');
         }
-        $('#sidebar-mask').css('width', sidebarLeftOffset);
+    });
+    $('#file-upload').bind('fileuploadsubmit', function (e, data) {
+        var datasetName = $('#dataset-name').val();
+        data.formData = {
+            'datasetName': datasetName,
+            '_xsrf': getCookie("_xsrf")
+        };
+    });
+</script>
+<script type="text/javascript">
+    function getFileUploadMessage(response) {
+        var message = '';
+
+        if ( response['isSuccessful'] ) {
+            message = '{{ _('Number of lines: ') }} %s, {{ _('Number of columns: ') }} %s'
+                        .format(response['fileInfo']['lines'], response['fileInfo']['columns']);
+        } else {
+            if ( !response['isDatasetNameLegal'] ) {
+                // TODO
+                message += '{{ _('The length of dataset name cannot exceed 64 characters.') }}';
+            } else if ( response['isDatasetNameExists'] ) {
+                message += '{{ _('The dataset name has already taken by another dataset.') }}';
+            }
+            if ( !response['isFileNameLegal'] ) {
+                message += '{{ _('The length of file name cannot exceed 64 characters.') }}';
+            } else if ( response['isFileNameExists'] ) {
+                message += '{{ _('There is another file having the same file name.') }}';
+            }
+        }
+        return message;
     }
 </script>
 <script type="text/javascript">
-    $('a', '#process-flow').click(function() {
-        $('.active').removeClass('active');
-        $(this).parent().addClass('active');
+    $('#chkbox-upload-dataset').change(function() {
+        var isChecked = $(this).is(':checked');
 
-        var sectionName = $(this).attr('data-value');
-        $('html, body').animate({
-            scrollTop: $('div.section[workbench-name=%s]'.format(sectionName)).offset().top
-        }, 500);
-    });
-</script>
-<script type="text/javascript">
-    $('#data-source').change(function() {
-        var dataSource = $(this).val();
-
-        if ( dataSource == 'new-data' ) {
-            $('.existing-data').addClass('hide');
-            $('.new-data').removeClass('hide');
+        if ( isChecked ) {
+            $('.upload-dataset').removeClass('hide');
         } else {
-            $('.new-data').addClass('hide');
-            $('.existing-data').removeClass('hide');
+            $('.upload-dataset').addClass('hide');
         }
     });
 </script>
@@ -167,7 +226,7 @@
             url: '/datasets',
             data: request,
             dataType: 'JSON',
-            success: function(suggestions){
+            success: function(suggestions) {
                 if ( suggestions.length == 0 ) {
                     return;                    
                 }
@@ -186,11 +245,24 @@
     }
 </script>
 <script type="text/javascript">
+    $(function() {
+        // Add default process steps
+        var defaultProcessSteps = ['impute-missing-values', 'normalization', 'pca', 'kmeans'];
+        for ( var index in defaultProcessSteps ) {
+            addProcessStep(defaultProcessSteps[index]);
+        }
+    });
+    
     $('.fa-plus-circle').click(function() {
-        $('#process-flow-configurator').append(
+        addProcessStep();
+    });
+</script>
+<script type="text/javascript">
+    function addProcessStep(algorithmName) {
+        $('#process-flow').append(
             '<li class="algorithm panel panel-default">' + 
             '    <div class="panel-heading">' + 
-            '        <h5>{{ _('Impute missing values') }}</h5>' + 
+            '        <h5></h5>' + 
             '        <ul class="list-inline">' + 
             '            <li><a href="javascript:void(0);"><i class="fa fa-edit"></i></a></li>' + 
             '            <li><a href="javascript:void(0);"><i class="fa fa-trash"></i></a></li>' + 
@@ -213,7 +285,7 @@
             '                </select>' + 
             '            </div> <!-- .col-sm-8 -->' + 
             '        </div> <!-- .row -->' + 
-            '        <div class="impute-missing-values parameters">' + 
+            '        <div class="impute-missing-values parameters hide">' + 
             '            <div class="row">' + 
             '                <div class="col-sm-4"><label>{{ _('Missing Values') }}</label></div> <!-- .col-sm-4 -->' + 
             '                <div class="col-sm-8">' + 
@@ -269,7 +341,7 @@
             '            <div class="row">' + 
             '                <div class="col-sm-4"><label>{{ _('Number of clusters') }}</label></div> <!-- .col-sm-4 -->' + 
             '                <div class="col-sm-8">' + 
-            '                    <input parameter-name="n-clusters" class="form-control" type="number" min="1">' + 
+            '                    <input parameter-name="n-clusters" class="form-control" type="number" min="1" max="10">' + 
             '                </div> <!-- .col-sm-8 -->' + 
             '            </div> <!-- .row -->' + 
             '        </div> <!-- .kmeans.parameters -->' + 
@@ -344,12 +416,16 @@
             '</li>'
         );
         
+        if ( typeof(algorithmName) == 'undefined' ) {
+            algorithmName = 'impute-missing-values';
+        }
+        $('#process-flow li:last-child .algorithm-name').val(algorithmName);
+        $('#process-flow li:last-child .algorithm-name').change();
         $('.dropdown').dropdown();
-        adjustSidebarHeight();
-    });
+    }
 </script>
 <script type="text/javascript">
-    $('#process-flow-configurator').on('change', 'select.algorithm-name', function() {
+    $('#process-flow').on('change', 'select.algorithm-name', function() {
         var alrotithmBox         = $(this).parent().parent().parent().parent(),
             algorithmPanelHeader = $('.panel-heading h5', alrotithmBox),
             algorithmName        = $('option:selected', this).text(),
@@ -358,12 +434,10 @@
         $('.parameters', alrotithmBox).addClass('hide');
         $('.%s'.format(algorithmValue), alrotithmBox).removeClass('hide');
         algorithmPanelHeader.html(algorithmName);
-        
-        adjustSidebarHeight();
     });
 </script>
 <script type="text/javascript">
-    $('#process-flow-configurator').on('change', 'select.kernel', function() {
+    $('#process-flow').on('change', 'select.kernel', function() {
         var kernel              = $(this).val(),
             parametersContainer = $(this).parent().parent().parent();
 
@@ -380,7 +454,7 @@
     });
 </script>
 <script type="text/javascript">
-    $('#process-flow-configurator').on('click', '.fa-edit', function() {
+    $('#process-flow').on('click', '.fa-edit', function() {
         var algorithmPanelBody =  $('.panel-body', $(this).parent().parent().parent().parent().parent());
 
         if ( algorithmPanelBody.is(':visible') ) {
@@ -391,7 +465,7 @@
     });
 </script>
 <script type="text/javascript">
-    $('#process-flow-configurator').on('click', '.fa-trash', function() {
+    $('#process-flow').on('click', '.fa-trash', function() {
         var algorithmPanel =  $(this).parent().parent().parent().parent().parent();
         
         if ( confirm('{{ _('Are you sure to continue?') }}') ) {
@@ -399,16 +473,82 @@
         }
     });
 </script>
-<script type="text/javascript" src="{{ static_url('js/d3.min.js') }}"></script>
 <script type="text/javascript">
-    $(function() {
-        var numberOfClusters = 4;
-            clusterColors    = ['red', 'green', 'blue', 'orange'],
-            clusters         = getClusters(numberOfClusters, 50),
+    $('#btn-process').click(function() {
+        var datasetName     = $('#dataset-name').val(),
+            datasetFileName = $('#dataset-file').val(),
+            metasetFileName = $('#metaset-file').val(),
+            processFlow     = JSON.stringify(getProcessFlow()),
+            xsrfToken       = getCookie("_xsrf");
+
+        $('#btn-process').attr('disabled', 'disabled');
+        $('#btn-process').html('{{ _('Please wait...') }}');
+        return processDataset(datasetName, datasetFileName, metasetFileName, processFlow, xsrfToken);
+    });
+</script>
+<script type="text/javascript">
+    function getProcessFlow() {
+        var processFlow = [];
+
+        $('li.algorithm', '#process-flow').each(function() {
+            var algorithmName = $('select.algorithm-name', this).val(),
+                parameterBox  = $('div.parameters.%s'.format(algorithmName), this),
+                parameters    = {};
+
+            $('input, select', parameterBox).each(function() {
+                var parameterKey    = $(this).attr('parameter-name'),
+                    parameterValue  = $(this).val();
+
+                if ( typeof(parameterKey) != 'undefined' ) {
+                    parameters[parameterKey] = parameterValue;
+                }
+            });
+            processFlow.push({
+                'algorithmName': algorithmName,
+                'parameters': parameters
+            });
+        });
+        return processFlow;
+    }
+</script>
+<script type="text/javascript">
+    function processDataset(datasetName, datasetFileName, metasetFileName, processFlow, xsrfToken) {
+        var postData = {
+            'datasetName': datasetName,
+            'datasetFileName': datasetFileName,
+            'metasetFileName': metasetFileName,
+            'processFlow': processFlow,
+            '_xsrf': xsrfToken
+        };
+
+        $.ajax({
+            type: 'POST',
+            url: '/datasets/process',
+            data: postData,
+            dataType: 'JSON',
+            success: function(result) {
+                console.log(result);
+
+                if ( result['isSuccessful'] ) {
+                } else {
+                }
+                $('#btn-process').html('{{ _('Process') }}');
+                $('#btn-process').removeAttr('disabled');
+            }
+        });
+    }
+</script>
+<script type="text/javascript">
+    function draw(clusters) {
+        $('#d3-diagram').empty();
+
+        var CLUSTER_COLORS   = ['#f4394c', '#f6aa4a', '#40a3e7', '#8fbf59', '#6a1b9a', '#795548', '#607d8b', '#283593', '#1b5e20', '#333'],
+            numberOfClusters = clusters.length;
             maxMinPoint      = getPointsStatistics(clusters),
+            containerWidth   = $('#d3-diagram').width(),
             svgOptions       = {
-                height: 500,
-                width: 500,
+                height: containerWidth,
+                width: containerWidth,
                 margin: {
                     'top': 20,
                     'right': 20,
@@ -419,21 +559,23 @@
             svgComponents    = setUpScatterSvg(clusters, svgOptions, maxMinPoint);
 
         for ( var i = 0; i < numberOfClusters; ++ i ) {
-            addPointsToSvg(svgComponents, clusters[i], clusterColors[i]);
+            addPointsToSvg(svgComponents, clusters[i], CLUSTER_COLORS[i]);
         }
-        adjustSidebarHeight();
-    });
+    }
 </script>
 <script type="text/javascript">
     function getClusters(numberOfClusters, numberOfPoints) {
         var clusters = [];
         for ( var i = 0; i < numberOfClusters; ++ i ) {
-            var points = [];
+            var points      = [],
+                centroidX   =  Math.random() * 200 - 100,
+                centroidY   =  Math.random() * 200 - 100;
+
 
             for ( var j = 0; j < numberOfPoints; ++ j ) {
                 points.push({
-                    'x': Math.random() * 200 - 100,
-                    'y': Math.random() * 200 - 100
+                    'x': centroidX + Math.random() * 20 - 10,
+                    'y': centroidY + Math.random() * 20 - 10
                 });
             }
             clusters.push(points);
@@ -488,7 +630,7 @@
         y.domain([yMin, yMax]).nice();
 
         // Create SVG object
-        var svg = d3.select('#scatter-diagram').append('svg')
+        var svg = d3.select('#d3-diagram').append('svg')
                     .attr('width', width + margin.left + margin.right)
                     .attr('height', height + margin.top + margin.bottom)
                     .append('g')
@@ -529,7 +671,7 @@
 <script type="text/javascript">
     function addPointsToSvg(svgComponents, points, pointColor) {
         // Plot points in SVG
-        svgComponents.svg.append('g')
+        svgComponents.svg.insert('g', '#axis-x')
            .attr('id', 'scatter-plot')
            .selectAll('.dot').data(points)
            .enter().append('circle')
