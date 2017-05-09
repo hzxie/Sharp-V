@@ -99,7 +99,7 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
         
-        n_neighbors = 5 if not 'n-neighbors' in params else params['n-neighbors']
+        n_neighbors = 5 if not 'n-neighbors' in params else int(params['n-neighbors'])
         weights     = 'uniform' if not 'weights' in  params else params['weights']
         metric      = 'minkowski' if not 'metric' in params else params['metric']
         knn_clf     = neighbors.KNeighborsClassifier(n_neighbors = n_neighbors, weights = weights, metric = metric)
@@ -130,7 +130,7 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
         
-        n_estimators      = 10 if not 'n-estimators' in params else params['n-estimators']
+        n_estimators      = 10 if not 'n-estimators' in params else int(params['n-estimators'])
         criterion         = "gini" if not 'criterion' in params else params['criterion']
         random_forest_clf = ensemble.RandomForestClassifier(n_estimators = n_estimators, criterion = criterion)
         random_forest_clf.fit(training_samples, training_labels)
@@ -144,7 +144,7 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
         
-        n_clusters     = 8 if not 'n-clusters' in params else params['n-clusters']
+        n_clusters     = 8 if not 'n-clusters' in params else int(params['n-clusters'])
         kmeans_cluster = cluster.KMeans(n_clusters = n_clusters)
         kmeans_cluster.fit(training_samples)
         
@@ -157,7 +157,7 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
         
-        n_clusters = 2 if not 'n-clusters' in params else params['n-clusters']
+        n_clusters = 2 if not 'n-clusters' in params else int(params['n-clusters'])
         h_cluster  = cluster.AgglomerativeClustering(n_clusters = n_clusters)
         h_cluster.fit(training_samples)
         predicted_labels = h_cluster.labels_
@@ -170,7 +170,7 @@ class Algorithms(object):
         training_samples, testing_samples   = self.unpack_samples(data)
         training_labels, testing_labels     = self.unpack_labels(data)
 
-        n_components     = 100 if not 'n-components' in params else params['n-components']
+        n_components     = 100 if not 'n-components' in params else int(params['n-components'])
         pca              = decomposition.PCA(n_components = n_components)
         high_data        = np.concatenate((training_samples, testing_samples),axis = 0)
         low_data         = pca.fit(high_data).transform(high_data)
@@ -184,7 +184,7 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
         
-        n_components     = 100 if not 'n-components' in params else params['n-components']
+        n_components     = 100 if not 'n-components' in params else int(params['n-components'])
         rp               = random_projection.SparseRandomProjection(n_components = n_components)
         training_samples = rp.fit_transform(training_samples)
         testing_samples  = rp.fit_transform(testing_samples)
@@ -196,7 +196,7 @@ class Algorithms(object):
         training_labels, testing_labels   = self.unpack_labels(data)
         
         score_func       = 'chi2' if not 'select-strategy' in params else params['select-strategy']
-        k                = 100 if not 'n-components' in params else params['n-components']
+        k                = 100 if not 'n-components' in params else int(params['n-components'])
         high_data        = np.concatenate((training_samples, testing_samples), axis = 0)
         low_data         = feature_selection.SelectKBest(score_func = score_func, k = k).fit_transform(high_data)
         training_samples = low_data[0:training_samples.shape[0]]
@@ -210,7 +210,7 @@ class Algorithms(object):
         training_labels, testing_labels   = self.unpack_labels(data)
         
         n_components     = 2
-        n_iter           = 2500 if not 'n-iterations' in params else params['n-iterations']
+        n_iter           = 2500 if not 'n-iterations' in params else int(params['n-iterations'])
         high_data        = np.concatenate((training_samples, testing_samples), axis = 0)
         low_data         = manifold.TSNE(n_components = n_components, n_iter = n_iter).fit_transform(high_data)
         training_samples = low_data[0:training_samples.shape[0]]
@@ -225,7 +225,7 @@ class Algorithms(object):
        
         n_components     = 2
         n_init           = 1
-        max_iter         = 300 if not 'max-iterations' in params else params['max-iterations']
+        max_iter         = 300 if not 'max-iterations' in params else int(params['max-iterations'])
         high_data        = np.concatenate((training_samples, testing_samples), axis = 0)
         low_data         = manifold.MDS(n_components = n_components, max_iter = max_iter, n_init = n_init).fit_transform(high_data)
         training_samples = low_data[0:training_samples.shape[0]]
