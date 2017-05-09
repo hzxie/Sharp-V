@@ -32,6 +32,7 @@ from handlers.DefaultHandlers import UpgradeBrowserHandler
 from handlers.WorkbenchHandlers import DatasetProcessHandler
 from handlers.WorkbenchHandlers import DatasetUploadHandler
 from handlers.WorkbenchHandlers import WorkbenchHandler
+from handlers.WorkbenchHandlers import DatasetUploadHandler
 
 class Application(tornado.web.Application):
     def __init__(self, base_url, db_session, mail_sender):
