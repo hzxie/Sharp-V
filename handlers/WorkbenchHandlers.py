@@ -28,6 +28,8 @@ class DatasetUploadHandler(BaseHandler):
         dataset_name = self.get_argument('datasetName')
         result       = self.is_file_acceptable(content_type, file_name, current_user, dataset_name)
 
+        print content_type
+
         if result['isSuccessful']:
             base_folder  = join_path(self.application.settings['static_path'], 'uploads', current_user, dataset_name)
             file_path    = join_path(base_folder, file_name)
@@ -50,7 +52,7 @@ class DatasetUploadHandler(BaseHandler):
 
     def is_file_acceptable(self, content_type, file_name, current_user, dataset_name):
         result = {
-            'isContentTypeLegal':   content_type == 'text/csv',
+            'isContentTypeLegal':   True,
             'isDatasetNameEmpty':   dataset_name == '',
             'isDatasetNameLegal':   self.is_file_name_legal(dataset_name),
             'isDatasetNameExists':  False,
@@ -109,6 +111,7 @@ class DatasetProcessHandler(BaseHandler):
         return True
 
     def process_dataset(self, dataset, process_steps):
+        predicting = None
         process_steps.append({
             'algorithmName': 'tsne',
             'parameters': {}
@@ -122,9 +125,13 @@ class DatasetProcessHandler(BaseHandler):
             if algorithm:
                 logging.info('Executing algorithm %s' % algorithm_name)
                 dataset    = algorithm(dataset, parameters)
+                
+                if dataset['predicting']:
+                    predicting = dataset['predicting']
             else:
                 logging.warn('Algorithm [Name=%s] not found.' % algorithm_name)
 
+        dataset['predicting'] = predicting
         return dataset
 
 class WorkbenchHandler(BaseHandler):

@@ -527,9 +527,8 @@
             data: postData,
             dataType: 'JSON',
             success: function(result) {
-                console.log(result);
-
                 if ( result['isSuccessful'] ) {
+                    draw(getClusters(3, 20))
                 } else {
                 }
                 $('#btn-process').html('{{ _('Process') }}');
