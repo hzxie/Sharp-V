@@ -33,7 +33,6 @@ class Algorithms(object):
         return training_ids, testing_ids
 
     def pack_data(self, training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels, training_predicted_labels = None, testing_predicted_labels = None, cluster_centers = None):
-
         training_ids     = np.ndarray.tolist(training_ids) if isinstance(training_ids, np.ndarray) else None
         testing_ids      = np.ndarray.tolist(testing_ids) if isinstance(testing_ids, np.ndarray) else None
         training_samples = np.ndarray.tolist(training_samples) if isinstance(training_samples, np.ndarray) else None

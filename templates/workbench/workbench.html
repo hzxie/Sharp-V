@@ -528,7 +528,7 @@
             dataType: 'JSON',
             success: function(result) {
                 if ( result['isSuccessful'] ) {
-                    draw(getClusters(3, 20))
+                    draw(result['dataset'])
                 } else {
                 }
                 $('#btn-process').html('{{ _('Process') }}');
@@ -538,14 +538,15 @@
     }
 </script>
 <script type="text/javascript">
-    function draw(clusters) {
+    function draw(dataset) {
         $('#d3-diagram').empty();
 
         var CLUSTER_COLORS   = ['#f4394c', '#f6aa4a', '#40a3e7', '#8fbf59', '#6a1b9a', '#795548', '#607d8b', '#283593', '#1b5e20', '#333'],
-            numberOfClusters = clusters.length;
-            maxMinPoint      = getPointsStatistics(clusters),
-            containerWidth   = $('#d3-diagram').width(),
-            svgOptions       = {
+            trainingSamples         = dataset['samples']['training'],
+            trainingPredictedLabels = dataset['predicting']['training'],
+            maxMinPoint             = getPointsStatistics(trainingSamples),
+            containerWidth          = $('#d3-diagram').width(),
+            svgOptions              = {
                 height: containerWidth,
                 width: containerWidth,
                 margin: {
@@ -555,51 +556,29 @@
                     'left': 30,
                 }
             },
-            svgComponents    = setUpScatterSvg(clusters, svgOptions, maxMinPoint);
+            svgComponents    = setUpScatterSvg(svgOptions, maxMinPoint);
 
-        for ( var i = 0; i < numberOfClusters; ++ i ) {
-            addPointsToSvg(svgComponents, clusters[i], CLUSTER_COLORS[i]);
+        for ( var i = 0; i < trainingSamples.length; ++ i ) {
+            addPointToSvg(svgComponents, [trainingSamples[i]], CLUSTER_COLORS[trainingPredictedLabels[i]]);
         }
     }
 </script>
 <script type="text/javascript">
-    function getClusters(numberOfClusters, numberOfPoints) {
-        var clusters = [];
-        for ( var i = 0; i < numberOfClusters; ++ i ) {
-            var points      = [],
-                centroidX   =  Math.random() * 200 - 100,
-                centroidY   =  Math.random() * 200 - 100;
-
-
-            for ( var j = 0; j < numberOfPoints; ++ j ) {
-                points.push({
-                    'x': centroidX + Math.random() * 20 - 10,
-                    'y': centroidY + Math.random() * 20 - 10
-                });
-            }
-            clusters.push(points);
-        }
-        return clusters;
-    }
-</script>
-<script type="text/javascript">
-    function getPointsStatistics(clusters) {
+    function getPointsStatistics(trainingSamples) {
         var xMax = Number.MIN_VALUE, xMin = Number.MAX_VALUE,
             yMax = Number.MIN_VALUE, yMin = Number.MAX_VALUE;
 
-        clusters.forEach(function(points) {
-            points.forEach(function(point) {
-                if ( point.x > xMax ) {
-                    xMax = point.x;
-                } else if ( point.x < xMin ) {
-                    xMin = point.x;
-                }
-                if ( point.y > yMax ) {
-                    yMax = point.y;
-                } else if ( point.y < yMin ) {
-                    yMin = point.y;
-                }
-            });
+        trainingSamples.forEach(function(point) {
+            if ( point.x > xMax ) {
+                xMax = point.x;
+            } else if ( point.x < xMin ) {
+                xMin = point.x;
+            }
+            if ( point.y > yMax ) {
+                yMax = point.y;
+            } else if ( point.y < yMin ) {
+                yMin = point.y;
+            }
         });
         return {
             'xMax': xMax,
@@ -610,7 +589,7 @@
     }
 </script>
 <script type="text/javascript">
-    function setUpScatterSvg(points, svgOptions, maxMinPoint) {
+    function setUpScatterSvg(svgOptions, maxMinPoint) {
         var margin      = svgOptions.margin,
             width       = svgOptions.width - margin.left - margin.right,
             height      = svgOptions.height - margin.top - margin.bottom,
@@ -668,11 +647,11 @@
     }
 </script>
 <script type="text/javascript">
-    function addPointsToSvg(svgComponents, points, pointColor) {
+    function addPointToSvg(svgComponents, point, pointColor) {
         // Plot points in SVG
         svgComponents.svg.insert('g', '#axis-x')
            .attr('id', 'scatter-plot')
-           .selectAll('.dot').data(points)
+           .selectAll('.dot').data(point)
            .enter().append('circle')
            .attr('class', 'dot').attr('r', 4)
            .attr('cx', function (p) { return svgComponents.x(p.x); })

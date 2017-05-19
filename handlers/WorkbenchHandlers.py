@@ -28,8 +28,6 @@ class DatasetUploadHandler(BaseHandler):
         dataset_name = self.get_argument('datasetName')
         result       = self.is_file_acceptable(content_type, file_name, current_user, dataset_name)
 
-        print content_type
-
         if result['isSuccessful']:
             base_folder  = join_path(self.application.settings['static_path'], 'uploads', current_user, dataset_name)
             file_path    = join_path(base_folder, file_name)
@@ -95,6 +93,7 @@ class DatasetProcessHandler(BaseHandler):
                 process_steps       = load_json(process_steps)
                 result['dataset']   = self.process_dataset(dataset, process_steps)
             except Exception as ex:
+                result['isSuccessful'] = False
                 logging.error('Error occurred: %s' % ex)
 
             result['metaset']   = metaset
@@ -123,18 +122,17 @@ class DatasetProcessHandler(BaseHandler):
             algorithm      =  self.algorithms.get_algorithm(algorithm_name)
 
             if algorithm:
-                logging.info('Executing algorithm %s' % algorithm_name)
+                logging.debug('Executing algorithm %s' % algorithm_name)
                 dataset    = algorithm(dataset, parameters)
                 
-                if dataset['predicting']:
+                if dataset['predicting']['training'] or dataset['predicting']['testing']:
                     predicting = dataset['predicting']
             else:
                 logging.warn('Algorithm [Name=%s] not found.' % algorithm_name)
 
         dataset['samples']['training'] = self.format_sample_points(dataset['samples']['training'])
         dataset['samples']['testing']  = self.format_sample_points(dataset['samples']['testing'])
-        dataset['predicting'] = predicting
-        print dataset['samples']
+        dataset['predicting']          = predicting
         return dataset
 
     def format_sample_points(self, dataset):
