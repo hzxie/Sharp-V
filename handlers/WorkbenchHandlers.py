@@ -131,8 +131,23 @@ class DatasetProcessHandler(BaseHandler):
             else:
                 logging.warn('Algorithm [Name=%s] not found.' % algorithm_name)
 
+        dataset['samples']['training'] = self.format_sample_points(dataset['samples']['training'])
+        dataset['samples']['testing']  = self.format_sample_points(dataset['samples']['testing'])
         dataset['predicting'] = predicting
+        print dataset['samples']
         return dataset
+
+    def format_sample_points(self, dataset):
+        if not dataset:
+            return None
+        formated_data = []
+        for i in range(len(dataset)):
+            formated_data.append({
+                'x': dataset[i][0],
+                'y': dataset[i][1]
+            })
+
+        return formated_data
 
 class WorkbenchHandler(BaseHandler):
     def get(self):

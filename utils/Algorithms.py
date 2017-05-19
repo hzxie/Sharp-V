@@ -32,7 +32,7 @@ class Algorithms(object):
         testing_ids  = np.array(ids['testing']) if 'testing' in ids else None
         return training_ids, testing_ids
 
-    def pack_data(self, training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels, predicted_labels = None, cluster_centers = None):
+    def pack_data(self, training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels, training_predicted_labels = None, testing_predicted_labels = None, cluster_centers = None):
 
         training_ids     = np.ndarray.tolist(training_ids) if isinstance(training_ids, np.ndarray) else None
         testing_ids      = np.ndarray.tolist(testing_ids) if isinstance(testing_ids, np.ndarray) else None
@@ -40,23 +40,27 @@ class Algorithms(object):
         testing_samples  = np.ndarray.tolist(testing_samples) if isinstance(testing_samples, np.ndarray) else None
         training_labels  = np.ndarray.tolist(training_labels) if isinstance(training_labels, np.ndarray) else None
         testing_labels   = np.ndarray.tolist(testing_labels) if isinstance(testing_labels, np.ndarray) else None
-        predicted_labels = np.ndarray.tolist(predicted_labels) if isinstance(predicted_labels, np.ndarray) else None
+        training_predicted_labels = np.ndarray.tolist(training_predicted_labels) if isinstance(training_predicted_labels, np.ndarray) else None
+        testing_predicted_labels = np.ndarray.tolist(testing_predicted_labels) if isinstance(testing_predicted_labels, np.ndarray) else None
         cluster_centers  = np.ndarray.tolist(cluster_centers) if isinstance(cluster_centers, np.ndarray) else None
 
         data = {
             'ids':     {
                 'training': training_ids, 
-                'testing': testing_ids
+                'testing' : testing_ids
             },
             'samples': {
                 'training': training_samples, 
-                'testing': testing_samples
+                'testing' : testing_samples
             },
             'labels':  {
                 'training': training_labels, 
-                'testing': testing_labels
+                'testing' : testing_labels
             },
-            'predicting': predicted_labels, 
+            'predicting':{
+                'training': training_predicted_labels,
+                'testing' : testing_predicted_labels
+            }, 
             'cluster_centers': cluster_centers
         }
         return data
@@ -100,7 +104,7 @@ class Algorithms(object):
         if testing_samples.any():
             testing_samples = preprocessing.scale(testing_samples, axis = axis)
 
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
 
     def knn(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -113,9 +117,9 @@ class Algorithms(object):
         knn_clf     = neighbors.KNeighborsClassifier(n_neighbors = n_neighbors, weights = weights, metric = metric)
         knn_clf.fit(training_samples,training_labels)
         if testing_samples.any():
-            predicted_labels = knn_clf.predict(testing_samples)
-        return self.pack_data(training_ids,testing_ids, training_samples, testing_samples,\
-                training_labels, testing_labels, predicted_labels)
+            testing_predicted_labels = knn_clf.predict(testing_samples)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples,\
+                training_labels = training_labels, testing_labels = testing_labels, testing_predicted_labels = testing_predicted_labels)
 
     def svm(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -129,23 +133,23 @@ class Algorithms(object):
         svm_clf      = svm.SVC(C=C, kernel = kernel, degree = degree, gamma = gamma)
         svm_clf.fit(training_samples, training_labels)
         if testing_samples.any():
-            predicted_labels = svm_clf.predict(testing_samples)
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, \
-                training_labels, testing_labels, predicted_labels)
+            testing_predicted_labels = svm_clf.predict(testing_samples)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+                training_labels = training_labels, testing_labels = testing_labels, testing_predicted_labels = testing_predicted_labels)
 
     def random_forest(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
-        
+
         n_estimators      = 10 if (not 'n-estimators' in params or not params['n-estimators'])else int(params['n-estimators'])
         criterion         = "gini" if not 'criterion' in params else params['criterion']
         random_forest_clf = ensemble.RandomForestClassifier(n_estimators = n_estimators, criterion = criterion)
         random_forest_clf.fit(training_samples, training_labels)
         if testing_samples.any():
-            predicted_labels = random_forest_clf.predict(testing_samples)
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, \
-                training_labels, testing_labels, predicted_labels)
+            testing_predicted_labels = random_forest_clf.predict(testing_samples)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+                training_labels = training_labels, testing_labels = testing_labels, testing_predicted_labels = testing_predicted_labels)
 
     def kmeans(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -155,10 +159,10 @@ class Algorithms(object):
         n_clusters     = 8 if (not 'n-clusters' in params or not params['n-clusters']) else int(params['n-clusters'])
         kmeans_cluster = cluster.KMeans(n_clusters = n_clusters)
         kmeans_cluster.fit(training_samples)
-        predicted_labels = kmeans_cluster.labels_
+        training_predicted_labels = kmeans_cluster.labels_
         cluster_centers  = kmeans_cluster.cluster_centers_
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, \
-                training_labels, testing_labels, predicted_labels, cluster_centers)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+                training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels, cluster_centers = cluster_centers)
 
     def hierarchical_cluster(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -168,9 +172,9 @@ class Algorithms(object):
         n_clusters = 2 if not 'n-clusters' in params else int(params['n-clusters'])
         h_cluster  = cluster.AgglomerativeClustering(n_clusters = n_clusters)
         h_cluster.fit(training_samples)
-        predicted_labels = h_cluster.labels_
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, \
-                training_labels, testing_labels, predicted_labels)
+        training_predicted_labels = h_cluster.labels_
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+                training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels)
 
     def pca(self, data, params):
         training_ids, testing_ids           = self.unpack_ids(data)
@@ -185,7 +189,7 @@ class Algorithms(object):
         if testing_samples.any():
             testing_samples  = low_data[training_samples.shape[0]:(training_samples.shape[0] + testing_samples.shape[0])]
 
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
 
     def random_projection(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -196,7 +200,7 @@ class Algorithms(object):
         rp               = random_projection.SparseRandomProjection(n_components = n_components)
         training_samples = rp.fit_transform(training_samples)
         testing_samples  = rp.fit_transform(testing_samples) if testing_samples.any() else testing_samples
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
 
     def feature_selection(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -210,7 +214,7 @@ class Algorithms(object):
         training_samples = low_data[0:training_samples.shape[0]]
         if testing_samples.any():
             testing_samples  = low_data[training_samples.shape[0]:(training_samples.shape[0] + testing_samples.shape[0])]
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
 
     def tsne(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -224,7 +228,8 @@ class Algorithms(object):
         training_samples = low_data[0:training_samples.shape[0]]
         if testing_samples.any():
             testing_samples  = low_data[training_samples.shape[0]:(training_samples.shape[0] + testing_samples.shape[0])]
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels)
+
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
 
     def mds(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -240,4 +245,4 @@ class Algorithms(object):
         if testing_samples.any():
             testing_samples  = low_data[training_samples.shape[0]:(training_samples.shape[0] + testing_samples.shape[0])]
 
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
