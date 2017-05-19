@@ -129,27 +129,27 @@ div#main-content div.section ol#process-flow li.placeholder:before {
 	width: 0;
 }
 
-div#main-content div.section li.algorithm div.panel-heading {
+div#main-content div.section .algorithm div.panel-heading {
 	height: 55px;
 	position: relative;
 }
 
-div#main-content div.section li.algorithm div.panel-heading h5 {
+div#main-content div.section .algorithm div.panel-heading h5 {
 	cursor: move;
 }
 
-div#main-content div.section li.algorithm ul.list-inline {
+div#main-content div.section .algorithm ul.list-inline {
 	font-size: 15px;
 	position: absolute;
 	top: 15px;
 	right: 10px;
 }
 
-div#main-content div.section li.algorithm div.panel-body div.form-group {
+div#main-content div.section .algorithm div.panel-body div.form-group {
 	margin: 0;
 }
 
-div#main-content div.section li.algorithm div.panel-body label {
+div#main-content div.section .algorithm div.panel-body label {
 	color: #333;
 	margin: 10px 0 0;
 }
