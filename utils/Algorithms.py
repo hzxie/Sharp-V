@@ -93,7 +93,7 @@ class Algorithms(object):
             imputer.fit_transform(testing_samples)
         return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels)
 
-    def normalization(self, data, params):
+    def zscore_normalization(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
@@ -102,6 +102,43 @@ class Algorithms(object):
             training_samples = preprocessing.scale(training_samples, axis = axis)
         if testing_samples.any():
             testing_samples = preprocessing.scale(testing_samples, axis = axis)
+
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+
+    def return_to_zero_normalization(self, data, params):
+        training_ids, testing_ids         = self.unpack_ids(data)
+        training_samples, testing_samples = self.unpack_samples(data)
+        training_labels, testing_labels   = self.unpack_labels(data)
+        scaler = preprocessing.StandardScaler(with_std = False)
+        if training_samples.any():
+            training_samples = scaler.fit_transform(training_samples)
+        if testing_samples.any():
+            testing_samples = scaler.fit_transform(testing_samples)
+
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+
+
+    def min_max_normalization(self, data, params):
+        training_ids, testing_ids         = self.unpack_ids(data)
+        training_samples, testing_samples = self.unpack_samples(data)
+        training_labels, testing_labels   = self.unpack_labels(data)
+        scaler = preprocessing.MinMaxScaler()
+        if training_samples.any():
+            training_samples = scaler.fit_transform(training_samples)
+        if testing_samples.any():
+            testing_samples = scaler.fit_transform(testing_samples)
+
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+
+    def max_abs_normalization(self, data, params):
+        training_ids, testing_ids         = self.unpack_ids(data)
+        training_samples, testing_samples = self.unpack_samples(data)
+        training_labels, testing_labels   = self.unpack_labels(data)
+        scaler = preprocessing.MaxAbsScaler()
+        if training_samples.any():
+            training_samples = scaler.fit_transform(training_samples)
+        if testing_samples.any():
+            testing_samples = scaler.fit_transform(testing_samples)
 
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
 
@@ -155,7 +192,7 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
 
-        n_clusters     = 8 if (not 'n-clusters' in params or not params['n-clusters']) else int(params['n-clusters'])
+        n_clusters     = 5 if (not 'n-clusters' in params or not params['n-clusters']) else int(params['n-clusters'])
         kmeans_cluster = cluster.KMeans(n_clusters = n_clusters)
         kmeans_cluster.fit(training_samples)
         training_predicted_labels = kmeans_cluster.labels_
@@ -167,7 +204,7 @@ class Algorithms(object):
         training_ids, testing_ids         = self.unpack_ids(data)
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
-        
+
         n_clusters = 2 if not 'n-clusters' in params else int(params['n-clusters'])
         h_cluster  = cluster.AgglomerativeClustering(n_clusters = n_clusters)
         h_cluster.fit(training_samples)
