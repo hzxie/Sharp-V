@@ -183,7 +183,7 @@
 <script type="text/javascript">
     $('.dropdown').dropdown();
     $('#file-upload').fileupload({
-        url: '/datasets/upload',
+        url: '{{ base_url('/datasets/upload') }}',
         dataType: 'JSON',
         add: function(e, data) {
             $('.progress .progress-bar').css('width', '0');
@@ -295,7 +295,7 @@
         
         $.ajax({
             type: 'GET',
-            url: '/datasets',
+            url: '{{ base_url('/datasets') }}',
             data: request,
             dataType: 'JSON',
             success: function(suggestions) {
@@ -421,7 +421,7 @@
 
         $.ajax({
             type: 'POST',
-            url: '/datasets/process',
+            url: '{{ base_url('/datasets/process') }}',
             data: postData,
             dataType: 'JSON',
             success: function(result) {

@@ -128,8 +128,8 @@ class RegisterHandler(BaseHandler):
         return True if self.user_mapper.get_user_using_email(email) else False
 
 class ForgotPasswordHandler(BaseHandler):
-    def initialize(self, db_session, mail_sender, base_url):
-        self.base_url = base_url
+    def initialize(self, db_session, mail_sender):
+        self.base_url = self.application.settings['base_url']
         self.mail_sender = mail_sender
         self.user_mapper = UserMapper(db_session)
         self.email_verification_mapper = EmailVerificationMapper(db_session)

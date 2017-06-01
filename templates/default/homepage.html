@@ -9,7 +9,7 @@
 	<div id="introduction">
 		<img src="{{ static_url('img/Logo.png') }}" alt="Logo">
 		<h3>{{ _('Visualize everything with Sharp-V') }}</h3>
-		<button class="btn btn-raised" onclick="window.location.href = '/workbench'">{{ _('Get Started') }}</button>
+		<button class="btn btn-raised" onclick="window.location.href = '{{ base_url('/workbench') }}'">{{ _('Get Started') }}</button>
 	</div> <!-- #introduction -->
 </div> <!-- #hero -->
 {% end %}

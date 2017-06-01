@@ -20,7 +20,7 @@
             <label class="control-label" for="username">
                 {{ _('Password') }}
                 <span class="pull-right">
-                    <a href="/accounts/forgot-password">{{ _('Forgot password?') }}</a>
+                    <a href="{{ base_url('/accounts/forgot-password') }}">{{ _('Forgot password?') }}</a>
                 </span>
             </label>
             <input id="password" class="form-control" type="password">
@@ -35,7 +35,7 @@
     </form> <!-- #login-form -->
     <p class="text-center">
         {{ _('Don´t have an account?') }}<br>
-        <a href="/accounts/register">{{ _('Create an account') }}</a>
+        <a href="{{ base_url('/accounts/register') }}">{{ _('Create an account') }}</a>
     </p>
 </div> <!-- #login -->
 {% end %}
@@ -66,7 +66,7 @@
 
         $.ajax({
             type: 'POST',
-            url: '/accounts/login',
+            url: '{{ base_url('/accounts/login') }}',
             data: postData,
             dataType: 'JSON',
             success: function(result){
@@ -78,7 +78,7 @@
 <script type="text/javascript">
     function processLoginResult(result) {
         if ( result['isSuccessful'] ) {
-            window.location.href = '/';
+            window.location.href = '{{ base_url('/') }}';
         } else {
             var errorMessage = '';
 

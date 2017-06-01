@@ -29,27 +29,27 @@
             <div class="row">
                 <div class="col-sm-4">
                     <div id="logo">
-                        <a href="/">
+                        <a href="{{ base_url('/') }}">
                             <img src="{{ static_url('img/Sharp-V.png') }}" alt="Logo">
                         </a>
                     </div> <!-- #logo -->
                 </div> <!-- .col-md-4 -->
                 <div class="col-sm-8">
                     <ul class="nav navbar-nav pull-right">
-                        <li><a href="/">{{ _('Home') }}</a></li>
-                        <li><a href="/workbench">{{ _('Workbench') }}</a></li>
+                        <li><a href="{{ base_url('/') }}">{{ _('Home') }}</a></li>
+                        <li><a href="{{ base_url('/workbench') }}">{{ _('Workbench') }}</a></li>
                         <li class="dropdown">
                             <a href="javascript:void(0);" data-target="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> {{ current_user }}
-                            <img src="/static/img/avatar.jpg" alt="Avatar" />
+                            <img src="{{ static_url('img/avatar.jpg') }}" alt="Avatar" />
                             <ul class="dropdown-menu">
                             {% if current_user != 'Guest' %}
-                                <li><a href="/accounts/profile">{{ _('Profile') }}</a></li>
+                                <li><a href="{{ base_url('/accounts/profile') }}">{{ _('Profile') }}</a></li>
                                 <li class="divider"></li>
-                                <li><a href="/accounts/login?logout=true">{{ _('Sign Out') }}</a></li>
+                                <li><a href="{{ base_url('/accounts/login?logout=true') }}">{{ _('Sign Out') }}</a></li>
                             {% else %}
-                                <li><a href="/accounts/login">{{ _('Sign In') }}</a></li>
+                                <li><a href="{{ base_url('/accounts/login') }}">{{ _('Sign In') }}</a></li>
                                 <li class="divider"></li>
-                                <li><a href="/accounts/register">{{ _('Sign Up') }}</a></li>
+                                <li><a href="{{ base_url('/accounts/register') }}">{{ _('Sign Up') }}</a></li>
                             {% end %}
                             </ul>
                         </li>
@@ -69,15 +69,15 @@
                 <div class="col-md-3 col-sm-6">
                     <h3>{{ _('Resources') }}</h3>
                     <ul>
-                        <li><a href="/about">{{ _('About') }}</a></li>
-                        <li><a href="/terms">{{ _('Terms of Use') }}</a></li>
-                        <li><a href="/privacy">{{ _('Privacy & Cookie') }}</a></li>
+                        <li><a href="{{ base_url('/about') }}">{{ _('About') }}</a></li>
+                        <li><a href="{{ base_url('/terms') }}">{{ _('Terms of Use') }}</a></li>
+                        <li><a href="{{ base_url('/privacy') }}">{{ _('Privacy & Cookie') }}</a></li>
                     </ul>
                 </div> <!-- .col-sm-3 -->
                 <div class="col-md-3 col-sm-6">
                     <h3>{{ _('Contact Us') }}</h3>
                     <ul>
-                        <li><i class="fa fa-envelope"></i> support@sharp-v.org</li>
+                        <li><i class="fa fa-envelope"></i> jieli@hit.edu.cn</li>
                         <li><i class="fa fa-map-marker"></i> {{ _('Harbin Institute of Technology, Harbin, China') }}</li>
                     </ul>
                 </div> <!-- .col-sm-3 -->
@@ -127,7 +127,7 @@
                 };
             $.ajax({
                 type: 'GET',
-                url: '/set-locale',
+                url: '{{ base_url('/set-locale') }}',
                 data: postData,
                 dataType: 'JSON',
                 success: function(result) {

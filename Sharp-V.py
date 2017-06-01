@@ -33,6 +33,7 @@ from handlers.WorkbenchHandlers import DatasetProcessHandler
 from handlers.WorkbenchHandlers import DatasetUploadHandler
 from handlers.WorkbenchHandlers import WorkbenchHandler
 from handlers.WorkbenchHandlers import DatasetUploadHandler
+from helpers import UiMethods
 
 class Application(tornado.web.Application):
     def __init__(self, base_url, db_session, mail_sender):
@@ -46,7 +47,7 @@ class Application(tornado.web.Application):
         handlers = [
             (r"/", HomeHandler),
             (r"/accounts/forgot-password", ForgotPasswordHandler, 
-                dict(db_session=db_session, mail_sender=mail_sender, base_url=base_url)),
+                dict(db_session=db_session, mail_sender=mail_sender)),
             (r"/accounts/login", LoginHandler, dict(db_session=db_session)),
             (r"/accounts/register", RegisterHandler, dict(db_session=db_session)),
             (r"/accounts/reset-password", ResetPasswordHandler, dict(db_session=db_session)),
@@ -60,6 +61,7 @@ class Application(tornado.web.Application):
             (r"/not-supported", UpgradeBrowserHandler),
         ]
         settings = {
+            'base_url': base_url,
             'cookie_secret': '__TODO:_GENERATE_YOUR_OWN_RANDOM_VALUE_HERE__',
             'debug': True,
             'default_handler_class': BaseHandler,
@@ -68,12 +70,13 @@ class Application(tornado.web.Application):
             'static_path': join(dirname(__file__), "static"),
             'xsrf_cookies': True,
             'compress_response': True,
+            'ui_methods': UiMethods
         }
         tornado.web.Application.__init__(self, handlers, **settings)
 
 def main():
     """ The entrance of the application."""
-    define('base_url', default='https://sharp-v.org', help='The URL of the application', type=str)
+    define('base_url', default='https://mlg.hit.edu.cn/spf', help='The URL of the application', type=str)
     define('http_port', default=8000, help='The port of the application', type=int)
     define('mysql_host', default='127.0.0.1:3306', help='The host of MySQL', type=str)
     define('mysql_database', default='sharpv', help='The database name of MySQL', type=str)
