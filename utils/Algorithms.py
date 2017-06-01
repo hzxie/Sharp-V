@@ -105,7 +105,7 @@ class Algorithms(object):
 
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
 
-    def return_to_zero_normalization(self, data, params):
+    def zero_centered_normalization(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)

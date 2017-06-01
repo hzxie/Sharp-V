@@ -31,7 +31,7 @@ class DatasetUploadHandler(BaseHandler):
         if result['isSuccessful']:
             base_folder  = join_path(self.application.settings['static_path'], 'uploads', current_user, dataset_name)
             file_path    = join_path(base_folder, file_name)
-            
+
             if not path_exists(base_folder):
                 makedirs(base_folder)
 
