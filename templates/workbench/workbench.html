@@ -85,7 +85,10 @@
                                 <div class="form-group label-static">
                                     <label>{{ _('Method') }}</label>
                                     <select class="algorithm-name form-control dropdown">
-                                        <option value="normalization">{{ _('Normalization') }}</option>
+                                        <option value="zscore-normalization">{{ _('Z-Score normalization') }}</option>
+                                        <option value="return-to-zero-normalization">{{ _('Return to zero (RTZ) normalization') }}</option>
+                                        <option value="min-max-normalization">{{ _('Min-Max normalization') }}</option>
+                                        <option value="max-abs-normalization">{{ _('Max-Abs normalization') }}</option>
                                     </select>
                                 </div> <!-- .form-group -->
                             </div> <!-- .col-sm-6 -->
@@ -106,7 +109,7 @@
                                 <div class="form-group label-static">
                                     <label>{{ _('Method') }}</label>
                                     <select class="algorithm-name form-control dropdown">
-                                        <option value="pca">{{ _('Principle Component Analysis') }}</option>
+                                        <option value="pca">{{ _('Principle Component Analysis (PCA)') }}</option>
                                         <option value="random-projection">{{ _('Random Projection') }}</option>
                                     </select>
                                 </div> <!-- .form-group -->
@@ -148,7 +151,7 @@
                                 <div class="kmeans parameters hide">
                                     <div class="form-group label-static">
                                         <label>{{ _('Number of clusters') }}</label>
-                                        <input parameter-name="n-clusters" class="form-control" type="number" min="1" max="10" placeholder="{{ _('Default:') }} 8">
+                                        <input parameter-name="n-clusters" class="form-control" type="number" min="1" max="10" placeholder="{{ _('Default:') }} 5">
                                     </div> <!-- .form-group -->
                                 </div> <!-- .kmeans.parameters -->
                             </div> <!-- .col-sm-6 -->
