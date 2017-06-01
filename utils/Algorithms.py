@@ -142,6 +142,18 @@ class Algorithms(object):
 
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
 
+    def median_centered_normalization(self, data, params):
+        training_ids, testing_ids         = self.unpack_ids(data)
+        training_samples, testing_samples = self.unpack_samples(data)
+        training_labels, testing_labels   = self.unpack_labels(data)
+        scaler = preprocessing.RobustScaler()
+        if training_samples.any():
+            training_samples = scaler.fit_transform(training_samples)
+        if testing_samples.any():
+            testing_samples = scaler.fit_transform(testing_samples)
+
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+
     def knn(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
         training_samples, testing_samples = self.unpack_samples(data)
@@ -206,7 +218,8 @@ class Algorithms(object):
         training_labels, testing_labels   = self.unpack_labels(data)
 
         n_clusters = 2 if not 'n-clusters' in params else int(params['n-clusters'])
-        h_cluster  = cluster.AgglomerativeClustering(n_clusters = n_clusters)
+        linkage  = 'ward' if not 'linkage' in params else params['linkage']
+        h_cluster  = cluster.AgglomerativeClustering(n_clusters = n_clusters, linkage = linkage)
         h_cluster.fit(training_samples)
         training_predicted_labels = h_cluster.labels_
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
