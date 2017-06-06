@@ -18,7 +18,7 @@
     <script type="text/javascript" src="{{ static_url('js/jquery-2.1.4.min.js') }}"></script>
     <!--[if lte IE 9]>
         <script type="text/javascript">
-            window.location.href='/not-supported';
+            window.location.href='{{ base_url('/not-supported') }}';
         </script>
     <![endif]-->
     {% block header %}{% end %}
@@ -36,8 +36,9 @@
                 </div> <!-- .col-md-4 -->
                 <div class="col-sm-8">
                     <ul class="nav navbar-nav pull-right">
-                        <li><a href="{{ base_url('/') }}">{{ _('Home') }}</a></li>
+                        <li><a href="{{ base_url('/') }}">{{ _('Introduction') }}</a></li>
                         <li><a href="{{ base_url('/workbench') }}">{{ _('Workbench') }}</a></li>
+                        <li><a href="{{ base_url('/about') }}">{{ _('About') }}</a></li>
                         <li class="dropdown">
                             <a href="javascript:void(0);" data-target="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"> {{ current_user }}
                             <img src="{{ static_url('img/avatar.jpg') }}" alt="Avatar" />
@@ -64,32 +65,6 @@
     <div id="footer">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-3 col-sm-6">
-                </div> <!-- .col-sm-3 -->
-                <div class="col-md-3 col-sm-6">
-                    <h3>{{ _('Resources') }}</h3>
-                    <ul>
-                        <li><a href="{{ base_url('/about') }}">{{ _('About') }}</a></li>
-                        <li><a href="{{ base_url('/terms') }}">{{ _('Terms of Use') }}</a></li>
-                        <li><a href="{{ base_url('/privacy') }}">{{ _('Privacy & Cookie') }}</a></li>
-                    </ul>
-                </div> <!-- .col-sm-3 -->
-                <div class="col-md-3 col-sm-6">
-                    <h3>{{ _('Contact Us') }}</h3>
-                    <ul>
-                        <li><i class="fa fa-envelope"></i> jieli@hit.edu.cn</li>
-                        <li><i class="fa fa-map-marker"></i> {{ _('Harbin Institute of Technology, Harbin, China') }}</li>
-                    </ul>
-                </div> <!-- .col-sm-3 -->
-                <div class="col-md-3 col-sm-6">
-                    <h3>{{ _('Languages') }}</h3>
-                    <ul id="locales">
-                        <li><a href="javascript:void(0);" data-value="en_US">English</a></li>
-                        <li><a href="javascript:void(0);" data-value="zh_CN">简体中文</a></li>
-                    </ul>
-                </div> <!-- .col-sm-3 -->
-            </div> <!-- .row -->
-            <div id="footer-bottom" class="row">
             	<div class="col-sm-8">
             		{{ _('Copyright') }}&copy;
                     <script type="text/javascript">document.write((new Date()).getFullYear());</script>

@@ -79,7 +79,8 @@ div#header li.dropdown img {
 div#footer {
 	background-color: #474747;
 	color: #fff;
-	padding: 15px 0 0;
+	font-size: 12px;
+	padding: 15px 0;
 	position: relative;
 	z-index: 4;
 }
@@ -91,18 +92,6 @@ div#footer a {
 div#footer ul {
 	list-style: none;
 	padding-left: 2px;
-}
-
-div#footer i.fa {
-	display: inline-block;
-	width: 20px;
-}
-
-div#footer-bottom {
-	border-top: 1px solid #999;
-    font-size: 12px;
-    margin: 20px 0 0;
-    padding: 15px 0;
 }
 
 div#footer a#github-link:hover {

@@ -83,7 +83,6 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group label-static">
-                                    <label>{{ _('Method') }}</label>
                                     <select class="algorithm-name form-control dropdown">
                                         <option value="zscore-normalization">{{ _('Z-Score normalization') }}</option>
                                         <option value="zero-centered-normalization">{{ _('Zero-Centered normalization') }}</option>
@@ -108,27 +107,32 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group label-static">
-                                    <label>{{ _('Method') }}</label>
                                     <select class="algorithm-name form-control dropdown">
                                         <option value="pca">{{ _('Principle Component Analysis (PCA)') }}</option>
                                         <option value="random-projection">{{ _('Random Projection') }}</option>
                                     </select>
                                 </div> <!-- .form-group -->
                             </div> <!-- .col-sm-6 -->
-                            <div class="col-sm-6">
+                            <div class="col-sm-3">
+                                <div class="pca parameters hide">
+                                    <label>{{ _('Number of components: ') }}</label>
+                                </div> <!-- .pca.parameters -->
+                                <div class="random-projection parameters hide">
+                                    <label>{{ _('Number of components: ') }}</label>
+                                </div> <!-- .random-projection.parameters -->
+                            </div> <!-- .col-sm-3 -->
+                            <div class="col-sm-3">
                                 <div class="pca parameters hide">
                                     <div class="form-group label-static">
-                                        <label>{{ _('Number of components') }}</label>
                                         <input parameter-name="n-components" class="form-control" type="number" min="1" placeholder="{{ _('Default:') }} 100">
                                     </div> <!-- .form-group -->
                                 </div> <!-- .pca.parameters -->
                                 <div class="random-projection parameters hide">
                                     <div class="form-group label-static">
-                                        <label>{{ _('Number of components') }}</label>
                                         <input parameter-name="n-components" class="form-control" type="number" min="1" placeholder="{{ _('Default:') }} 100">
                                     </div> <!-- .form-group -->
                                 </div> <!-- .random-projection.parameters -->
-                            </div> <!-- .col-sm-6 -->
+                            </div> <!-- .col-sm-3 -->
                         </div> <!-- .row -->
                     </div> <!-- .panel-body -->
                 </div> <!-- .algorithm -->
@@ -142,20 +146,23 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="form-group label-static">
-                                    <label>{{ _('Method') }}</label>
                                     <select class="algorithm-name form-control dropdown">
                                         <option value="kmeans">{{ _('KMeans') }}</option>
                                     </select>
                                 </div> <!-- .form-group -->
                             </div> <!-- .col-sm-6 -->
-                            <div class="col-sm-6">
+                            <div class="col-sm-3">
+                                <div class="kmeans parameters hide">
+                                    <label>{{ _('Number of clusters: ') }}</label>
+                                </div> <!-- .kmeans.parameters -->
+                            </div> <!-- .col-sm-3 -->
+                            <div class="col-sm-3">
                                 <div class="kmeans parameters hide">
                                     <div class="form-group label-static">
-                                        <label>{{ _('Number of clusters') }}</label>
                                         <input parameter-name="n-clusters" class="form-control" type="number" min="1" max="10" placeholder="{{ _('Default:') }} 5">
                                     </div> <!-- .form-group -->
                                 </div> <!-- .kmeans.parameters -->
-                            </div> <!-- .col-sm-6 -->
+                            </div> <!-- .col-sm-3 -->
                         </div> <!-- .row -->
                     </div> <!-- .panel-body -->
                 </div> <!-- .algorithm -->
