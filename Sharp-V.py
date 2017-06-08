@@ -107,7 +107,7 @@ def main():
     )
 
     # Load translations for different locale
-    load_gettext_translations(join(dirname(__file__), 'locales'), 'messages')
+    # load_gettext_translations(join(dirname(__file__), 'locales'), 'messages')
 
     # Start HTTP Server
     http_server = tornado.httpserver.HTTPServer(Application(options.base_url, db_session, mail_sender))

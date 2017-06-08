@@ -2,7 +2,7 @@
 <html lang="en-US">
 <head>
 	<meta charset="UTF-8">
-	<title>{% block title %}{% end %} | Sharp-V</title>
+	<title>{% block title %}{% end %} | Similar Patient Finder</title>
 	<meta http-equiv="X-UA-Compatible" content="IE=edge, chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Icon -->
@@ -30,7 +30,7 @@
                 <div class="col-sm-4">
                     <div id="logo">
                         <a href="{{ base_url('/') }}">
-                            <img src="{{ static_url('img/Sharp-V.png') }}" alt="Logo">
+                            <img src="{{ static_url('img/Logo.png') }}" alt="Logo">
                         </a>
                     </div> <!-- #logo -->
                 </div> <!-- .col-md-4 -->
@@ -68,7 +68,7 @@
             	<div class="col-sm-8">
             		{{ _('Copyright') }}&copy;
                     <script type="text/javascript">document.write((new Date()).getFullYear());</script>
-                    <a href="/">Sharp-V</a>. {{ _('All rights reserved.') }}
+                    <a href="{{ base_url('/') }}">Similar Patient Finder</a>. {{ _('All rights reserved.') }}
             	</div> <!-- .col-sm-8 -->
             	<div class="col-sm-4 text-right">
             		<i class="fa fa-code"></i> with <a id="github-link" href="https://github.com/hzxie/Sharp-V" target="_blank"><i class="fa fa-heart"></i></a>
