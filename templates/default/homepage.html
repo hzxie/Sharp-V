@@ -2,12 +2,20 @@
 {% block title %}{{ _('Introduction') }}{% end %}
 {% block header %}
 <link rel="stylesheet" type="text/css" href="{{ static_url('css/default/homepage.css') }}">
+<style type="text/css">
+	p{
+		margin: 0 auto;
+    	width:700px;
+    	word-wrap:break-word;
+}
+</style>
 {% end %}
 {% block body %}
 <div id="hero">
     <div id="particles-js"></div> <!-- #particles-js -->
 	<div id="introduction">
-		<h3>{{ _('Visualize everything with Sharp-V') }}</h3>
+		<h3>{{ _('An easy approach to find patients\' similarity') }}</h3>
+		<p style="text-align:left;font-size:17px;">{{ _('The Similar Patient Finder(SPF), a web-based molecular level aided diagnosis tool, is aimed at helping physicians explore the patients’ similarity at the molecular level and facilitate prescription making. The SPF integrates flexible medical data, including molecular level high-throughput data and corresponding clinical data if available. Some methods are provided to easily handle the related data and visualize it in different forms for auxiliary diagnosis.') }}</p>
 		<button class="btn btn-raised" onclick="window.location.href = '{{ base_url('/workbench') }}'">{{ _('Get Started') }}</button>
 	</div> <!-- #introduction -->
 </div> <!-- #hero -->
