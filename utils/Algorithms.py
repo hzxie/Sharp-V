@@ -32,7 +32,7 @@ class Algorithms(object):
         testing_ids  = np.array(ids['testing']) if 'testing' in ids else None
         return training_ids, testing_ids
 
-    def pack_data(self, training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels, training_predicted_labels = None, testing_predicted_labels = None, cluster_centers = None):
+    def pack_data(self, training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels, training_predicted_labels = None, testing_predicted_labels = None, cluster_centers = None, nearest_neighbors = None):
         training_ids     = np.ndarray.tolist(training_ids) if isinstance(training_ids, np.ndarray) else None
         testing_ids      = np.ndarray.tolist(testing_ids) if isinstance(testing_ids, np.ndarray) else None
         training_samples = np.ndarray.tolist(training_samples) if isinstance(training_samples, np.ndarray) else None
@@ -42,6 +42,7 @@ class Algorithms(object):
         training_predicted_labels = np.ndarray.tolist(training_predicted_labels) if isinstance(training_predicted_labels, np.ndarray) else None
         testing_predicted_labels = np.ndarray.tolist(testing_predicted_labels) if isinstance(testing_predicted_labels, np.ndarray) else None
         cluster_centers  = np.ndarray.tolist(cluster_centers) if isinstance(cluster_centers, np.ndarray) else None
+        nearest_neighbors = np.ndarray.tolist(nearest_neighbors) if isinstance(nearest_neighbors, np.ndarray) else None
 
         data = {
             'ids':     {
@@ -60,7 +61,8 @@ class Algorithms(object):
                 'training': training_predicted_labels,
                 'testing' : testing_predicted_labels
             }, 
-            'cluster_centers': cluster_centers
+            'cluster_centers': cluster_centers,
+            'nearest_neighbors': nearest_neighbors
         }
         return data
 
@@ -91,7 +93,7 @@ class Algorithms(object):
             #     training_samples[tag_indexes] = training_sample
         if testing_samples.any():
             imputer.fit_transform(testing_samples)
-        return self.pack_data(training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
 
     def zscore_normalization(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -209,8 +211,14 @@ class Algorithms(object):
         kmeans_cluster.fit(training_samples)
         training_predicted_labels = kmeans_cluster.labels_
         cluster_centers  = kmeans_cluster.cluster_centers_
+        n_neighbors = 11
+        neighbourhood = neighbors.NearestNeighbors(n_neighbors = n_neighbors)
+        neighbourhood.fit(training_samples)
+        neighbor_indices = neighbourhood.kneighbors(target_sample, return_distance=False)
+        nearest_neighbors = neighbourhood[:,1:]
+        
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
-                training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels, cluster_centers = cluster_centers)
+                training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels, cluster_centers = cluster_centers, nearest_neighbors = nearest_neighbors)
 
     def hierarchical_cluster(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
