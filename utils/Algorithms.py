@@ -212,11 +212,10 @@ class Algorithms(object):
         training_predicted_labels = kmeans_cluster.labels_
         cluster_centers  = kmeans_cluster.cluster_centers_
         n_neighbors = 11
-        neighbourhood = neighbors.NearestNeighbors(n_neighbors = n_neighbors)
-        neighbourhood.fit(training_samples)
-        neighbor_indices = neighbourhood.kneighbors(target_sample, return_distance=False)
-        nearest_neighbors = neighbourhood[:,1:]
-        
+        neighborhood = neighbors.NearestNeighbors(n_neighbors = n_neighbors)
+        neighborhood.fit(training_samples)
+        neighbor_indices = neighborhood.kneighbors(training_samples, return_distance=False)
+        nearest_neighbors = neighbor_indices[:,1:]
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
                 training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels, cluster_centers = cluster_centers, nearest_neighbors = nearest_neighbors)
 
@@ -230,6 +229,8 @@ class Algorithms(object):
         h_cluster  = cluster.AgglomerativeClustering(n_clusters = n_clusters, linkage = linkage)
         h_cluster.fit(training_samples)
         training_predicted_labels = h_cluster.labels_
+        childrens = sorted(h_cluster.children_, key = lambda x: x[0])
+        
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
                 training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels)
 
