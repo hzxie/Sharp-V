@@ -3,6 +3,7 @@
 
 import logging
 from pandas import read_csv
+from io import StringIO
 
 class DatasetParser(object):
     def get_datasets(self, training_set_file_path, testing_set_file_path, label_columns_name):
@@ -77,3 +78,28 @@ class DatasetParser(object):
             
             number_of_columns = len(line.split(','))
         return number_of_lines, number_of_columns
+
+class MetasetParser(object):
+    def get_metaset(self, metaset_file_path):
+        data_frame      = self.get_dataset(metaset_file_path)
+        data_columns    = data_frame.columns.values if not data_frame is None else None
+        id_column_name  = data_frame.columns.values[0] if not data_frame is None else None
+
+        metaset         = dict()
+        if not data_frame is None:
+            for index, row in data_frame.iterrows():
+                sample_id           = row[id_column_name]
+                metaset[sample_id]  = dict()
+                for i in range(1, len(data_columns)):
+                    column_name                     = data_columns[i]
+                    metaset[sample_id][column_name] = row[column_name]
+
+        return metaset
+
+    def get_dataset(self, file_path):
+        if file_path:
+            try:
+                return read_csv(file_path, dtype=object, na_filter = False)
+            except:
+                pass
+        return None

@@ -13,14 +13,15 @@ from re import match
 
 from handlers.BaseHandler import BaseHandler
 from utils.Algorithms import Algorithms
-from utils.DatasetParser import DatasetParser
+from utils.DatasetParsers import DatasetParser
+from utils.DatasetParsers import MetasetParser
 
 class DatasetUploadHandler(BaseHandler):
     def initialize(self):
         self.dataset_parser = DatasetParser()
 
     def post(self):
-        file         = self.request.files['files[]'][0]
+        file         = self.request.files['file'][0]
         file_content = file['body']
         content_type = file['content_type']
         file_name    = file['filename']
@@ -43,7 +44,7 @@ class DatasetUploadHandler(BaseHandler):
             result['fileInfo']            = dict()
             result['fileInfo']['lines']   = file_stats[0]
             result['fileInfo']['columns'] = file_stats[1]
-            logging.info('User [Username=%s] uploaded new dataset [%s] at %s.' % \
+            logging.info('User [Username=%s] uploaded new file [%s] at %s.' % \
                 (current_user, file_path, self.get_user_ip_addr()))
 
         self.write(dump_json(result))
@@ -68,19 +69,20 @@ class DatasetUploadHandler(BaseHandler):
 class DatasetProcessHandler(BaseHandler):
     def initialize(self):
         self.dataset_parser     = DatasetParser()
+        self.metaset_parser     = MetasetParser()
         self.algorithms         = Algorithms()
 
     def post(self):
         dataset_name        = self.get_argument('datasetName')
-        dataset_file_name   = self.get_argument('datasetFileName')
-        metaset_file_name   = self.get_argument('metasetFileName')
+        dataset_file_name   = self.get_argument('datasetFileName', '')
+        metaset_file_name   = self.get_argument('metasetFileName', '')
         process_steps       = self.get_argument('processFlow')
 
         current_user        = self.get_current_user()
         dataset_file_path   = self.get_file_path(current_user, dataset_name, dataset_file_name)
         metaset_file_path   = self.get_file_path(current_user, dataset_name, metaset_file_name)
         dataset             = self.dataset_parser.get_datasets(dataset_file_path, None, None)
-        metaset             = None
+        metaset             = self.metaset_parser.get_metaset(metaset_file_path)
 
         result              = {
             'isDatasetExists': file_exists(dataset_file_path) if dataset_file_path else False,

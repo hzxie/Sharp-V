@@ -17,59 +17,81 @@
     <div class="container">
         <div class="col-sm-12 col-md-9">
             <div class="section">
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2>{{ _('Step') }} 1. {{ _('Select Dataset') }}</h2>
-                    </div> <!-- .col-md-6 -->
-                    <div class="col-md-6">
-                        <div class="togglebutton">
-                            <label>
-                                <input id="chkbox-upload-dataset" type="checkbox"> {{ _('Upload new dataset') }}
-                            </label>
-                        </div> <!-- .togglebutton -->
-                    </div> <!-- .col-md-6 -->
-                </div> <!-- .row -->
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="form-group label-static">
-                            <label for="dataset-name">{{ _('Dataset name') }}</label>
-                            <input id="dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My Dataset #0">
-                            <ul class="search-suggestions"></ul> <!-- .search-suggestions -->
-                        </div> <!-- .form-group -->
-                    </div> <!-- .col-md-8 -->
-                    <div class="col-md-4 upload-dataset hide">
-                        <div class="form-group label-static">
-                            <label for="file-upload">{{ _('Upload file') }} (<a href="javascript:void(0);">{{ _('File Format') }}</a>)</label>
-                            <span class="btn btn-raised btn-primary fileinput-button">
-                                <i class="fa fa-plus"></i>
-                                <span>{{ _('Select files...') }}</span>
-                                <input id="file-upload" type="file" name="files[]" multiple>
-                            </span>
-                        </div> <!-- .form-group -->
-                    </div> <!-- .col-md-4 -->
-                </div> <!-- .row -->
-                <div class="progress progress-striped active upload-dataset hide">
-                    <div class="progress-bar"></div> <!-- .progress-bar" -->
-                </div> <!-- .progress -->
-                <div class="row">
-                    <div class="col-md-12">
-                        <ul id="datasets"></ul>
-                    </div> <!-- .col-md-12 -->
-                </div> <!-- .row -->
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="dataset-file">{{ _('Dataset File Name') }}</label>
-                            <select id="dataset-file" class="form-control dropdown"></select>
-                        </div> <!-- .form-group -->
-                    </div> <!-- .col-md-4 -->
-                    <div class="col-md-4">
-                        <div class="form-group">
-                            <label for="metaset-file">{{ _('Metaset File Name') }} <i>({{ _('Optional') }})</i></label>
-                            <select id="metaset-file" class="form-control dropdown"></select>
-                        </div> <!-- .form-group -->
-                    </div> <!-- .col-md-4 -->
-                </div> <!-- .row -->
+                <h2>{{ _('Step') }} 1. {{ _('Select Dataset') }}</h2>
+                <div id="dataset-selection">
+                    <ul class="nav nav-tabs" role="tablist">
+                        <li role="presentation" class="active">
+                            <a href="#existing-data" id="existing-data-tab" role="tab" data-toggle="tab" aria-controls="existing-data" aria-expanded="true">Use existing data</a>
+                        </li>
+                        <li role="presentation">
+                            <a href="#upload-data" role="tab" id="upload-data-tab" data-toggle="tab" aria-controls="upload-data">Upload new data</a>
+                        </li>
+                    </ul> <!-- .nav-tabs -->
+                    <div class="tab-content">
+                        <div role="tabpanel" class="tab-pane fade in active" id="existing-data" aria-labelledby="existing-data-tab">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group label-static">
+                                        <label for="existing-dataset-name">{{ _('Dataset name') }}</label>
+                                        <input id="existing-dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My Dataset #0">
+                                        <ul class="search-suggestions">
+                                        </ul> <!-- .search-suggestions -->
+                                    </div> <!-- .form-group -->
+                                </div> <!-- .col-md-4 -->
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="existing-dataset-file-name">{{ _('Dataset File Name') }}</label>
+                                        <select id="existing-dataset-file-name" class="form-control dropdown"></select>
+                                    </div> <!-- .form-group -->
+                                </div> <!-- .col-md-4 -->
+                                <div class="col-md-4">
+                                    <div class="form-group">
+                                        <label for="existing-metaset-file-name">{{ _('Metaset File Name') }} <i>({{ _('Optional') }})</i></label>
+                                        <select id="existing-metaset-file-name" class="form-control dropdown"></select>
+                                    </div> <!-- .form-group -->
+                                </div> <!-- .col-md-4 -->
+                            </div> <!-- .row -->
+                        </div> <!-- .tab-pane -->
+                        <div role="tabpanel" class="tab-pane fade" id="upload-data" aria-labelledby="upload-data-tab">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="form-group label-static">
+                                        <label for="new-dataset-name">{{ _('Dataset name') }}</label>
+                                        <input id="new-dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My Dataset #0">
+                                    </div> <!-- .form-group -->
+                                </div> <!-- .col-md-4 -->
+                                <div class="col-md-4">
+                                    <div class="form-group label-static">
+                                        <label for="dataset-file">{{ _('Dataset file') }} (<a href="javascript:void(0);">{{ _('File Format') }}</a>)</label>
+                                        <span class="btn btn-raised btn-primary fileinput-button">
+                                            <i class="fa fa-plus"></i>
+                                            <span>{{ _('Select file...') }}</span>
+                                            <input id="new-dataset-file-name" class="file-upload" type="file" name="file">
+                                        </span>
+                                    </div> <!-- .form-group -->
+                                </div> <!-- .col-md-4 -->
+                                <div class="col-md-4">
+                                    <div class="form-group label-static">
+                                        <label for="metaset-file">{{ _('Metaset file') }} (<a href="javascript:void(0);">{{ _('File Format') }}</a>)</label>
+                                        <span class="btn btn-raised btn-primary fileinput-button">
+                                            <i class="fa fa-plus"></i>
+                                            <span>{{ _('Select file...') }}</span>
+                                            <input id="new-metaset-file-name" class="file-upload" type="file" name="file">
+                                        </span>
+                                    </div> <!-- .form-group -->
+                                </div> <!-- .col-md-4 -->
+                            </div> <!-- .row -->
+                            <div class="progress progress-striped active upload-dataset">
+                                <div class="progress-bar"></div> <!-- .progress-bar" -->
+                            </div> <!-- .progress -->
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <ul id="datasets"></ul>
+                                </div> <!-- .col-md-12 -->
+                            </div> <!-- .row -->
+                        </div> <!-- .tabpanel -->
+                    </div> <!-- .tab-content -->
+                </div> <!-- #dataset-selection -->
             </div> <!-- .section -->
             <div id="process-flow" class="section">
                 <h2>{{ _('Step') }} 2. {{ _('Processing Data') }} </h2>
@@ -194,21 +216,24 @@
 <script type="text/javascript">
     highlightNavigationItem('{{ _('Workbench') }}');
     $('.dropdown').dropdown();
-    $('#file-upload').fileupload({
+    $('.file-upload').fileupload({
         url: '{{ base_url('/datasets/upload') }}',
         dataType: 'JSON',
         add: function(e, data) {
             $('.progress .progress-bar').css('width', '0');
             
-            var datasetName = $('#dataset-name').val();
+            var datasetName     = $('#new-dataset-name').val(),
+                acceptFileTypes = /.*\.(csv)$/i,
+                fileName        = data.originalFiles[0]['name'];
             if ( !datasetName ) {
                 alert('{{ _('Please name your datasets.') }}');
                 return;
             }
-            var acceptFileTypes = /.*\.(csv)$/i;
-            if ( !acceptFileTypes.test(data.originalFiles[0]['name']) ) {
+            if ( !acceptFileTypes.test(fileName) ) {
                 alert('{{ _('You are allow to upload comma seperated CSV files only.') }}');
                 return;
+            } else {
+                $(this).attr('file-name', fileName);
             }
             data.submit();
         },
@@ -228,21 +253,17 @@
                 datasetName    = $('#dataset-name').val();
 
             if ( isSuccessful ) {
-                $('select#dataset-file, select#metaset-file').append($('<option>', {
-                    value: fileName,
-                    text : fileName
-                }));
-                $('select#dataset-file, select#metaset-file').val('');
+                $('ul#datasets').append(
+                    '<li class="dataset alert alert-%s">'.format(alertClassName) + 
+                    '    <h5>%s</h5>'.format(fileName) + 
+                    '    <p>%s</p>'.format(message) + 
+                    '</li>'
+                );
             }
-            $('ul#datasets').append(
-                '<li class="dataset alert alert-%s">'.format(alertClassName) + 
-                '    <h5>%s</h5>'.format(fileName) + 
-                '    <p>%s</p>'.format(message) + 
-                '</li>');
         }
     });
-    $('#file-upload').bind('fileuploadsubmit', function (e, data) {
-        var datasetName = $('#dataset-name').val();
+    $('.file-upload').bind('fileuploadsubmit', function (e, data) {
+        var datasetName = $('#new-dataset-name').val();
         data.formData = {
             'datasetName': datasetName,
             '_xsrf': getCookie("_xsrf")
@@ -385,9 +406,9 @@
 </script>
 <script type="text/javascript">
     $('#btn-process').click(function() {
-        var datasetName     = $('#dataset-name').val(),
-            datasetFileName = $('#dataset-file').val(),
-            metasetFileName = $('#metaset-file').val(),
+        var datasetName     = getDatasetName(),
+            datasetFileName = getDatasetFileName(),
+            metasetFileName = getMetasetFileName(),
             processFlow     = JSON.stringify(getProcessFlow()),
             xsrfToken       = getCookie("_xsrf");
 
@@ -396,6 +417,23 @@
         return processDataset(datasetName, datasetFileName, metasetFileName, processFlow, xsrfToken);
     });
 </script>
+<script type="text/javascript">
+    function getDatasetName() {
+        return isUsingExistingData() ? $('#existing-dataset-name').val() : $('#new-dataset-name').val();
+    }
+
+    function getDatasetFileName() {
+        return isUsingExistingData() ? $('#existing-dataset-file-name').val() : $('#new-dataset-file-name').attr('file-name');
+    }
+
+    function getMetasetFileName() {
+        return isUsingExistingData() ? $('#existing-metaset-file-name').val() : $('#new-metaset-file-name').attr('file-name');
+    }
+
+    function isUsingExistingData() {
+        return $('a[aria-expanded=true]').attr('aria-controls') == 'existing-data';
+    }
+ </script>
 <script type="text/javascript">
     function getProcessFlow() {
         var processFlow = [];
@@ -437,21 +475,26 @@
             data: postData,
             dataType: 'JSON',
             success: function(result) {
+                console.log(result);
+                
                 if ( result['isSuccessful'] ) {
                     draw(result['dataset'])
-                } else {
                 }
                 $('#btn-process').html('{{ _('Process') }}');
                 $('#btn-process').removeAttr('disabled');
+            },
+            error: function() {
+                alert('FUCK YOU!');
             }
         });
     }
 </script>
 <script type="text/javascript">
     function draw(dataset) {
+        console.log(dataset);
         $('#d3-diagram').empty();
 
-        var CLUSTER_COLORS   = ['#f4394c', '#f6aa4a', '#40a3e7', '#8fbf59', '#6a1b9a', '#795548', '#607d8b', '#283593', '#1b5e20', '#333'],
+        var CLUSTER_COLORS          = ['#f4394c', '#f6aa4a', '#40a3e7', '#8fbf59', '#6a1b9a', '#795548', '#607d8b', '#283593', '#1b5e20', '#333'],
             trainingSamples         = dataset['samples']['training'],
             trainingPredictedLabels = dataset['predicting']['training'],
             maxMinPoint             = getPointsStatistics(trainingSamples),
@@ -467,6 +510,8 @@
                 }
             },
             svgComponents    = setUpScatterSvg(svgOptions, maxMinPoint);
+
+        console.log(trainingSamples);
 
         for ( var i = 0; i < trainingSamples.length; ++ i ) {
             addPointToSvg(svgComponents, [trainingSamples[i]], CLUSTER_COLORS[trainingPredictedLabels[i]]);

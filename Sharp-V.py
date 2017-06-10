@@ -110,7 +110,8 @@ def main():
     # load_gettext_translations(join(dirname(__file__), 'locales'), 'messages')
 
     # Start HTTP Server
-    http_server = tornado.httpserver.HTTPServer(Application(options.base_url, db_session, mail_sender))
+    http_server = tornado.httpserver.HTTPServer(
+        Application(options.base_url, db_session, mail_sender), max_buffer_size=10485760000)
     http_server.listen(options.http_port)
     logging.info('BioIndex web application is running on port: %d.' % options.http_port)
     IOLoop.current().start()

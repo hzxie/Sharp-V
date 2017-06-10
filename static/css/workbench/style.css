@@ -14,6 +14,12 @@ body.dragging, body.dragging * {
 	color: #333;
 }
 
+.form-group input[type=text],
+.form-group input[type=number],
+.form-group select {
+	border-bottom: 2px solid #eee;
+}
+
 div.hero {
 	background-color: #474747;
 	color: #fff;
@@ -55,6 +61,7 @@ div#main-content div.section h2 {
 
 div#main-content div.section ul.search-suggestions {
 	background-color: #fff;
+	display: none;
 	position: absolute;
 	top: 65px;
 	left: 0;
@@ -70,6 +77,27 @@ div#main-content div.section ul.search-suggestions {
 div#main-content div.section ul.search-suggestions li {
 	cursor: pointer;
 	margin: 5px 10px;
+}
+
+div#main-content div#dataset-selection ul.nav-tabs {
+	background: #fff;
+}
+
+div#main-content div#dataset-selection ul.nav-tabs a {
+	color: #333!important;
+	font-weight: normal;
+	font-size: 16px;
+}
+
+div#main-content div#dataset-selection ul.nav-tabs > li.active > a {
+	border: 1px solid #ddd!important;
+	border-bottom-color: #fff!important;
+}
+
+div#main-content div#dataset-selection div.tab-content {
+	border: 1px solid #ddd;
+	border-top-color: transparent!important;
+	padding: 30px 15px;
 }
 
 div#main-content div.section span.fileinput-button {
