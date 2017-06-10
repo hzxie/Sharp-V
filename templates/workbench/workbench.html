@@ -475,23 +475,17 @@
             data: postData,
             dataType: 'JSON',
             success: function(result) {
-                console.log(result);
-                
                 if ( result['isSuccessful'] ) {
                     draw(result['dataset'])
                 }
                 $('#btn-process').html('{{ _('Process') }}');
                 $('#btn-process').removeAttr('disabled');
-            },
-            error: function() {
-                alert('FUCK YOU!');
             }
         });
     }
 </script>
 <script type="text/javascript">
     function draw(dataset) {
-        console.log(dataset);
         $('#d3-diagram').empty();
 
         var CLUSTER_COLORS          = ['#f4394c', '#f6aa4a', '#40a3e7', '#8fbf59', '#6a1b9a', '#795548', '#607d8b', '#283593', '#1b5e20', '#333'],
@@ -510,8 +504,6 @@
                 }
             },
             svgComponents    = setUpScatterSvg(svgOptions, maxMinPoint);
-
-        console.log(trainingSamples);
 
         for ( var i = 0; i < trainingSamples.length; ++ i ) {
             addPointToSvg(svgComponents, [trainingSamples[i]], CLUSTER_COLORS[trainingPredictedLabels[i]]);
