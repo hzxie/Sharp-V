@@ -129,12 +129,15 @@ class DatasetProcessHandler(BaseHandler):
                 
                 if dataset['predicting']['training'] or dataset['predicting']['testing']:
                     predicting = dataset['predicting']
+                if dataset['nearest_neighbors']:
+                    nearest_neighbors = dataset['nearest_neighbors']
             else:
                 logging.warn('Algorithm [Name=%s] not found.' % algorithm_name)
 
         dataset['samples']['training'] = self.format_sample_points(dataset['samples']['training'])
         dataset['samples']['testing']  = self.format_sample_points(dataset['samples']['testing'])
         dataset['predicting']          = predicting
+        dataset['nearest_neighbors']   = nearest_neighbors
         return dataset
 
     def format_sample_points(self, dataset):
