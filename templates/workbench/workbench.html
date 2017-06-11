@@ -484,25 +484,17 @@
             data: postData,
             dataType: 'JSON',
             success: function(result) {
-                console.log(result);
-
                 if ( result['isSuccessful'] ) {
                     draw(result['dataset'], result['metaset'])
                 }
                 $('#btn-process').html('{{ _('Process') }}');
                 $('#btn-process').removeAttr('disabled');
-            },
-            error: function() {
-                alert('FUCK YOU');
             }
         });
     }
 </script>
 <script type="text/javascript">
     function draw(dataset, metaset) {
-        console.log(dataset);
-        console.log(metaset);
-
         var containerWidth          = $('#d3-diagram').width(),
             svgOptions              = {
                 height: containerWidth,
@@ -515,7 +507,6 @@
                 }
             };
 
-        console.log(isHierarchicalClustering());
         $('#d3-diagram').empty();
         if ( isHierarchicalClustering() ) {
             return drawCollapsibleTree(dataset, metaset, svgOptions);
