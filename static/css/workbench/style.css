@@ -20,6 +20,10 @@ body.dragging, body.dragging * {
 	border-bottom: 2px solid #eee;
 }
 
+button.btn[disabled][disabled] {
+	background-color: #03a9f4;
+}
+
 div.hero {
 	background-color: #474747;
 	color: #fff;

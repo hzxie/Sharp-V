@@ -45,7 +45,8 @@
                             <img src="{{ static_url('img/avatar.jpg') }}" alt="Avatar" />
                             <ul class="dropdown-menu">
                             {% if current_user != 'Guest' %}
-                                <li><a href="{{ base_url('/accounts/profile') }}">{{ _('Profile') }}</a></li>
+                                <li><a href="{{ base_url('/accounts/profile') }}">{{ _('My Profile') }}</a></li>
+                                <li><a href="{{ base_url('/accounts/profile') }}">{{ _('My Projects') }}</a></li>
                                 <li class="divider"></li>
                                 <li><a href="{{ base_url('/accounts/login?logout=true') }}">{{ _('Sign Out') }}</a></li>
                             {% else %}
