@@ -343,15 +343,18 @@
 </script>
 <script type="text/javascript">
     $('.search-suggestions').on('click', 'li', function() {
-        var datasetFiles        = JSON.parse($(this).attr('dataset-files'));
+        var datasetName  = $(this).html(),
+            datasetFiles = JSON.parse($(this).attr('dataset-files'));
 
         $('#existing-dataset-file-name, #existing-metaset-file-name').find('option').remove();
+        $('#existing-dataset-file-name, #existing-metaset-file-name').append('<option value=""></option>');
         for ( var i = 0; i < datasetFiles.length; ++ i ) {
             $('#existing-dataset-file-name, #existing-metaset-file-name')
                 .append('<option value="%s">%s</option>'
                     .format(datasetFiles[i], datasetFiles[i]));
             $('#existing-dataset-file-name, #existing-metaset-file-name').dropdown();
         }
+        $('#existing-dataset-name').val(datasetName);
         $('.search-suggestions').addClass('hide');
     });
 </script>
