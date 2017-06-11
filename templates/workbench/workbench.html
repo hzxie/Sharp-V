@@ -347,7 +347,7 @@
             datasetFiles = JSON.parse($(this).attr('dataset-files'));
 
         $('#existing-dataset-file-name, #existing-metaset-file-name').find('option').remove();
-        $('#existing-dataset-file-name, #existing-metaset-file-name').append('<option value=""></option>');
+        $('#existing-metaset-file-name').append('<option value=" "></option>');
         for ( var i = 0; i < datasetFiles.length; ++ i ) {
             $('#existing-dataset-file-name, #existing-metaset-file-name')
                 .append('<option value="%s">%s</option>'
