@@ -4,9 +4,12 @@
 import logging
 
 from os import makedirs
+from os import listdir
 from os.path import isfile as file_exists
+from os.path import isdir as folder_exists
 from os.path import join as join_path
 from os.path import exists as path_exists
+from sets import Set
 from tornado.escape import json_decode as load_json
 from tornado.escape import json_encode as dump_json
 from re import match
@@ -15,6 +18,30 @@ from handlers.BaseHandler import BaseHandler
 from utils.Algorithms import Algorithms
 from utils.DatasetParsers import DatasetParser
 from utils.DatasetParsers import MetasetParser
+
+class DatasetSuggestionsHandler(BaseHandler):
+    def get(self):
+        dataset_keywords     = self.get_argument('keyword', '')
+        try:
+            dataset_keywords = load_json(dataset_keywords)
+        except:
+            dataset_keywords = []
+
+        current_user         = self.get_current_user()
+        base_folder          = join_path(self.application.settings['static_path'], 'uploads', current_user)
+        dataset_names        = Set()
+        datasets             = []
+        for dataset in listdir(base_folder):
+             if folder_exists(join_path(base_folder, dataset)):
+                for keyword in dataset_keywords:
+                    if dataset.lower().find(keyword.lower()) != -1 and not dataset in dataset_names:
+                        dataset_files = [file for file in listdir(join_path(base_folder, dataset))]
+                        dataset_names.add(dataset)
+                        datasets.append({
+                            'datasetName': dataset,
+                            'datasetFiles': dataset_files    
+                        })
+        self.write(dump_json(datasets))
 
 class DatasetUploadHandler(BaseHandler):
     def initialize(self):
@@ -121,7 +148,7 @@ class DatasetProcessHandler(BaseHandler):
         for process_step in process_steps:
             algorithm_name = process_step['algorithmName'].replace('-', '_')
             parameters     = process_step['parameters']
-            algorithm      =  self.algorithms.get_algorithm(algorithm_name)
+            algorithm      = self.algorithms.get_algorithm(algorithm_name)
 
             if algorithm:
                 logging.debug('Executing algorithm %s' % algorithm_name)

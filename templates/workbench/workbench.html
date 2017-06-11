@@ -34,7 +34,7 @@
                                     <div class="form-group label-static">
                                         <label for="existing-dataset-name">{{ _('Dataset name') }}</label>
                                         <input id="existing-dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My Dataset #0">
-                                        <ul class="search-suggestions">
+                                        <ul class="search-suggestions hide">
                                         </ul> <!-- .search-suggestions -->
                                     </div> <!-- .form-group -->
                                 </div> <!-- .col-md-4 -->
@@ -170,6 +170,7 @@
                                 <div class="form-group label-static">
                                     <select class="algorithm-name form-control dropdown">
                                         <option value="kmeans">{{ _('KMeans') }}</option>
+                                        <option value="hierarchical-cluster">{{ _('Hierarchical Clustering') }}</option>
                                     </select>
                                 </div> <!-- .form-group -->
                             </div> <!-- .col-sm-6 -->
@@ -307,28 +308,23 @@
 <script type="text/javascript">
     $('#existing-dataset-name').keyup(function() {
         var currentValue        = $(this).val().toLowerCase(),
-            dataSource          = $('#existing-data-source').val(),
             suggestionsControl  = $('.search-suggestions', $(this).parent());
 
         suggestionsControl.empty();
         suggestionsControl.addClass('hide');
-        return getSearchSuggestions(currentValue, dataSource, suggestionsControl);
+        return getSearchSuggestions(currentValue, suggestionsControl);
     });
 </script>
 <script type="text/javascript">
-    function getSearchSuggestions(currentValue, dataSource, suggestionsControl) {
-        var currentValues       = currentValue.split(/[\s,;\+]+/),
-            prefixValues        = currentValues.slice(0, currentValues.length - 1),
-            prefixValue         = prefixValues.join(' '),
-            lastValue           = currentValues[currentValues.length - 1],
+    function getSearchSuggestions(currentValue, suggestionsControl) {
+        var currentValues = currentValue.split(/[\s,;\+]+/);
             request = {
-                'dataSource': dataSource,
-                'currentValue': lastValue
+                'keyword': JSON.stringify(currentValues)
             };
-        
+
         $.ajax({
             type: 'GET',
-            url: '{{ base_url('/datasets') }}',
+            url: '{{ base_url('/datasets/suggestions') }}',
             data: request,
             dataType: 'JSON',
             success: function(suggestions) {
@@ -336,18 +332,28 @@
                     return;                    
                 }
                 for ( var i = 0; i < suggestions.length; ++ i ) {
-                    var suggestionWords = suggestions[i].split(' ');
-
-                    if ( suggestionWords[0] == prefixValues[prefixValues.length - 1] ) {
-                        suggestionWords = suggestionWords.slice(1, suggestionWords.length);
-                    }
-                    suggestionsControl.append('<li>%s <strong>%s</strong></li>'
-                        .format(prefixValue, suggestionWords.join(' ')));
+                    var datasetName  = suggestions[i]['datasetName'],
+                        datasetFiles = suggestions[i]['datasetFiles'];
+                    suggestionsControl.append('<li dataset-files=\'%s\'>%s</li>'.format(JSON.stringify(datasetFiles), datasetName));
                 }
                 suggestionsControl.removeClass('hide');
             }
         });
     }
+</script>
+<script type="text/javascript">
+    $('.search-suggestions').on('click', 'li', function() {
+        var datasetFiles        = JSON.parse($(this).attr('dataset-files'));
+
+        $('#existing-dataset-file-name, #existing-metaset-file-name').find('option').remove();
+        for ( var i = 0; i < datasetFiles.length; ++ i ) {
+            $('#existing-dataset-file-name, #existing-metaset-file-name')
+                .append('<option value="%s">%s</option>'
+                    .format(datasetFiles[i], datasetFiles[i]));
+            $('#existing-dataset-file-name, #existing-metaset-file-name').dropdown();
+        }
+        $('.search-suggestions').addClass('hide');
+    });
 </script>
 <script type="text/javascript">
     $(function() {
@@ -475,24 +481,26 @@
             data: postData,
             dataType: 'JSON',
             success: function(result) {
+                console.log(result);
+
                 if ( result['isSuccessful'] ) {
-                    draw(result['dataset'])
+                    draw(result['dataset'], result['metaset'])
                 }
                 $('#btn-process').html('{{ _('Process') }}');
                 $('#btn-process').removeAttr('disabled');
+            },
+            error: function() {
+                alert('FUCK YOU');
             }
         });
     }
 </script>
 <script type="text/javascript">
-    function draw(dataset) {
-        $('#d3-diagram').empty();
+    function draw(dataset, metaset) {
+        console.log(dataset);
+        console.log(metaset);
 
-        var CLUSTER_COLORS          = ['#f4394c', '#f6aa4a', '#40a3e7', '#8fbf59', '#6a1b9a', '#795548', '#607d8b', '#283593', '#1b5e20', '#333'],
-            trainingSamples         = dataset['samples']['training'],
-            trainingPredictedLabels = dataset['predicting']['training'],
-            maxMinPoint             = getPointsStatistics(trainingSamples),
-            containerWidth          = $('#d3-diagram').width(),
+        var containerWidth          = $('#d3-diagram').width(),
             svgOptions              = {
                 height: containerWidth,
                 width: containerWidth,
@@ -502,8 +510,36 @@
                     'bottom': 30,
                     'left': 30,
                 }
-            },
-            svgComponents    = setUpScatterSvg(svgOptions, maxMinPoint);
+            };
+
+        console.log(isHierarchicalClustering());
+        $('#d3-diagram').empty();
+        if ( isHierarchicalClustering() ) {
+            return drawCollapsibleTree(dataset, metaset, svgOptions);
+        } else {
+            return drawScatterPlot(dataset, metaset, svgOptions);
+        }
+    }
+</script>
+<script type="text/javascript">
+    function isHierarchicalClustering() {
+        var processFlow         = getProcessFlow();
+
+        for ( var i = 0; i < processFlow.length; ++ i ) {
+            if ( processFlow[i]['algorithmName'] == 'hierarchical-cluster' ) {
+                return true;
+            }
+        }
+        return false;
+    }
+</script>
+<script type="text/javascript">
+    function drawScatterPlot(dataset, metaset, svgOptions) {
+        var CLUSTER_COLORS          = ['#f4394c', '#f6aa4a', '#40a3e7', '#8fbf59', '#6a1b9a', '#795548', '#607d8b', '#283593', '#1b5e20', '#333'],
+            trainingSamples         = dataset['samples']['training'],
+            trainingPredictedLabels = dataset['predicting']['training'],
+            maxMinPoint             = getPointsStatistics(trainingSamples),
+            svgComponents           = setUpScatterSvg(svgOptions, maxMinPoint);
 
         for ( var i = 0; i < trainingSamples.length; ++ i ) {
             addPointToSvg(svgComponents, [trainingSamples[i]], CLUSTER_COLORS[trainingPredictedLabels[i]]);
@@ -595,6 +631,8 @@
 </script>
 <script type="text/javascript">
     function addPointToSvg(svgComponents, point, pointColor) {
+        console.log(point);
+
         // Plot points in SVG
         svgComponents.svg.insert('g', '#axis-x')
            .attr('id', 'scatter-plot')
@@ -609,6 +647,11 @@
         svgComponents.svg.selectAll('circle').on('click', function(data, index) {
             console.log(data);
         });
+    }
+</script>
+<script type="text/javascript">
+    function drawCollapsibleTree(dataset, metaset, svgOptions) {
+
     }
 </script>
 {% end %}
