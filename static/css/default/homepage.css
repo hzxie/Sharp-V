@@ -23,6 +23,7 @@ div#hero div#particles-js canvas{
 }
 
 div#hero div#introduction {
+	padding: 100px;
 	position: relative;
 	z-index: 4;
 }

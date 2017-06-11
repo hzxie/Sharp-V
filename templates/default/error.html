@@ -26,5 +26,18 @@
             <button class="btn btn-raised btn-primary" onclick="history.go(-1)">{{ _('Go back') }}</button>
         </div> <!-- .col-md-6 -->
     </div> <!-- .row -->
-</div> <!-- .container-fluid -->
+</div> <!-- .container -->
+<script type="text/javascript">
+    $(function() {
+        var windowHeight   = $(window).height(),
+            contentHeight  = $('#content').height(),
+            reservedHeight = $('#header').height() + $('#footer').height() + contentHeight + 30,
+            contentPadding = (windowHeight - reservedHeight) / 2;
+
+        $('#content').css({
+            'padding-top': contentPadding,
+            'padding-bottom': contentPadding
+        });
+    });
+</script>
 {% end %}

@@ -1,18 +1,21 @@
 div#content {
-	min-height: 480px;
+	padding: 50px 0;
 }
 
 div#content img {
-	margin-top: 60px;
 	max-height: 360px;
 }
 
 div#content div#error-message {
-	margin-top: 180px;
+	margin-top: 120px;
 }
 
 /* Smaller than standard 960 (devices and browsers) */
 @media only screen and (max-width: 959px) {
+	div#content div#error-message {
+		margin-top: 20px;
+		text-align: center;
+	}
 }
 
 /* Tablet Portrait size to standard 960 (devices and browsers) */
@@ -28,10 +31,6 @@ div#content div#error-message {
 	div#content img {
 		margin-top: 20px;
 		display: none;
-	}
-
-	div#content div#error-message {
-		margin-top: 20px;
 	}
 }
 
