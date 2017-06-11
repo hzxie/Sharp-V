@@ -12,6 +12,7 @@ from os.path import exists as path_exists
 from sets import Set
 from tornado.escape import json_decode as load_json
 from tornado.escape import json_encode as dump_json
+from tornado.web import asynchronous
 from re import match
 
 from handlers.BaseHandler import BaseHandler
@@ -20,6 +21,7 @@ from utils.DatasetParsers import DatasetParser
 from utils.DatasetParsers import MetasetParser
 
 class DatasetSuggestionsHandler(BaseHandler):
+    @asynchronous
     def get(self):
         dataset_keywords     = self.get_argument('keyword', '')
         try:
@@ -47,6 +49,7 @@ class DatasetUploadHandler(BaseHandler):
     def initialize(self):
         self.dataset_parser = DatasetParser()
 
+    @asynchronous
     def post(self):
         file         = self.request.files['file'][0]
         file_content = file['body']
@@ -99,6 +102,7 @@ class DatasetProcessHandler(BaseHandler):
         self.metaset_parser     = MetasetParser()
         self.algorithms         = Algorithms()
 
+    @asynchronous
     def post(self):
         dataset_name        = self.get_argument('datasetName')
         dataset_file_name   = self.get_argument('datasetFileName', '')
