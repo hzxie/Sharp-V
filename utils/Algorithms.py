@@ -266,7 +266,7 @@ class Algorithms(object):
             del n["node_id"]
 
             # Labeling convention: "-"-separated leaf names
-            n["name"] = leafNames
+            n["name"] = leafNames[0] if len(leafNames) == 1 else "non-leaf node"
             
             return leafNames
         add_node(T, tree_data)
