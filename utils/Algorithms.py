@@ -32,7 +32,8 @@ class Algorithms(object):
         testing_ids  = np.array(ids['testing']) if 'testing' in ids else None
         return training_ids, testing_ids
 
-    def pack_data(self, training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels, training_predicted_labels = None, testing_predicted_labels = None, cluster_centers = None, nearest_neighbors = None):
+    def pack_data(self, training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels, training_predicted_labels = None, \
+        testing_predicted_labels = None, cluster_centers = None, nearest_neighbors = None, tree_data = None):
         training_ids     = np.ndarray.tolist(training_ids) if isinstance(training_ids, np.ndarray) else None
         testing_ids      = np.ndarray.tolist(testing_ids) if isinstance(testing_ids, np.ndarray) else None
         training_samples = np.ndarray.tolist(training_samples) if isinstance(training_samples, np.ndarray) else None
@@ -43,7 +44,8 @@ class Algorithms(object):
         testing_predicted_labels = np.ndarray.tolist(testing_predicted_labels) if isinstance(testing_predicted_labels, np.ndarray) else None
         cluster_centers  = np.ndarray.tolist(cluster_centers) if isinstance(cluster_centers, np.ndarray) else None
         nearest_neighbors = np.ndarray.tolist(nearest_neighbors) if isinstance(nearest_neighbors, np.ndarray) else None
-
+        tree_data        = np.ndarray.tolist(tree_data) if isinstance(tree_data, np.ndarray) else None
+        
         data = {
             'ids':     {
                 'training': training_ids, 
@@ -62,8 +64,10 @@ class Algorithms(object):
                 'testing' : testing_predicted_labels
             }, 
             'cluster_centers': cluster_centers,
-            'nearest_neighbors': nearest_neighbors
+            'nearest_neighbors': nearest_neighbors,
+            'tree_data': tree_data
         }
+        
         return data
 
     def get_algorithm(self, algorithm_name):
@@ -93,7 +97,8 @@ class Algorithms(object):
             #     training_samples[tag_indexes] = training_sample
         if testing_samples.any():
             imputer.fit_transform(testing_samples)
-        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+            training_labels = training_labels, testing_labels = testing_labels)
 
     def zscore_normalization(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -105,7 +110,8 @@ class Algorithms(object):
         if testing_samples.any():
             testing_samples = preprocessing.scale(testing_samples, axis = axis)
 
-        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+            training_labels = training_labels, testing_labels = testing_labels)
 
     def zero_centered_normalization(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -117,7 +123,8 @@ class Algorithms(object):
         if testing_samples.any():
             testing_samples = scaler.fit_transform(testing_samples)
 
-        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+            training_labels = training_labels, testing_labels = testing_labels)
 
 
     def min_max_normalization(self, data, params):
@@ -130,7 +137,8 @@ class Algorithms(object):
         if testing_samples.any():
             testing_samples = scaler.fit_transform(testing_samples)
 
-        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+            training_labels = training_labels, testing_labels = testing_labels)
 
     def max_abs_normalization(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -142,7 +150,8 @@ class Algorithms(object):
         if testing_samples.any():
             testing_samples = scaler.fit_transform(testing_samples)
 
-        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+            training_labels = training_labels, testing_labels = testing_labels)
 
     def median_centered_normalization(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -154,7 +163,8 @@ class Algorithms(object):
         if testing_samples.any():
             testing_samples = scaler.fit_transform(testing_samples)
 
-        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+            training_labels = training_labels, testing_labels = testing_labels)
 
     def knn(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
@@ -216,6 +226,7 @@ class Algorithms(object):
         neighborhood.fit(training_samples)
         neighbor_indices = neighborhood.kneighbors(training_samples, return_distance=False)
         nearest_neighbors = neighbor_indices[:,1:]
+
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
                 training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels, cluster_centers = cluster_centers, nearest_neighbors = nearest_neighbors)
 
@@ -229,10 +240,12 @@ class Algorithms(object):
         h_cluster  = cluster.AgglomerativeClustering(n_clusters = n_clusters, linkage = linkage)
         h_cluster.fit(training_samples)
         training_predicted_labels = h_cluster.labels_
-        childrens = sorted(h_cluster.children_, key = lambda x: x[0])
+        tree_data = h_cluster.children_
+        #TODO convert tree_data
+
         
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
-                training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels)
+                training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels, tree_data = tree_data)
 
     def pca(self, data, params):
         training_ids, testing_ids           = self.unpack_ids(data)

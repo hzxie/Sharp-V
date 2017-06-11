@@ -141,9 +141,10 @@ class DatasetProcessHandler(BaseHandler):
     def is_parameters_legal(self, process_steps):
         return True
 
-    @return_future
     def process_dataset(self, dataset, process_steps):
-        predicting = None
+        predicting        = None
+        nearest_neighbors = None
+        tree_data         = None
         process_steps.append({
             'algorithmName': 'tsne',
             'parameters': {}
@@ -162,6 +163,8 @@ class DatasetProcessHandler(BaseHandler):
                     predicting = dataset['predicting']
                 if dataset['nearest_neighbors']:
                     nearest_neighbors = dataset['nearest_neighbors']
+                if dataset['tree_data']:
+                    tree_data = dataset['tree_data']
             else:
                 logging.warn('Algorithm [Name=%s] not found.' % algorithm_name)
 
@@ -169,6 +172,8 @@ class DatasetProcessHandler(BaseHandler):
         dataset['samples']['testing']  = self.format_sample_points(dataset['samples']['testing'])
         dataset['predicting']          = predicting
         dataset['nearest_neighbors']   = nearest_neighbors
+        dataset['tree_data']           = tree_data
+ 
         return dataset
 
     def format_sample_points(self, dataset):
