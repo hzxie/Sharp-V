@@ -62,7 +62,7 @@
                                 </div> <!-- .col-md-4 -->
                                 <div class="col-md-4">
                                     <div class="form-group label-static">
-                                        <label for="dataset-file">{{ _('Dataset file') }} (<a href="javascript:void(0);">{{ _('File Format') }}</a>)</label>
+                                        <label for="dataset-file">{{ _('Dataset file') }} (<a href="javascript:void(0);" data-toggle="modal" data-target="#file-format-modal">{{ _('File Format') }}</a>)</label>
                                         <span class="btn btn-raised btn-primary fileinput-button">
                                             <i class="fa fa-plus"></i>
                                             <span>{{ _('Select file...') }}</span>
@@ -72,7 +72,7 @@
                                 </div> <!-- .col-md-4 -->
                                 <div class="col-md-4">
                                     <div class="form-group label-static">
-                                        <label for="metaset-file">{{ _('Metaset file') }} (<a href="javascript:void(0);">{{ _('File Format') }}</a>)</label>
+                                        <label for="metaset-file">{{ _('Metaset file') }} (<a href="javascript:void(0);" data-toggle="modal" data-target="#file-format-modal">{{ _('File Format') }}</a>)</label>
                                         <span class="btn btn-raised btn-primary fileinput-button">
                                             <i class="fa fa-plus"></i>
                                             <span>{{ _('Select file...') }}</span>
@@ -209,6 +209,24 @@
         </div> <!-- .col-md-9 -->
     </div> <!-- .container -->
 </div> <!-- #main-content -->
+<div id="file-format-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">File Format</h4>
+            </div> <!-- .modal-header -->
+            <div class="modal-body">
+                <h5>Dataset File Format</h5>
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+                <p><button class="btn btn-raised btn-primary">Download Demo Dataset</button></p>
+                <h5>Metaset File Format</h5>
+                <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+                <p><button class="btn btn-raised btn-primary">Download Demo Metaset</button></p>
+            </div> <!-- .modal-body -->
+        </div> <!-- .modal-content -->
+    </div> <!-- .modal-dialog -->
+</div> <!-- .modal -->
 {% end %}
 {% block scripts %}
 <script type="text/javascript" src="{{ static_url('js/jquery.dropdown.min.js') }}"></script>

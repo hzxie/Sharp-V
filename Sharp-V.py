@@ -24,8 +24,7 @@ from handlers.AccountsHandlers import LoginHandler
 from handlers.AccountsHandlers import RegisterHandler
 from handlers.AccountsHandlers import ResetPasswordHandler
 from handlers.DefaultHandlers import AboutHandler
-from handlers.DefaultHandlers import TermsHandler
-from handlers.DefaultHandlers import PrivacyHandler
+from handlers.DefaultHandlers import TutorialHandler
 from handlers.DefaultHandlers import HomeHandler
 from handlers.DefaultHandlers import SetLocaleHandler
 from handlers.DefaultHandlers import UpgradeBrowserHandler
@@ -56,9 +55,8 @@ class Application(tornado.web.Application):
             (r"/datasets/upload", DatasetUploadHandler),
             (r"/datasets/process", DatasetProcessHandler),
             (r"/workbench", WorkbenchHandler),
+            (r"/tutorial", TutorialHandler),
             (r"/about", AboutHandler),
-            (r"/terms", TermsHandler),
-            (r"/privacy", PrivacyHandler),
             (r"/set-locale", SetLocaleHandler),
             (r"/not-supported", UpgradeBrowserHandler),
         ]

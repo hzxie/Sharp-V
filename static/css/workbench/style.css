@@ -24,11 +24,21 @@ button.btn[disabled][disabled] {
 	background-color: #03a9f4;
 }
 
+div.modal div.modal-dialog {
+	margin-top: 10%;
+}
+
+div.modal div.modal-body h5 {
+	font-size: 16px;
+	font-weight: bold;
+	margin-top: 20px;
+}
+
 div.hero {
 	background-color: #474747;
 	color: #fff;
 	font-size: 16px;
-	height: 195px;
+	height: 160px;
 	line-height: 22px;
 	padding: 20px 0;
 	position: relative;
