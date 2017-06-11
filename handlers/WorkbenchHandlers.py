@@ -145,6 +145,7 @@ class DatasetProcessHandler(BaseHandler):
         predicting        = None
         nearest_neighbors = None
         tree_data         = None
+        
         process_steps.append({
             'algorithmName': 'tsne',
             'parameters': {}

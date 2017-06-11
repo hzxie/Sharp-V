@@ -2,6 +2,8 @@
 # -*- coding: utf-8 -*-
 
 import numpy as np
+import scipy.spatial
+import scipy.cluster
 
 from sklearn import preprocessing       # Imputer, Scale
 from sklearn import neighbors           # KNeighborsClassifier
@@ -44,7 +46,7 @@ class Algorithms(object):
         testing_predicted_labels = np.ndarray.tolist(testing_predicted_labels) if isinstance(testing_predicted_labels, np.ndarray) else None
         cluster_centers  = np.ndarray.tolist(cluster_centers) if isinstance(cluster_centers, np.ndarray) else None
         nearest_neighbors = np.ndarray.tolist(nearest_neighbors) if isinstance(nearest_neighbors, np.ndarray) else None
-        tree_data        = np.ndarray.tolist(tree_data) if isinstance(tree_data, np.ndarray) else None
+        tree_data        = tree_data if isinstance(tree_data, dict) else None
         
         data = {
             'ids':     {
@@ -235,17 +237,43 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
 
-        n_clusters = 2 if not 'n-clusters' in params else int(params['n-clusters'])
-        linkage  = 'ward' if not 'linkage' in params else params['linkage']
-        h_cluster  = cluster.AgglomerativeClustering(n_clusters = n_clusters, linkage = linkage)
-        h_cluster.fit(training_samples)
-        training_predicted_labels = h_cluster.labels_
-        tree_data = h_cluster.children_
-        #TODO convert tree_data
+        distMat = scipy.spatial.distance.pdist(training_samples)
+        clusters = scipy.cluster.hierarchy.linkage(distMat, method='average')
+        T = scipy.cluster.hierarchy.to_tree( clusters , rd=False )
+        ids = np.ndarray.tolist(training_ids)
+        id2name = dict(zip(range(len(ids)), ids))
+        tree_data = dict(children=[], name="Root")
+        def add_node(node, parent):
+            # First create the new node and append it to its parent's children
+            newNode = dict(node_id=node.id, children=[])
+            parent["children"].append(newNode)
 
+            # Recursively add the current node's children
+            if node.left: add_node(node.left, newNode)
+            if node.right: add_node(node.right, newNode)
+
+        def label_tree(n):
+            # If the node is a leaf, then we have its name
+            if len(n["children"]) == 0:
+                leafNames = [id2name[n["node_id"]]]
+            
+            # If not, flatten all the leaves in the node's subtree
+            else:
+                leafNames = reduce(lambda ls, c: ls + label_tree(c), n["children"], [])
+
+            # Delete the node id since we don't need it anymore and
+            # it makes for cleaner JSON
+            del n["node_id"]
+
+            # Labeling convention: "-"-separated leaf names
+            n["name"] = leafNames
+            
+            return leafNames
+        add_node(T, tree_data)
+        label_tree( tree_data["children"][0])
         
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
-                training_labels = training_labels, testing_labels = testing_labels, training_predicted_labels = training_predicted_labels, tree_data = tree_data)
+                training_labels = training_labels, testing_labels = testing_labels, tree_data = tree_data)
 
     def pca(self, data, params):
         training_ids, testing_ids           = self.unpack_ids(data)
