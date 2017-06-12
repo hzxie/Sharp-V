@@ -1,6 +1,7 @@
 # Requirements of Share-V
 
 tornado
+futures
 mysql-python
 sqlalchemy
 git+https://github.com/equeny/tornadomail.git

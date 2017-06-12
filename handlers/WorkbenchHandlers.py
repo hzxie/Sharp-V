@@ -3,6 +3,7 @@
 
 import logging
 
+from concurrent.futures import ThreadPoolExecutor
 from os import makedirs
 from os import listdir
 from os.path import isfile as file_exists
@@ -10,10 +11,10 @@ from os.path import isdir as folder_exists
 from os.path import join as join_path
 from os.path import exists as path_exists
 from sets import Set
-from tornado import gen
-from tornado.concurrent import return_future
+from tornado.concurrent import run_on_executor
 from tornado.escape import json_decode as load_json
 from tornado.escape import json_encode as dump_json
+from tornado.gen import coroutine
 from tornado.web import asynchronous
 from re import match
 
@@ -78,6 +79,7 @@ class DatasetUploadHandler(BaseHandler):
                 (current_user, file_path, self.get_user_ip_addr()))
 
         self.write(dump_json(result))
+        self.finish()
 
     def is_file_acceptable(self, content_type, file_name, current_user, dataset_name):
         result = {
@@ -97,11 +99,15 @@ class DatasetUploadHandler(BaseHandler):
         return not match(r'^[0-9a-zA-Z_\-\+\.]{4,64}$', file_name) is None
 
 class DatasetProcessHandler(BaseHandler):
+    executor = ThreadPoolExecutor(10)
+
     def initialize(self):
         self.dataset_parser     = DatasetParser()
         self.metaset_parser     = MetasetParser()
         self.algorithms         = Algorithms()
 
+    @asynchronous
+    @coroutine
     def post(self):
         dataset_name        = self.get_argument('datasetName')
         dataset_file_name   = self.get_argument('datasetFileName', '')
@@ -123,13 +129,14 @@ class DatasetProcessHandler(BaseHandler):
         if result['isSuccessful']:
             try:
                 process_steps       = load_json(process_steps)
-                result['dataset']   = self.process_dataset(dataset, process_steps)
+                result['dataset']   = yield self.process_dataset(dataset, process_steps)
             except Exception as ex:
                 result['isSuccessful'] = False
                 logging.error('Error occurred: %s' % ex)
 
             result['metaset']   = metaset
         self.write(dump_json(result))
+        self.finish()
 
     def get_file_path(self, current_user, dataset_name, file_name):
         if not dataset_name:
@@ -141,6 +148,7 @@ class DatasetProcessHandler(BaseHandler):
     def is_parameters_legal(self, process_steps):
         return True
 
+    @run_on_executor
     def process_dataset(self, dataset, process_steps):
         predicting        = None
         nearest_neighbors = None
