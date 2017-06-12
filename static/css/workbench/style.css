@@ -14,12 +14,6 @@ body.dragging, body.dragging * {
 	color: #333;
 }
 
-.form-group input[type=text],
-.form-group input[type=number],
-.form-group select {
-	border-bottom: 2px solid #eee;
-}
-
 button.btn[disabled][disabled] {
 	background-color: #03a9f4;
 }
