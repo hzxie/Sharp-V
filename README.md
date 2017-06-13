@@ -24,5 +24,5 @@ python Sharp-V.py
 
 ## License
 
-This project is open sourced under [GNU GPL v3](http://www.gnu.org/licenses/gpl-3.0.txt).
+This project is open sourced under [GNU GPL v2](http://www.gnu.org/licenses/gpl-2.0.txt).
 
