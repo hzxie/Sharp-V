@@ -237,8 +237,9 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
 
+        method = 'average' if (not 'method' in params or not params['method']) else params['method']
         distMat = scipy.spatial.distance.pdist(training_samples)
-        clusters = scipy.cluster.hierarchy.linkage(distMat, method='average')
+        clusters = scipy.cluster.hierarchy.linkage(distMat, method = method)
         T = scipy.cluster.hierarchy.to_tree( clusters, rd=False)
         ids = np.ndarray.tolist(training_ids)
         id2name = dict(zip(range(len(ids)), ids))
