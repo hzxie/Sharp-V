@@ -223,7 +223,7 @@ class Algorithms(object):
         kmeans_cluster.fit(training_samples)
         training_predicted_labels = kmeans_cluster.labels_
         cluster_centers  = kmeans_cluster.cluster_centers_
-        n_neighbors = 11
+        n_neighbors = 11 if training_samples.shape[0] > 10 else training_samples.shape[0]
         neighborhood = neighbors.NearestNeighbors(n_neighbors = n_neighbors)
         neighborhood.fit(training_samples)
         neighbor_indices = neighborhood.kneighbors(training_samples, return_distance=False)
@@ -239,7 +239,7 @@ class Algorithms(object):
 
         distMat = scipy.spatial.distance.pdist(training_samples)
         clusters = scipy.cluster.hierarchy.linkage(distMat, method='average')
-        T = scipy.cluster.hierarchy.to_tree( clusters , rd=False )
+        T = scipy.cluster.hierarchy.to_tree( clusters, rd=False)
         ids = np.ndarray.tolist(training_ids)
         id2name = dict(zip(range(len(ids)), ids))
         tree_data = dict(children=[], name="Root")
@@ -269,6 +269,7 @@ class Algorithms(object):
             n["name"] = leafNames[0] if len(leafNames) == 1 else "non-leaf node"
             
             return leafNames
+        
         add_node(T, tree_data)
         label_tree( tree_data["children"][0])
         
@@ -281,6 +282,10 @@ class Algorithms(object):
         training_labels, testing_labels     = self.unpack_labels(data)
 
         n_components     = 100 if (not 'n-components' in params or not params['n-components']) else int(params['n-components'])
+        if n_components > training_samples.shape[1]:
+            return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, \
+                testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+
         pca              = decomposition.PCA(n_components = n_components)
         high_data        = np.concatenate((training_samples, testing_samples), 0) if testing_samples.any() else training_samples
         low_data         = pca.fit(high_data).transform(high_data)
@@ -288,7 +293,8 @@ class Algorithms(object):
         if testing_samples.any():
             testing_samples  = low_data[training_samples.shape[0]:(training_samples.shape[0] + testing_samples.shape[0])]
 
-        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+        return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
+            training_labels = training_labels, testing_labels = testing_labels)
 
     def random_projection(self, data, params):
         training_ids, testing_ids         = self.unpack_ids(data)
