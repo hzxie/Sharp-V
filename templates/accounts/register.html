@@ -21,7 +21,6 @@
             <input id="password" class="form-control" type="password" maxlength="16">
         </div> <!-- .form-group -->
         {% module xsrf_form_html() %}
-        <p>By clicking Create Account, I agree to the <a href="{{ base_url('/terms') }}">Terms of Service</a> and <a href="{{ base_url('/privacy') }}">Privacy Policy</a>.</p>
         <button class="btn btn-raised btn-primary btn-block" type="submit">{{ _('Sign up') }}</button>
     </form> <!-- #register-form -->
     <p class="text-center">
