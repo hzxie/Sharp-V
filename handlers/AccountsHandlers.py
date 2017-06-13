@@ -7,6 +7,7 @@ from datetime import timedelta
 from hashlib import md5
 from tornado.escape import json_encode as dump_json
 from tornadomail.message import EmailFromTemplate
+from tornado.web import asynchronous
 from re import match as match_regx
 from uuid import uuid4
 
@@ -19,6 +20,7 @@ class LoginHandler(BaseHandler):
     def initialize(self, db_session):
         self.user_mapper = UserMapper(db_session)
 
+    @asynchronous
     def get(self):
         is_logging_out  = self.get_argument("logout", default=False, strip=False)
         is_logged_in    = self.get_secure_cookie('user')
@@ -31,6 +33,7 @@ class LoginHandler(BaseHandler):
         else:
             self.redirect('/')
 
+    @asynchronous
     def post(self):
         username        = self.get_argument("username", default=None, strip=False)
         password        = self.get_argument("password", default=None, strip=False)
@@ -41,7 +44,7 @@ class LoginHandler(BaseHandler):
             self.set_secure_cookie('user', username)
             logging.info('User [Username=%s] logged in at %s.' % (username, self.get_user_ip_addr()))
 
-        self.write(dump_json(result))
+        self.finish(dump_json(result))
 
     def is_allow_to_access(self, username, password):
         is_account_valid    = False
@@ -79,6 +82,7 @@ class RegisterHandler(BaseHandler):
         self.user_mapper        = UserMapper(db_session)
         self.user_group_mapper  = UserGroupMapper(db_session)
 
+    @asynchronous
     def get(self):
         is_logged_in = self.get_secure_cookie('user')
 
@@ -87,6 +91,7 @@ class RegisterHandler(BaseHandler):
         else:
             self.redirect('/')
 
+    @asynchronous
     def post(self):
         username        = self.get_argument("username", default=None, strip=False)
         password        = self.get_argument("password", default=None, strip=False)
@@ -95,8 +100,7 @@ class RegisterHandler(BaseHandler):
         result          = self.create_user(username, password, email)
         if result['isSuccessful']:
             logging.info('New user [Username=%s] was created at %s' % (username, self.get_user_ip_addr()))
-        
-        self.write(dump_json(result))
+        self.finish(dump_json(result))
 
     def create_user(self, username, password, email):
         user_group      = self.user_group_mapper.get_user_group_using_slug('users')
@@ -134,6 +138,7 @@ class ForgotPasswordHandler(BaseHandler):
         self.user_mapper = UserMapper(db_session)
         self.email_verification_mapper = EmailVerificationMapper(db_session)
 
+    @asynchronous
     def get(self):
         is_logged_in    = self.get_secure_cookie('user')
 
@@ -142,6 +147,7 @@ class ForgotPasswordHandler(BaseHandler):
         else:
             self.redirect('/')
 
+    @asynchronous
     def post(self):
         username        = self.get_argument("username", default=None, strip=False)
         email           = self.get_argument("email", default=None, strip=False)
@@ -169,7 +175,7 @@ class ForgotPasswordHandler(BaseHandler):
             )
             mail.send()
 
-        self.write(dump_json({
+        self.finish(dump_json({
             'isSuccessful': is_user_exists,
             'isUserExists': is_user_exists
         }))
@@ -186,6 +192,7 @@ class ResetPasswordHandler(BaseHandler):
         self.user_mapper = UserMapper(db_session)
         self.email_verification_mapper = EmailVerificationMapper(db_session)
 
+    @asynchronous
     def get(self):
         is_logged_in    = self.get_secure_cookie('user')
         email           = self.get_argument("email", default=None, strip=False)
@@ -198,6 +205,7 @@ class ResetPasswordHandler(BaseHandler):
         else:
             self.redirect('/')
 
+    @asynchronous
     def post(self):
         email               = self.get_argument("email", default=None, strip=False)
         token               = self.get_argument("token", default=None, strip=False)
@@ -207,7 +215,7 @@ class ResetPasswordHandler(BaseHandler):
 
         if result['isSuccessful']:
             logging.info('User [Email=%s] reset password at %s' % (email, self.get_user_ip_addr()))
-        self.write(dump_json(result))
+        self.finish(dump_json(result))
 
     def reset_password(self, email, token, new_password, confirm_password):
         result = {

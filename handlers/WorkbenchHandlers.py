@@ -1,6 +1,5 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-
 import logging
 
 from concurrent.futures import ThreadPoolExecutor
@@ -24,6 +23,7 @@ from utils.DatasetParsers import DatasetParser
 from utils.DatasetParsers import MetasetParser
 
 class DatasetSuggestionsHandler(BaseHandler):
+    @asynchronous
     def get(self):
         dataset_keywords     = self.get_argument('keyword', '')
         try:
@@ -45,12 +45,13 @@ class DatasetSuggestionsHandler(BaseHandler):
                             'datasetName': dataset,
                             'datasetFiles': dataset_files    
                         })
-        self.write(dump_json(datasets))
+        self.finish(dump_json(datasets))
 
 class DatasetUploadHandler(BaseHandler):
     def initialize(self):
         self.dataset_parser = DatasetParser()
     
+    @asynchronous
     def post(self):
         file         = self.request.files['file'][0]
         file_content = file['body']
@@ -78,8 +79,7 @@ class DatasetUploadHandler(BaseHandler):
             logging.info('User [Username=%s] uploaded new file [%s] at %s.' % \
                 (current_user, file_path, self.get_user_ip_addr()))
 
-        self.write(dump_json(result))
-        self.finish()
+        self.finish(dump_json(result))
 
     def is_file_acceptable(self, content_type, file_name, current_user, dataset_name):
         result = {
@@ -106,7 +106,6 @@ class DatasetProcessHandler(BaseHandler):
         self.metaset_parser     = MetasetParser()
         self.algorithms         = Algorithms()
 
-    @asynchronous
     @coroutine
     def post(self):
         dataset_name        = self.get_argument('datasetName')
@@ -135,8 +134,7 @@ class DatasetProcessHandler(BaseHandler):
                 logging.error('Error occurred: %s' % ex)
 
             result['metaset']   = metaset
-        self.write(dump_json(result))
-        self.finish()
+        self.finish(dump_json(result))
 
     def get_file_path(self, current_user, dataset_name, file_name):
         if not dataset_name:
@@ -198,5 +196,6 @@ class DatasetProcessHandler(BaseHandler):
         return formated_data
 
 class WorkbenchHandler(BaseHandler):
+    @asynchronous
     def get(self):
         self.render('workbench/workbench.html')
