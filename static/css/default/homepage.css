@@ -54,6 +54,10 @@ div#hero div#introduction ul.list-inline li {
 
 /* All Mobile Sizes (devices and browser) */
 @media only screen and (max-width: 767px) {
+	div#hero div#introduction {
+		padding: 10px;
+	}
+
 	div#hero div#introduction p {
 		width: 100%;
 	}

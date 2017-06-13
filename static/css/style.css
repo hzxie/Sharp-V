@@ -42,6 +42,7 @@ div#header div#logo a {
 
 div#header div#logo img {
 	max-height: 48px;
+	max-width: 100%;
 }
 
 div#header ul.nav > li > a {

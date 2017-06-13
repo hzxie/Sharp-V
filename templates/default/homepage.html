@@ -23,7 +23,7 @@
         var windowHeight   = $(window).height(),
             reservedHeight = $('#header').height() + $('#footer').height() + 30,
             textHeight     = $('#introduction').height(),
-            heroHeight     = textHeight > windowHeight ? textHeight : windowHeight - reservedHeight,
+            heroHeight     = textHeight > windowHeight ? textHeight + 20 : windowHeight - reservedHeight,
             textPadding    = (heroHeight - textHeight) / 2;
 
         highlightNavigationItem('{{ _('Home') }}');
