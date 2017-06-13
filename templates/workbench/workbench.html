@@ -178,6 +178,9 @@
                                 <div class="kmeans parameters hide">
                                     <label>{{ _('Number of clusters: ') }}</label>
                                 </div> <!-- .kmeans.parameters -->
+                                <div class="hierarchical-cluster parameters hide">
+                                    <label>{{ _('Distance metric: ') }}</label>
+                                </div> <!-- .hierarchical-cluster.parameters -->
                             </div> <!-- .col-sm-3 -->
                             <div class="col-sm-3">
                                 <div class="kmeans parameters hide">
@@ -185,6 +188,16 @@
                                         <input parameter-name="n-clusters" class="form-control" type="number" min="1" max="10" placeholder="{{ _('Default:') }} 5">
                                     </div> <!-- .form-group -->
                                 </div> <!-- .kmeans.parameters -->
+                                <div class="hierarchical-cluster parameters hide">
+                                    <select parameter-name="method" class="form-control dropdown">
+                                        <option value="average">{{ _('Average distance') }}</option>
+                                        <option value="centroid">{{ _('Centroid distance') }}</option>
+                                        <option value="single">{{ _('Minimum distance') }}</option>
+                                        <option value="complete">{{ _('Maximum distance') }}</option>
+                                        <option value="median">{{ _('Median distance') }}</option>
+                                        <option value="weighted">{{ _('Weighted distance') }}</option>
+                                    </select>
+                                </div> <!-- .hierarchical-cluster.parameters -->
                             </div> <!-- .col-sm-3 -->
                         </div> <!-- .row -->
                     </div> <!-- .panel-body -->
