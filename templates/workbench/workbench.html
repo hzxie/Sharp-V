@@ -328,7 +328,6 @@
         var currentValue        = $(this).val().toLowerCase(),
             suggestionsControl  = $('.search-suggestions', $(this).parent());
 
-        suggestionsControl.empty();
         suggestionsControl.addClass('hide');
         return getSearchSuggestions(currentValue, suggestionsControl);
     });
@@ -346,6 +345,7 @@
             data: request,
             dataType: 'JSON',
             success: function(suggestions) {
+                suggestionsControl.empty();
                 if ( suggestions.length == 0 ) {
                     return;                    
                 }
