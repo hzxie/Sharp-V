@@ -97,6 +97,19 @@
         }
     </script>
     <script type="text/javascript">
+        function adjustFooterPosition(magicHeight) {
+            var windowHeight   = $(window).height(),
+                contentHeight  = $('#content').height(),
+                reservedHeight = $('#header').height() + $('#footer').height() + contentHeight + magicHeight,
+                contentPadding = (windowHeight - reservedHeight) / 2;
+
+            $('#content').css({
+                'padding-top': contentPadding,
+                'padding-bottom': contentPadding
+            });
+        }
+    </script>
+    <script type="text/javascript">
         $('a', '#locales').click(function() {
             var userLocale = $(this).attr('data-value'),
                 postData = {

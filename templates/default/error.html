@@ -27,17 +27,11 @@
         </div> <!-- .col-md-6 -->
     </div> <!-- .row -->
 </div> <!-- .container -->
+{% end %}
+{% block scripts %}
 <script type="text/javascript">
     $(function() {
-        var windowHeight   = $(window).height(),
-            contentHeight  = $('#content').height(),
-            reservedHeight = $('#header').height() + $('#footer').height() + contentHeight + 30,
-            contentPadding = (windowHeight - reservedHeight) / 2;
-
-        $('#content').css({
-            'padding-top': contentPadding,
-            'padding-bottom': contentPadding
-        });
+        adjustFooterPosition(30);
     });
 </script>
 {% end %}

@@ -163,7 +163,7 @@ class ForgotPasswordHandler(BaseHandler):
                     'email': email,
                     'token': token
                 },
-                from_email='noreply@sharp-v.org',
+                from_email='noreply@hit.edu.cn',
                 to=[email],
                 connection=self.mail_sender
             )

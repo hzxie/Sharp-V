@@ -41,6 +41,11 @@
 {% end %}
 {% block scripts %}
 <script type="text/javascript">
+    $(function() {
+        adjustFooterPosition(110);
+    });
+</script>
+<script type="text/javascript">
     function onSubmit() {
         $('.alert').addClass('hide');
         $('button[type=submit]').attr('disabled', 'disabled');
