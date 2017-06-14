@@ -150,7 +150,7 @@ class DatasetProcessHandler(BaseHandler):
     def process_dataset(self, dataset, process_steps):
         predicting        = None
         nearest_neighbors = None
-        tree_data         = None
+        hierarchy         = None
         
         process_steps.append({
             'algorithmName': 'tsne',
@@ -170,8 +170,8 @@ class DatasetProcessHandler(BaseHandler):
                     predicting = dataset['predicting']
                 if dataset['nearest_neighbors']:
                     nearest_neighbors = dataset['nearest_neighbors']
-                if dataset['tree_data']:
-                    tree_data = dataset['tree_data']
+                if dataset['hierarchy']:
+                    hierarchy = dataset['hierarchy']
             else:
                 logging.warn('Algorithm [Name=%s] not found.' % algorithm_name)
 
@@ -179,7 +179,7 @@ class DatasetProcessHandler(BaseHandler):
         dataset['samples']['testing']  = self.format_sample_points(dataset['samples']['testing'])
         dataset['predicting']          = predicting
         dataset['nearest_neighbors']   = nearest_neighbors
-        dataset['tree_data']           = tree_data
+        dataset['hierarchy']           = hierarchy
  
         return dataset
 

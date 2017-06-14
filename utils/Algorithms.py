@@ -35,7 +35,7 @@ class Algorithms(object):
         return training_ids, testing_ids
 
     def pack_data(self, training_ids, testing_ids, training_samples, testing_samples, training_labels, testing_labels, training_predicted_labels = None, \
-        testing_predicted_labels = None, cluster_centers = None, nearest_neighbors = None, tree_data = None):
+        testing_predicted_labels = None, cluster_centers = None, nearest_neighbors = None, hierarchy = None):
         training_ids     = np.ndarray.tolist(training_ids) if isinstance(training_ids, np.ndarray) else None
         testing_ids      = np.ndarray.tolist(testing_ids) if isinstance(testing_ids, np.ndarray) else None
         training_samples = np.ndarray.tolist(training_samples) if isinstance(training_samples, np.ndarray) else None
@@ -46,7 +46,7 @@ class Algorithms(object):
         testing_predicted_labels = np.ndarray.tolist(testing_predicted_labels) if isinstance(testing_predicted_labels, np.ndarray) else None
         cluster_centers  = np.ndarray.tolist(cluster_centers) if isinstance(cluster_centers, np.ndarray) else None
         nearest_neighbors = np.ndarray.tolist(nearest_neighbors) if isinstance(nearest_neighbors, np.ndarray) else None
-        tree_data        = tree_data if isinstance(tree_data, dict) else None
+        hierarchy        = hierarchy if isinstance(hierarchy, dict) else None
         
         data = {
             'ids':     {
@@ -67,7 +67,7 @@ class Algorithms(object):
             }, 
             'cluster_centers': cluster_centers,
             'nearest_neighbors': nearest_neighbors,
-            'tree_data': tree_data
+            'hierarchy': hierarchy
         }
         
         return data
@@ -243,7 +243,7 @@ class Algorithms(object):
         T = scipy.cluster.hierarchy.to_tree( clusters, rd=False)
         ids = np.ndarray.tolist(training_ids)
         id2name = dict(zip(range(len(ids)), ids))
-        tree_data = dict(children=[], name="Root")
+        hierarchy = dict(children=[], name="non-leaf-node")
         def add_node(node, parent):
             # First create the new node and append it to its parent's children
             newNode = dict(node_id=node.id, children=[])
@@ -267,15 +267,15 @@ class Algorithms(object):
             del n["node_id"]
 
             # Labeling convention: "-"-separated leaf names
-            n["name"] = leafNames[0] if len(leafNames) == 1 else "non-leaf node"
+            n["name"] = leafNames[0] if len(leafNames) == 1 else "non-leaf-node"
             
             return leafNames
         
-        add_node(T, tree_data)
-        label_tree( tree_data["children"][0])
+        add_node(T, hierarchy)
+        label_tree( hierarchy["children"][0])
         
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
-                training_labels = training_labels, testing_labels = testing_labels, tree_data = tree_data)
+                training_labels = training_labels, testing_labels = testing_labels, hierarchy = hierarchy)
 
     def pca(self, data, params):
         training_ids, testing_ids           = self.unpack_ids(data)

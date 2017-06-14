@@ -517,7 +517,7 @@
             dataType: 'JSON',
             success: function(result) {
                 if ( result['isSuccessful'] ) {
-                    draw(result['dataset'], result['metaset'])
+                    draw(result['dataset'])
                 }
                 $('#btn-process').html('{{ _('Process') }}');
                 $('#btn-process').removeAttr('disabled');
@@ -526,7 +526,7 @@
     }
 </script>
 <script type="text/javascript">
-    function draw(dataset, metaset) {
+    function draw(dataset) {
         var containerWidth          = $('#d3-diagram').width(),
             svgOptions              = {
                 height: containerWidth,
@@ -541,9 +541,9 @@
 
         $('#d3-diagram').empty();
         if ( isHierarchicalClustering() ) {
-            return drawCollapsibleTree(dataset, metaset, svgOptions);
+            return drawHierarchyTree(dataset, svgOptions);
         } else {
-            return drawScatterPlot(dataset, metaset, svgOptions);
+            return drawScatterPlot(dataset, svgOptions);
         }
     }
 </script>
@@ -560,7 +560,7 @@
     }
 </script>
 <script type="text/javascript">
-    function drawScatterPlot(dataset, metaset, svgOptions) {
+    function drawScatterPlot(dataset, svgOptions) {
         var CLUSTER_COLORS          = ['#f4394c', '#f6aa4a', '#40a3e7', '#8fbf59', '#6a1b9a', '#795548', '#607d8b', '#283593', '#1b5e20', '#333'],
             trainingSamples         = dataset['samples']['training'],
             trainingPredictedLabels = dataset['predicting']['training'],
@@ -568,7 +568,7 @@
             svgComponents           = setUpScatterSvg(svgOptions, maxMinPoint);
 
         for ( var i = 0; i < trainingSamples.length; ++ i ) {
-            addPointToSvg(svgComponents, [trainingSamples[i]], CLUSTER_COLORS[trainingPredictedLabels[i]]);
+            addPointToScatterSvg(svgComponents, [trainingSamples[i]], CLUSTER_COLORS[trainingPredictedLabels[i]]);
         }
     }
 </script>
@@ -656,9 +656,7 @@
     }
 </script>
 <script type="text/javascript">
-    function addPointToSvg(svgComponents, point, pointColor) {
-        console.log(point);
-
+    function addPointToScatterSvg(svgComponents, point, pointColor) {
         // Plot points in SVG
         svgComponents.svg.insert('g', '#axis-x')
            .attr('id', 'scatter-plot')
@@ -676,8 +674,66 @@
     }
 </script>
 <script type="text/javascript">
-    function drawCollapsibleTree(dataset, metaset, svgOptions) {
+    function drawHierarchyTree(dataset, svgOptions) {
+        var hierarchyTree = dataset['hierarchy'],
+            svgComponents = setUpHierarchyTreeSvg(svgOptions),
+            treeRoot      = d3.hierarchy(hierarchyTree);
 
+        svgComponents['tree'](treeRoot);
+
+        var link = svgComponents['svg'].selectAll(".link")
+                    .data(treeRoot.descendants().slice(1))
+                    .enter().append("path")
+                    .attr("class", "link")
+                    .attr("d", function(d) {
+                        return "M" + d.y + "," + d.x + 
+                            "C" + (d.parent.y + 100) + "," + d.x + 
+                            " " + (d.parent.y + 100) + "," + d.parent.x + 
+                            " " + d.parent.y + "," + d.parent.x;
+                    }),
+            node = svgComponents['svg'].selectAll(".node")
+                    .data(treeRoot.descendants())
+                    .enter().append("g")
+                    .attr("class", function(d) { 
+                        return "node" + (d.children ? " node-internal" : " node-leaf"); 
+                    })
+                    .attr("transform", function(d) { 
+                        return "translate(" + d.y + "," + d.x + ")"; 
+                    });
+
+        node.append("circle")
+      .attr("r", 2.5);
+
+  node.append("text")
+      .attr("dy", 3)
+      .attr("x", function(d) { return d.children ? -8 : 8; })
+      .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
+      .text(function(d) { 
+        var dataName = d.data.name;
+        return dataName == 'non-leaf-node' ? '' : dataName;
+      });
+    }
+</script>
+<script type="text/javascript">
+    function setUpHierarchyTreeSvg(svgOptions) {
+        var margin      = svgOptions.margin,
+            width       = svgOptions.width - margin.left - margin.right,
+            height      = svgOptions.height - margin.top - margin.bottom;
+
+        // Create SVG object
+        var svg = d3.select('#d3-diagram').append('svg')
+                    .attr('width', width + margin.left + margin.right)
+                    .attr('height', height + margin.top + margin.bottom)
+                    .append('g')
+                    .attr('transform', 'translate(60,0)');
+
+        // Create Tree object
+        var tree = d3.cluster().size([height, width]);
+
+        return {
+            'svg': svg,
+            'tree': tree
+        }
     }
 </script>
 {% end %}
