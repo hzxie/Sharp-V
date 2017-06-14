@@ -237,42 +237,41 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
 
-        method = 'average' if (not 'method' in params or not params['method']) else params['method']
-        distMat = scipy.spatial.distance.pdist(training_samples)
-        clusters = scipy.cluster.hierarchy.linkage(distMat, method = method)
-        T = scipy.cluster.hierarchy.to_tree( clusters, rd=False)
-        ids = np.ndarray.tolist(training_ids)
-        id2name = dict(zip(range(len(ids)), ids))
-        hierarchy = dict(children=[], name="non-leaf-node")
+        method      = 'average' if (not 'method' in params or not params['method']) else params['method']
+        distMat     = scipy.spatial.distance.pdist(training_samples)
+        clusters    = scipy.cluster.hierarchy.linkage(distMat, method = method)
+        tree        = scipy.cluster.hierarchy.to_tree(clusters, rd=False)
+        ids         = np.ndarray.tolist(training_ids)
+        id2name     = dict(zip(range(len(ids)), ids))
+        hierarchy   = dict(children=[], name="non-leaf-node")
+        
         def add_node(node, parent):
             # First create the new node and append it to its parent's children
-            newNode = dict(node_id=node.id, children=[])
-            parent["children"].append(newNode)
-
+            new_node = dict(node_id=node.id, children=[])
+            parent["children"].append(new_node)
             # Recursively add the current node's children
-            if node.left: add_node(node.left, newNode)
-            if node.right: add_node(node.right, newNode)
+            if node.left: 
+                add_node(node.left, new_node)
+            if node.right: 
+                add_node(node.right, new_node)
 
         def label_tree(n):
             # If the node is a leaf, then we have its name
             if len(n["children"]) == 0:
-                leafNames = [id2name[n["node_id"]]]
-            
+                leaf_names = [id2name[n["node_id"]]]
             # If not, flatten all the leaves in the node's subtree
             else:
-                leafNames = reduce(lambda ls, c: ls + label_tree(c), n["children"], [])
-
+                leaf_names = reduce(lambda ls, c: ls + label_tree(c), n["children"], [])
             # Delete the node id since we don't need it anymore and
             # it makes for cleaner JSON
             del n["node_id"]
-
             # Labeling convention: "-"-separated leaf names
-            n["name"] = leafNames[0] if len(leafNames) == 1 else "non-leaf-node"
+            n["name"] = leaf_names[0] if len(leaf_names) == 1 else "non-leaf-node"
             
-            return leafNames
+            return leaf_names
         
-        add_node(T, hierarchy)
-        label_tree( hierarchy["children"][0])
+        add_node(tree, hierarchy)
+        label_tree(hierarchy["children"][0])
         
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
                 training_labels = training_labels, testing_labels = testing_labels, hierarchy = hierarchy)

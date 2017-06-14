@@ -701,17 +701,19 @@
                         return "translate(" + d.y + "," + d.x + ")"; 
                     });
 
-        node.append("circle")
-      .attr("r", 2.5);
-
-  node.append("text")
-      .attr("dy", 3)
-      .attr("x", function(d) { return d.children ? -8 : 8; })
-      .style("text-anchor", function(d) { return d.children ? "end" : "start"; })
-      .text(function(d) { 
-        var dataName = d.data.name;
-        return dataName == 'non-leaf-node' ? '' : dataName;
-      });
+        node.append("circle").attr("r", 2.5);
+        node.append("text")
+            .attr("dy", 3)
+            .attr("x", function(d) { 
+                return d.children ? -8 : 8; 
+            })
+            .style("text-anchor", function(d) { 
+                return d.children ? "end" : "start"; 
+            })
+            .text(function(d) { 
+                var dataName = d.data.name;
+                return dataName == 'non-leaf-node' ? '' : dataName;
+            });
     }
 </script>
 <script type="text/javascript">
