@@ -669,7 +669,7 @@
 
         // Add event listeners to points
         svgComponents.svg.selectAll('circle').on('click', function(data, index) {
-            console.log(data);
+            console.log(data, index);
         });
     }
 </script>
@@ -679,9 +679,8 @@
             svgComponents = setUpHierarchyTreeSvg(svgOptions),
             treeRoot      = d3.hierarchy(hierarchyTree);
 
-        svgComponents['tree'](treeRoot);
-
-        var link = svgComponents['svg'].selectAll(".link")
+        svgComponents.tree(treeRoot);
+        var link = svgComponents.svg.selectAll(".link")
                     .data(treeRoot.descendants().slice(1))
                     .enter().append("path")
                     .attr("class", "link")
@@ -691,7 +690,7 @@
                             " " + (d.parent.y + 100) + "," + d.parent.x + 
                             " " + d.parent.y + "," + d.parent.x;
                     }),
-            node = svgComponents['svg'].selectAll(".node")
+            node = svgComponents.svg.selectAll(".node")
                     .data(treeRoot.descendants())
                     .enter().append("g")
                     .attr("class", function(d) { 
@@ -731,6 +730,14 @@
 
         // Create Tree object
         var tree = d3.cluster().size([height, width]);
+
+        // Handling zoom operations
+        var zoom = d3.zoom()
+                     .scaleExtent([1, 16384]).on('zoom', function() {
+                          svg.attr('transform', 'translate(%s, %s)scale(%s)'
+                             .format(d3.event.transform.x, d3.event.transform.y, d3.event.transform.k));
+                     });
+        svg.call(zoom);
 
         return {
             'svg': svg,
