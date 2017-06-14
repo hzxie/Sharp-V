@@ -267,7 +267,8 @@ class Algorithms(object):
             del n["node_id"]
             # Labeling convention: "-"-separated leaf names
             n["name"] = leaf_names[0] if len(leaf_names) == 1 else "non-leaf-node"
-            
+            n["children"] = leafNames if len(leafNames) <= 5 else n["children"]
+
             return leaf_names
         
         add_node(tree, hierarchy)
