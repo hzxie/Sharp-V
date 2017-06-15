@@ -83,7 +83,7 @@
 <script type="text/javascript">
     function processLoginResult(result) {
         if ( result['isSuccessful'] ) {
-            window.location.href = '{{ base_url('/') }}';
+            window.location.href = '{{ base_url('/workbench') }}';
         } else {
             var errorMessage = '';
 

@@ -191,7 +191,7 @@ div#main-content div.section .algorithm div.panel-body label {
 
 div#main-content div#d3-diagram .node circle {
     fill: #fff;
-    stroke: steelblue;
+    stroke: #03a9f4;
     stroke-width: 3px;
 }
 

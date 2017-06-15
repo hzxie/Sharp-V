@@ -239,3 +239,21 @@ class ResetPasswordHandler(BaseHandler):
         if ticket and ticket.token == token and ticket.expire_time >= datetime.now():
             return True
         return False
+
+class ProfileHandler(BaseHandler):
+    def initialize(self, db_session):
+        self.user_mapper = UserMapper(db_session)
+
+    @asynchronous
+    def get(self):
+        current_user     = self.get_current_user()
+        self.render('accounts/profile.html')
+
+class ProjectsHandler(BaseHandler):
+    def initialize(self, db_session):
+        self.user_mapper = UserMapper(db_session)
+
+    @asynchronous
+    def get(self):
+        current_user     = self.get_current_user()
+        self.render('accounts/projects.html') 

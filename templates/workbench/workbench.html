@@ -214,10 +214,40 @@
                 <h2>{{ _('Step') }} 3. {{ _('Visualization') }}</h2>
                 <div class="row">
                     <div class="col-md-8">
-                        <div id="d3-diagram"></div> <!-- #d3-diagram -->
+                        <div id="d3-diagram">
+                            <p id="no-diagram">{{ _('The diagram will be shown after processing.') }}</p>
+                        </div> <!-- #d3-diagram -->
                     </div> <!-- .col-md-8 -->
-                    <div class="col-md-4">
+                    <div id="visualization-sidebar" class="col-md-4 hide">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h5>{{ _('Search') }}</h5>
+                            </div> <!-- .panel-heading -->
+                            <div class="panel-body">
+                                <div class="form-group label-floating">
+                                    <input class="form-control" type="text" placeholder="{{ _('Enter sample name here...') }}">
+                                </div> <!-- .form-group -->
+                            </div> <!-- .panel-body -->
+                        </div> <!-- .panel -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h5>{{ _('Settings') }}</h5>
+                            </div> <!-- .panel-heading -->
+                            <div class="panel-body">
+                                <div class="form-group label-static">
+                                    <label for="number-of-neighbors" class="control-label">Number of neighbors to display</label>
+                                    <input id="number-of-neighbors" class="form-control" type="number" min="1" max="10" value="3">
+                                </div> <!-- .form-group -->
+                            </div> <!-- .panel-body -->
+                        </div> <!-- .panel -->
                     </div> <!-- .col-md-4 -->
+                </div> <!-- .row -->
+                <div id="meta-of-neighbors" class="hide">
+                    <h4>{{ _('Metadata of Nearest Neighbors') }}</h4>
+                    <table class="table table-striped">
+                        <thead></thead>
+                        <tbody></tbody>
+                    </table>
                 </div> <!-- .row -->
             </div> <!-- .section -->
         </div> <!-- .col-md-9 -->
@@ -292,6 +322,9 @@
                     '    <p>%s</p>'.format(message) + 
                     '</li>'
                 );
+            } else {
+                // TODO: Why?
+                alert('Failed to upload the file [FileName=%s].'.format(fileName));
             }
         }
     });
@@ -453,6 +486,9 @@
             processFlow     = JSON.stringify(getProcessFlow()),
             xsrfToken       = getCookie("_xsrf");
 
+        $('#d3-diagram > svg').remove();
+        $('#no-diagram').removeClass('hide');
+        $('#visualization-sidebar, #meta-of-neighbors').addClass('hide');
         $('#btn-process').attr('disabled', 'disabled');
         $('#btn-process').html('{{ _('Please wait...') }}');
         return processDataset(datasetName, datasetFileName, metasetFileName, processFlow, xsrfToken);
@@ -518,6 +554,11 @@
             success: function(result) {
                 if ( result['isSuccessful'] ) {
                     draw(result['dataset'])
+                    $('#visualization-sidebar, #meta-of-neighbors').removeClass('hide');
+                    $('#no-diagram').addClass('hide');
+                } else {
+                    // TODO: Why?
+                    alert('Error occurred while processing data.');
                 }
                 $('#btn-process').html('{{ _('Process') }}');
                 $('#btn-process').removeAttr('disabled');
@@ -532,14 +573,13 @@
                 height: containerWidth,
                 width: containerWidth,
                 margin: {
-                    'top': 20,
-                    'right': 20,
-                    'bottom': 30,
-                    'left': 30,
+                    'top': 25,
+                    'right': 25,
+                    'bottom': 50,
+                    'left': 50,
                 }
             };
 
-        $('#d3-diagram').empty();
         if ( isHierarchicalClustering() ) {
             return drawHierarchyTree(dataset, svgOptions);
         } else {
@@ -619,7 +659,7 @@
         // Create SVG object
         var svg = d3.select('#d3-diagram').append('svg')
                     .attr('width', svgOptions.width)
-                    .attr('height', height + svgOptions.height)
+                    .attr('height', svgOptions.height)
                     .append('g')
                     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -716,7 +756,7 @@
                 .attr('class', 'node')
                 .attr('r', 1e-6)
                 .style('fill', function(d) {
-                    return d._children ? 'lightsteelblue' : '#fff';
+                    return d._children ? '#03a9f4' : '#fff';
                 });
             // Add labels for the nodes
             nodeEnter.append('text')
@@ -742,7 +782,7 @@
             nodeUpdate.select('circle.node')
                 .attr('r', 10)
                 .style('fill', function(d) {
-                    return d._children ? 'lightsteelblue' : '#fff';
+                    return d._children ? '#03a9f4' : '#fff';
                 }).attr('cursor', 'pointer');
             // Remove any exiting nodes
             var nodeExit = node.exit().transition()
@@ -832,7 +872,7 @@
 
         // Handling zoom operations
         var zoom = d3.zoom()
-                     .scaleExtent([1, 16384]).on('zoom', function() {
+                     .scaleExtent([1, 1]).on('zoom', function() {
                           svg.attr('transform', 'translate(%s, %s)scale(%s)'
                              .format(d3.event.transform.x, d3.event.transform.y, d3.event.transform.k));
                      });
