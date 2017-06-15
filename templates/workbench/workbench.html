@@ -570,7 +570,8 @@
             dataType: 'JSON',
             success: function(result) {
                 if ( result['isSuccessful'] ) {
-                    draw(result['dataset'])
+                    draw(result['dataset']);
+                    list(result['metaset'])
                     $('#visualization-sidebar, #meta-of-neighbors').removeClass('hide');
                     $('#no-diagram').addClass('hide');
                 } else {
@@ -745,7 +746,7 @@
         treeRoot.x0       = treeHeight / 2;
         treeRoot.y0       = 0;
         // Collapse after the second level
-        treeRoot.children.forEach(collapseHierarchyTree);
+        // treeRoot.children.forEach(collapseHierarchyTree);
         updateHierarchyTree(treeRoot);
 
         // Update the structure of the hierarchy tree
@@ -899,6 +900,54 @@
             'svg': svg,
             'tree': tree
         }
+    }
+</script>
+<script type="text/javascript">
+    function list(metaset) {
+        var metaKeys        = getMetaKeys(metaset);
+        // Display head of table
+        $('#meta-of-neighbors > table > thead').empty();
+
+        var tableHeadHtml   = '';
+        for ( var i = 0; i < metaKeys.length; ++ i ) {
+            tableHeadHtml += '<td>%s</td>'.format(metaKeys[i]);
+        }
+        $('#meta-of-neighbors > table > thead').append(
+            '<tr>%s</tr>'.format(tableHeadHtml)
+        );
+
+        // Display body of table
+        $('#meta-of-neighbors > table > tbody').empty();
+        for ( var sampleId in metaset ) {
+            var tableBodyHtml = '',
+                sample        = metaset[sampleId];
+
+            for ( var i = 0; i < metaKeys.length; ++ i ) {
+                var metaKey   = metaKeys[i],
+                    metaValue = '';
+                if ( metaKey in sample ) {
+                    metaValue = sample[metaKey];
+                }
+                tableBodyHtml += '<td>%s</td>'.format(metaValue);
+            }
+            $('#meta-of-neighbors > table > tbody').append(
+                '<tr>%s</tr>'.format(tableBodyHtml)
+            );
+        }
+    }
+</script>
+<script type="text/javascript">
+    function getMetaKeys(metaset) {
+        var metaKeySet = [];
+
+        for ( var sampleId in metaset ) {
+            for ( key in metaset[sampleId] ) {
+                if ( metaKeySet.indexOf(key) == -1 ) {
+                    metaKeySet.push(key);
+                }
+            }
+        }
+        return metaKeySet;
     }
 </script>
 {% end %}

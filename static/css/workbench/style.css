@@ -205,6 +205,11 @@ div#main-content div#d3-diagram .link {
     stroke-width: 2px;
 }
 
+div#main-content #meta-of-neighbors > table > thead {
+	background-color: #03a9f4;
+	color: #fff;
+}
+
 @media only screen and (max-width: 767px) {
 	div.hero:before {
 		background: transparent;
