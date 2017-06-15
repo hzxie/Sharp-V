@@ -250,9 +250,9 @@ class Algorithms(object):
             new_node = dict(node_id=node.id, children=[])
             parent['children'].append(new_node)
             # Recursively add the current node's children
-            if node.left: 
+            if node.left:
                 add_node(node.left, new_node)
-            if node.right: 
+            if node.right:
                 add_node(node.right, new_node)
 
         def label_tree(n):
@@ -271,11 +271,24 @@ class Algorithms(object):
 
             return leaf_names
         
+        def parseTree(root):
+            if not len(root) and not isinstance(root[0], dict):
+                return
+            for i in range(len(root)):
+                children = root[i]["children"]
+                if isinstance(children[0], dict) and len(children) > 0:
+                    parseTree(children)
+                if not isinstance(children[0], dict):
+                    for j in range(len(children)):
+                        children[j] = dict(name=children[j],children=[])
+
         add_node(tree, hierarchy)
         label_tree(hierarchy['children'][0])
-        
+        hierarchy['children'][0]['name'] = 'root'
+        parseTree(hierarchy['children'][0]['children'])
+
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
-                training_labels = training_labels, testing_labels = testing_labels, hierarchy = hierarchy)
+                training_labels = training_labels, testing_labels = testing_labels, hierarchy = hierarchy['children'][0])
 
     def pca(self, data, params):
         training_ids, testing_ids           = self.unpack_ids(data)
