@@ -931,10 +931,9 @@
 
         // Display items in column filter
         for ( var i = 0; i < metaKeys.length; ++ i ) {
-            var metaKey = normalizeMetaKeyName(metaKeys[i]);
             $('#metaset-columns').append(
                 '<li class="checkbox"><label><input type="checkbox" value="%s" checked="checked"> %s</label></li>'
-                    .format(metaKey, metaKey)
+                    .format(normalizeMetaKeyName(metaKeys[i]), metaKeys[i])
             );
         }
         $.material.checkbox();
@@ -942,8 +941,8 @@
         // Display head of table
         var tableHeadHtml  = '<td>#</td>';
         for ( var i = 0; i < metaKeys.length; ++ i ) {
-            var metaKey = normalizeMetaKeyName(metaKeys[i]);
-            tableHeadHtml += '<td class="%s">%s</td>'.format(metaKey, metaKey);
+            tableHeadHtml += '<td class="%s">%s</td>'.format(
+                normalizeMetaKeyName(metaKeys[i]), metaKeys[i]);
         }
         $('#meta-of-neighbors table thead').append(
             '<tr>%s</tr>'.format(tableHeadHtml)
