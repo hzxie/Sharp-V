@@ -371,6 +371,23 @@
     });
 </script>
 <script type="text/javascript">
+    $('#existing-dataset-name').focus(function() {
+        var currentValue        = $(this).val().toLowerCase(),
+            suggestionsControl  = $('.search-suggestions', $(this).parent());
+
+        suggestionsControl.addClass('hide');
+        return getSearchSuggestions(currentValue, suggestionsControl);
+    });
+
+    $(document).mouseup(function(e) {
+        var container = $('.search-suggestions, #existing-dataset-name');
+        // if the target of the click isn't the container nor a descendant of the container
+        if ( !container.is(e.target) && container.has(e.target).length === 0 ) {
+            $('.search-suggestions').addClass('hide');
+        }
+    });
+</script>
+<script type="text/javascript">
     $('#existing-dataset-name').keyup(function() {
         var currentValue        = $(this).val().toLowerCase(),
             suggestionsControl  = $('.search-suggestions', $(this).parent());
