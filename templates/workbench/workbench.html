@@ -618,8 +618,8 @@
 
         // Create SVG object
         var svg = d3.select('#d3-diagram').append('svg')
-                    .attr('width', width + margin.left + margin.right)
-                    .attr('height', height + margin.top + margin.bottom)
+                    .attr('width', svgOptions.width)
+                    .attr('height', height + svgOptions.height)
                     .append('g')
                     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
@@ -675,44 +675,143 @@
 </script>
 <script type="text/javascript">
     function drawHierarchyTree(dataset, svgOptions) {
-        var hierarchyTree = dataset['hierarchy'],
+        var treeData      = dataset['hierarchy'],
             svgComponents = setUpHierarchyTreeSvg(svgOptions),
-            treeRoot      = d3.hierarchy(hierarchyTree);
+            treeHeight    = svgOptions.height - svgOptions.margin.top - svgOptions.margin.bottom,
+            treeWidth     = svgOptions.width - svgOptions.margin.left - svgOptions.margin.right,
+            hierarchyTree = d3.tree().size([treeHeight, treeWidth]),
+            treeRoot      = d3.hierarchy(treeData, function(d) { return d.children; }),
+            i             = 0,
+            DURATION      = 750;
+        
+        // Put the root of the tree in the left center of the diagram
+        treeRoot.x0       = treeHeight / 2;
+        treeRoot.y0       = 0;
+        // Collapse after the second level
+        treeRoot.children.forEach(collapseHierarchyTree);
+        updateHierarchyTree(treeRoot);
 
-        svgComponents.tree(treeRoot);
-        var link = svgComponents.svg.selectAll(".link")
-                    .data(treeRoot.descendants().slice(1))
-                    .enter().append("path")
-                    .attr("class", "link")
-                    .attr("d", function(d) {
-                        return "M" + d.y + "," + d.x + 
-                            "C" + (d.parent.y + 100) + "," + d.x + 
-                            " " + (d.parent.y + 100) + "," + d.parent.x + 
-                            " " + d.parent.y + "," + d.parent.x;
-                    }),
-            node = svgComponents.svg.selectAll(".node")
-                    .data(treeRoot.descendants())
-                    .enter().append("g")
-                    .attr("class", function(d) { 
-                        return "node" + (d.children ? " node-internal" : " node-leaf"); 
-                    })
-                    .attr("transform", function(d) { 
-                        return "translate(" + d.y + "," + d.x + ")"; 
-                    });
+        // Update the structure of the hierarchy tree
+        function updateHierarchyTree(source) {
+            // Compute the new tree layout.
+            var treeData = hierarchyTree(treeRoot),
+                nodes    = treeData.descendants(),
+                links    = treeData.descendants().slice(1);
 
-        node.append("circle").attr("r", 2.5);
-        node.append("text")
-            .attr("dy", 3)
-            .attr("x", function(d) { 
-                return d.children ? -8 : 8; 
-            })
-            .style("text-anchor", function(d) { 
-                return d.children ? "end" : "start"; 
-            })
-            .text(function(d) { 
-                var dataName = d.data.name;
-                return dataName == 'non-leaf-node' ? '' : dataName;
+            // Normalize for fixed-depth.
+            nodes.forEach(function(d) { d.y = d.depth * 180});
+            // Update the nodes...
+            var node  = svgComponents.svg.selectAll('g.node')
+                        .data(nodes, function(d) {
+                            return d.id || (d.id = ++ i); 
+                        });
+            // Enter any new modes at the parent's previous position.
+            var nodeEnter = node.enter().append('g')
+                            .attr('class', 'node')
+                            .attr('transform', function(d) {
+                                return 'translate(%s, %s)'.format(source.y0, source.x0);
+                            }).on('click', click);
+            // Add Circle for the nodes
+            nodeEnter.append('circle')
+                .attr('class', 'node')
+                .attr('r', 1e-6)
+                .style('fill', function(d) {
+                    return d._children ? 'lightsteelblue' : '#fff';
+                });
+            // Add labels for the nodes
+            nodeEnter.append('text')
+                .attr('dy', '.35em')
+                .attr('x', function(d) {
+                    return d.children || d._children ? -13 : 13;
+                })
+                .attr('text-anchor', function(d) {
+                    return d.children || d._children ? 'end' : 'start';
+                })
+                .text(function(d) { 
+                    return d.data.name; 
+                });
+            
+            // Transition to the proper position for the node
+            var nodeUpdate = nodeEnter.merge(node);
+            nodeUpdate.transition()
+                .duration(DURATION)
+                .attr('transform', function(d) { 
+                    return 'translate(%s, %s)'.format(d.y, d.x);
+                });
+            // Update the node attributes and style
+            nodeUpdate.select('circle.node')
+                .attr('r', 10)
+                .style('fill', function(d) {
+                    return d._children ? 'lightsteelblue' : '#fff';
+                }).attr('cursor', 'pointer');
+            // Remove any exiting nodes
+            var nodeExit = node.exit().transition()
+                              .duration(DURATION)
+                              .attr('transform', function(d) {
+                                  return 'translate(%s, %s)'.format(source.y, source.x);
+                              }).remove();
+            // On exit reduce the node circles size to 0
+            nodeExit.select('circle').attr('r', 1e-6);
+            // On exit reduce the opacity of text labels
+            nodeExit.select('text').style('fill-opacity', 1e-6);
+
+            // Update the links...
+            var link = svgComponents.svg.selectAll('path.link')
+                        .data(links, function(d) { return d.id; });
+            // Enter any new links at the parent's previous position.
+            var linkEnter = link.enter().insert('path', "g")
+                                .attr('class', 'link')
+                                .attr('d', function(d){
+                                    var o = {x: source.x0, y: source.y0};
+                                    return diagonal(o, o);
+                                });
+            // Transition back to the parent element position
+            var linkUpdate = linkEnter.merge(link);
+            linkUpdate.transition()
+                      .duration(DURATION)
+                      .attr('d', function(d) { return diagonal(d, d.parent) });
+            // Remove any exiting links
+            var linkExit = link.exit().transition()
+                            .duration(DURATION)
+                            .attr('d', function(d) {
+                                var o = {x: source.x, y: source.y};
+                                return diagonal(o, o);
+                            }).remove();
+            // Store the old positions for transition.
+            nodes.forEach(function(d){
+                d.x0 = d.x;
+                d.y0 = d.y;
             });
+        }
+
+        // Collapse the node and all its children
+        function collapseHierarchyTree(d) {
+            if (d.children) {
+                d._children = d.children;
+                d._children.forEach(collapseHierarchyTree);
+                d.children = null;
+            }
+        }
+
+        // Creates a curved (diagonal) path from parent to the child nodes
+        function diagonal(s, d) {
+            return `M ${s.y} ${s.x}
+                C ${(s.y + d.y) / 2} ${s.x},
+                ${(s.y + d.y) / 2} ${d.x},
+                ${d.y} ${d.x}`;
+        }
+
+        // Toggle children on click.
+        function click(d) {
+            if (d.children) {
+                d._children = d.children;
+                d.children = null;
+            } else {
+                d.children = d._children;
+                d._children = null;
+            }
+            updateHierarchyTree(d);
+        }
     }
 </script>
 <script type="text/javascript">
@@ -723,10 +822,10 @@
 
         // Create SVG object
         var svg = d3.select('#d3-diagram').append('svg')
-                    .attr('width', width + margin.left + margin.right)
-                    .attr('height', height + margin.top + margin.bottom)
+                    .attr('width', svgOptions.width)
+                    .attr('height', svgOptions.height)
                     .append('g')
-                    .attr('transform', 'translate(60,0)');
+                    .attr('transform', 'translate(%s, %s)'.format(margin.left, margin.top));
 
         // Create Tree object
         var tree = d3.cluster().size([height, width]);

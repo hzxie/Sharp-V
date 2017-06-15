@@ -243,12 +243,12 @@ class Algorithms(object):
         tree        = scipy.cluster.hierarchy.to_tree(clusters, rd=False)
         ids         = np.ndarray.tolist(training_ids)
         id2name     = dict(zip(range(len(ids)), ids))
-        hierarchy   = dict(children=[], name="non-leaf-node")
+        hierarchy   = dict(children=[], name='')
         
         def add_node(node, parent):
             # First create the new node and append it to its parent's children
             new_node = dict(node_id=node.id, children=[])
-            parent["children"].append(new_node)
+            parent['children'].append(new_node)
             # Recursively add the current node's children
             if node.left: 
                 add_node(node.left, new_node)
@@ -257,22 +257,22 @@ class Algorithms(object):
 
         def label_tree(n):
             # If the node is a leaf, then we have its name
-            if len(n["children"]) == 0:
+            if len(n['children']) == 0:
                 leaf_names = [id2name[n["node_id"]]]
             # If not, flatten all the leaves in the node's subtree
             else:
-                leaf_names = reduce(lambda ls, c: ls + label_tree(c), n["children"], [])
+                leaf_names = reduce(lambda ls, c: ls + label_tree(c), n['children'], [])
             # Delete the node id since we don't need it anymore and
             # it makes for cleaner JSON
-            del n["node_id"]
+            del n['node_id']
             # Labeling convention: "-"-separated leaf names
-            n["name"] = leaf_names[0] if len(leaf_names) == 1 else "non-leaf-node"
-            n["children"] = leafNames if len(leafNames) <= 5 else n["children"]
+            n['name'] = leaf_names[0] if len(leaf_names) == 1 else ''
+            n['children'] = leaf_names if len(leaf_names) <= 5 else n['children']
 
             return leaf_names
         
         add_node(tree, hierarchy)
-        label_tree(hierarchy["children"][0])
+        label_tree(hierarchy['children'][0])
         
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
                 training_labels = training_labels, testing_labels = testing_labels, hierarchy = hierarchy)

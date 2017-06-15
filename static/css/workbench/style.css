@@ -189,6 +189,22 @@ div#main-content div.section .algorithm div.panel-body label {
 	margin: 10px 0 0;
 }
 
+div#main-content div#d3-diagram .node circle {
+    fill: #fff;
+    stroke: steelblue;
+    stroke-width: 3px;
+}
+
+div#main-content div#d3-diagram .node text {
+    font: 12px sans-serif;
+}
+
+div#main-content div#d3-diagram .link {
+    fill: none;
+    stroke: #ccc;
+    stroke-width: 2px;
+}
+
 @media only screen and (max-width: 767px) {
 	div.hero:before {
 		background: transparent;
