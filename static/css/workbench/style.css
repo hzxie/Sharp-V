@@ -205,9 +205,17 @@ div#main-content div#d3-diagram .link {
     stroke-width: 2px;
 }
 
-div#main-content #meta-of-neighbors > table > thead {
+div#main-content #meta-of-neighbors table > thead {
 	background-color: #03a9f4;
 	color: #fff;
+}
+
+div#main-content #meta-of-neighbors div.panel {
+	margin-top: 40px;
+}
+
+div#main-content #meta-of-neighbors ul#metaset-columns {
+	padding-left: 0;
 }
 
 @media only screen and (max-width: 767px) {

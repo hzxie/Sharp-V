@@ -242,12 +242,24 @@
                         </div> <!-- .panel -->
                     </div> <!-- .col-md-4 -->
                 </div> <!-- .row -->
-                <div id="meta-of-neighbors" class="hide">
-                    <h4>{{ _('Metadata of Nearest Neighbors') }}</h4>
-                    <table class="table table-striped">
-                        <thead></thead>
-                        <tbody></tbody>
-                    </table>
+                <div id="meta-of-neighbors" class="row hide">
+                    <div class="col-md-8">
+                        <h4>{{ _('Metaset of Nearest Neighbors') }}</h4>
+                        <table class="table table-striped">
+                            <thead></thead>
+                            <tbody></tbody>
+                        </table>
+                    </div> <!-- .col-md-8 -->
+                    <div class="col-md-4">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h5>{{ _('Columns to Display') }}</h5>
+                            </div> <!-- .panel-heading -->
+                            <div class="panel-body">
+                                <ul id="metaset-columns"></ul>
+                            </div> <!-- .panel-body -->
+                        </div> <!-- .panel -->
+                    </div> <!-- .col-md-4 -->
                 </div> <!-- .row -->
             </div> <!-- .section -->
         </div> <!-- .col-md-9 -->
@@ -265,7 +277,7 @@
                 <p>The uploaded series-matrixing dataset file is required as a CSV formated text file that include a tab-delimited value-matrix table generated from the 'VALUE' column each sample, headed by sample. These files are suitable for loading into spreadsheet applications such as Excel.</p>
                 <p><button class="btn btn-raised btn-primary" onclick="window.location.href = '{{ static_url('uploads/Guest/Demo/Demo-Dataset.csv') }}'">Download Demo Dataset</button></p>
                 <h5>Metaset File Format</h5>
-                <p>The uploaded optional metadata is also required in CSV format and contains comprehensive clinical information. The same line of matrixing metadata and dataset corresponds to the same sample.</p>
+                <p>The uploaded optional metaset is also required in CSV format and contains comprehensive clinical information. The same line of matrixing metaset and dataset corresponds to the same sample.</p>
                 <p><button class="btn btn-raised btn-primary" onclick="window.location.href = '{{ static_url('uploads/Guest/Demo/Demo-Metaset.csv') }}'">Download Demo Metaset</button></p>
             </div> <!-- .modal-body -->
         </div> <!-- .modal-content -->
@@ -571,9 +583,13 @@
             success: function(result) {
                 if ( result['isSuccessful'] ) {
                     draw(result['dataset']);
-                    list(result['metaset'])
-                    $('#visualization-sidebar, #meta-of-neighbors').removeClass('hide');
+                    list(result['metaset']);
+                    
+                    $('#visualization-sidebar').removeClass('hide');
                     $('#no-diagram').addClass('hide');
+                    if ( !jQuery.isEmptyObject(result['metaset']) ) {
+                        $('#meta-of-neighbors').removeClass('hide');
+                    }
                 } else {
                     // TODO: Why?
                     alert('Error occurred while processing data.');
@@ -689,8 +705,10 @@
         
         // Plot X axis and Y axis in SVG
         svg.append('g').attr('id', 'axis-x').attr('class', 'x axis')
-           .attr('transform', 'translate(0,' + height + ')').call(xAxis);
-        svg.append('g').attr('id', 'axis-y').attr('class', 'y axis').call(yAxis);
+           .attr('transform', 'translate(0,' + height + ')')
+           .call(xAxis);    // TODO: Use scientific notation
+        svg.append('g').attr('id', 'axis-y').attr('class', 'y axis')
+           .call(yAxis);    // TODO: Use scientific notation
 
         // Handling zoom operations
         var zoom = d3.zoom()
@@ -904,34 +922,50 @@
 </script>
 <script type="text/javascript">
     function list(metaset) {
-        var metaKeys        = getMetaKeys(metaset);
-        // Display head of table
-        $('#meta-of-neighbors > table > thead').empty();
+        var metaKeys = getMetaKeys(metaset);
 
-        var tableHeadHtml   = '';
+        // Initialize
+        $('#meta-of-neighbors table thead').empty();
+        $('#meta-of-neighbors table tbody').empty();
+        $('#metaset-columns').empty();
+
+        // Display items in column filter
         for ( var i = 0; i < metaKeys.length; ++ i ) {
-            tableHeadHtml += '<td>%s</td>'.format(metaKeys[i]);
+            var metaKey = normalizeMetaKeyName(metaKeys[i]);
+            $('#metaset-columns').append(
+                '<li class="checkbox"><label><input type="checkbox" value="%s" checked="checked"> %s</label></li>'
+                    .format(metaKey, metaKey)
+            );
         }
-        $('#meta-of-neighbors > table > thead').append(
+        $.material.checkbox();
+
+        // Display head of table
+        var tableHeadHtml  = '<td>#</td>';
+        for ( var i = 0; i < metaKeys.length; ++ i ) {
+            var metaKey = normalizeMetaKeyName(metaKeys[i]);
+            tableHeadHtml += '<td class="%s">%s</td>'.format(metaKey, metaKey);
+        }
+        $('#meta-of-neighbors table thead').append(
             '<tr>%s</tr>'.format(tableHeadHtml)
         );
 
         // Display body of table
-        $('#meta-of-neighbors > table > tbody').empty();
         for ( var sampleId in metaset ) {
             var tableBodyHtml = '',
                 sample        = metaset[sampleId];
 
+            tableBodyHtml    += '<td>%s</td>'.format(sampleId);
             for ( var i = 0; i < metaKeys.length; ++ i ) {
                 var metaKey   = metaKeys[i],
-                    metaValue = '';
-                if ( metaKey in sample ) {
                     metaValue = sample[metaKey];
+                if ( typeof(metaValue) == 'undefined' ) {
+                    metaValue = '';
                 }
-                tableBodyHtml += '<td>%s</td>'.format(metaValue);
+                tableBodyHtml += '<td class="%s">%s</td>'.format(
+                    normalizeMetaKeyName(metaKey), metaValue);
             }
-            $('#meta-of-neighbors > table > tbody').append(
-                '<tr>%s</tr>'.format(tableBodyHtml)
+            $('#meta-of-neighbors table > tbody').append(
+                '<tr data-value="%s">%s</tr>'.format(sampleId, tableBodyHtml)
             );
         }
     }
@@ -948,6 +982,24 @@
             }
         }
         return metaKeySet;
+    }
+</script>
+<script type="text/javascript">
+    $('#metaset-columns').on('click', '.checkbox', function() {
+        var checkbox    = $('input[type=checkbox]', $(this)),
+            columnName  = checkbox.val(), 
+            isChecked   = checkbox.is(':checked');
+
+        if ( isChecked ) {
+            $('td.%s'.format(columnName), '#meta-of-neighbors table').removeClass('hide');
+        } else {
+            $('td.%s'.format(columnName), '#meta-of-neighbors table').addClass('hide');
+        }
+    });
+</script>
+<script type="text/javascript">
+    function normalizeMetaKeyName(metaKeyName) {
+        return metaKeyName.replace(/[\/ \+\.#]/g, '-');
     }
 </script>
 {% end %}
