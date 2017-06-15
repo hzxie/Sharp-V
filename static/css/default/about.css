@@ -38,6 +38,10 @@ div#content div#main-content div.section p {
 	line-height: 150%;
 }
 
+div#content div#main-content div.section ul {
+	padding-left: 15px;
+}
+
 div#content div#main-content h3 {
 	margin-bottom: 20px;
 }
