@@ -902,32 +902,32 @@
             height      = svgOptions.height - margin.top - margin.bottom;
 
         // Create SVG object
-        var svg = d3.select('#d3-diagram').append('svg')
+        var svg   = d3.select('#d3-diagram').append('svg')
                     .attr('width', svgOptions.width)
                     .attr('height', svgOptions.height)
                     .append('g')
                     .attr('transform', 'translate(%s, %s)'.format(margin.left, margin.top));
 
         // Create Tree object
-        var tree = d3.cluster().size([height, width]);
+        var tree  = d3.cluster().size([height, width]);
 
         // Create sensing area to detect zoom and drag operations
-        var view = svg.append('rect')
+        var layer = svg.append("g"),
+            view  = svg.append('rect')
                       .attr('class', 'view').attr('x', 0).attr('y', 0)
                       .attr('width', width * 4).attr('height', height * 4)
                       .style('fill', 'none')
                       .style('pointer-events', 'all');
+        
 
         // Handling zoom operations
-        var zoom = d3.zoom()
-                     .scaleExtent([0.5, 1]).on('zoom', function() {
-                          console.log(d3.event.transform);
-                          svg.attr('transform', d3.event.transform);
-                     });
+        var zoom  = d3.zoom().scaleExtent([0.5, 1]).on('zoom', function() {
+                        layer.attr('transform', d3.event.transform);
+                    });
         svg.call(zoom);
 
         return {
-            'svg': svg,
+            'svg': layer,
             'tree': tree
         }
     }
