@@ -705,10 +705,8 @@
         
         // Plot X axis and Y axis in SVG
         svg.append('g').attr('id', 'axis-x').attr('class', 'x axis')
-           .attr('transform', 'translate(0,' + height + ')')
-           .call(xAxis);    // TODO: Use scientific notation
-        svg.append('g').attr('id', 'axis-y').attr('class', 'y axis')
-           .call(yAxis);    // TODO: Use scientific notation
+           .attr('transform', 'translate(0,' + height + ')').call(xAxis);
+        svg.append('g').attr('id', 'axis-y').attr('class', 'y axis').call(yAxis);
 
         // Handling zoom operations
         var zoom = d3.zoom()
@@ -719,8 +717,7 @@
                           svg.select('#axis-x').call(xAxis.scale(d3.event.transform.rescaleX(x)));
                           svg.select('#axis-y').call(yAxis.scale(d3.event.transform.rescaleY(y)));
                           svg.selectAll('circle')
-                                  .attr('transform', 'translate(%s, %s) scale(%s)'
-                                    .format(d3.event.transform.x, d3.event.transform.y, d3.event.transform.k));
+                                  .attr('transform', d3.event.transform);
                      });
         svg.call(zoom);
 
@@ -786,7 +783,7 @@
                             .attr('class', 'node')
                             .attr('transform', function(d) {
                                 return 'translate(%s, %s)'.format(source.y0, source.x0);
-                            }).on('click', click);
+                            }).on('click', toggle);
             // Add Circle for the nodes
             nodeEnter.append('circle')
                 .attr('class', 'node')
@@ -878,8 +875,9 @@
         }
 
         // Toggle children on click.
-        function click(d) {
-            if (d.children) {
+        function toggle(d) {
+            console.log(d);
+            if ( d.children ) {
                 d._children = d.children;
                 d.children = null;
             } else {
@@ -906,11 +904,18 @@
         // Create Tree object
         var tree = d3.cluster().size([height, width]);
 
+        // Create sensing area to detect zoom and drag operations
+        var view = svg.append('rect')
+                      .attr('class', 'view').attr('x', 0).attr('y', 0)
+                      .attr('width', width * 4).attr('height', height * 4)
+                      .style('fill', 'none')
+                      .style('pointer-events', 'all');
+
         // Handling zoom operations
         var zoom = d3.zoom()
-                     .scaleExtent([1, 1]).on('zoom', function() {
-                          svg.attr('transform', 'translate(%s, %s)scale(%s)'
-                             .format(d3.event.transform.x, d3.event.transform.y, d3.event.transform.k));
+                     .scaleExtent([0.5, 1]).on('zoom', function() {
+                          console.log(d3.event.transform);
+                          svg.attr('transform', d3.event.transform);
                      });
         svg.call(zoom);
 
