@@ -52,7 +52,7 @@ class ProjectsSuggestionsHandler(BaseHandler):
                             'projectName': project_name,
                             'projectFiles': project_files
                         })
-        self.finish(dump_json(projects))
+        self.finish(dump_json(projects[:10]))
 
     def get_project_files(self, project_folder_path):
         project_files      = [file for file in listdir(project_folder_path)]

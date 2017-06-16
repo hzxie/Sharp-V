@@ -921,7 +921,7 @@
         
 
         // Handling zoom operations
-        var zoom  = d3.zoom().scaleExtent([0.5, 1]).on('zoom', function() {
+        var zoom  = d3.zoom().scaleExtent([0.1, 128]).on('zoom', function() {
                         layer.attr('transform', d3.event.transform);
                     });
         svg.call(zoom);
@@ -944,8 +944,8 @@
         // Display items in column filter
         for ( var i = 0; i < metaKeys.length; ++ i ) {
             $('#metaset-columns').append(
-                '<li class="checkbox"><label><input type="checkbox" value="%s" checked="checked"> %s</label></li>'
-                    .format(normalizeMetaKeyName(metaKeys[i]), metaKeys[i])
+                '<li class="checkbox"><label><input type="checkbox" value="%s" %s> %s</label></li>'
+                    .format(normalizeMetaKeyName(metaKeys[i]), isColumnDisplayed(i, true), metaKeys[i])
             );
         }
         $.material.checkbox();
@@ -953,8 +953,8 @@
         // Display head of table
         var tableHeadHtml  = '<td>#</td>';
         for ( var i = 0; i < metaKeys.length; ++ i ) {
-            tableHeadHtml += '<td class="%s">%s</td>'.format(
-                normalizeMetaKeyName(metaKeys[i]), metaKeys[i]);
+            tableHeadHtml += '<td class="%s %s">%s</td>'.format(
+                normalizeMetaKeyName(metaKeys[i]), isColumnDisplayed(i, false), metaKeys[i]);
         }
         $('#meta-of-neighbors table thead').append(
             '<tr>%s</tr>'.format(tableHeadHtml)
@@ -972,8 +972,8 @@
                 if ( typeof(metaValue) == 'undefined' ) {
                     metaValue = '';
                 }
-                tableBodyHtml += '<td class="%s">%s</td>'.format(
-                    normalizeMetaKeyName(metaKey), metaValue);
+                tableBodyHtml += '<td class="%s %s">%s</td>'.format(
+                    normalizeMetaKeyName(metaKey), isColumnDisplayed(i, false), metaValue);
             }
             $('#meta-of-neighbors table > tbody').append(
                 '<tr data-value="%s">%s</tr>'.format(sampleId, tableBodyHtml)
@@ -996,6 +996,22 @@
     }
 </script>
 <script type="text/javascript">
+    function isColumnDisplayed(columnIndex, isCheckbox) {
+        var INDEX_BOUND  = 2;
+
+        if ( isCheckbox ) {
+            return columnIndex <= INDEX_BOUND ? 'checked="checked"' : '';
+        } else {
+            return columnIndex <= INDEX_BOUND ? '' : 'hide';
+        }
+    }
+</script>
+<script type="text/javascript">
+    function normalizeMetaKeyName(metaKeyName) {
+        return metaKeyName.replace(/[\/ \+\.#]/g, '-');
+    }
+</script>
+<script type="text/javascript">
     $('#metaset-columns').on('click', '.checkbox', function() {
         var checkbox    = $('input[type=checkbox]', $(this)),
             columnName  = checkbox.val(), 
@@ -1007,10 +1023,5 @@
             $('td.%s'.format(columnName), '#meta-of-neighbors table').addClass('hide');
         }
     });
-</script>
-<script type="text/javascript">
-    function normalizeMetaKeyName(metaKeyName) {
-        return metaKeyName.replace(/[\/ \+\.#]/g, '-');
-    }
 </script>
 {% end %}
