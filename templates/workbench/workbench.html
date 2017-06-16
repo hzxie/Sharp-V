@@ -32,8 +32,8 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group label-static">
-                                        <label for="existing-dataset-name">{{ _('Project name') }}</label>
-                                        <input id="existing-dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My-Project-0">
+                                        <label for="existing-project-name">{{ _('Project name') }}</label>
+                                        <input id="existing-project-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My-Project-0">
                                         <ul class="search-suggestions hide">
                                         </ul> <!-- .search-suggestions -->
                                     </div> <!-- .form-group -->
@@ -56,8 +56,8 @@
                             <div class="row">
                                 <div class="col-md-4">
                                     <div class="form-group label-static">
-                                        <label for="new-dataset-name">{{ _('Project name') }}</label>
-                                        <input id="new-dataset-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My-Project-0">
+                                        <label for="new-project-name">{{ _('Project name') }}</label>
+                                        <input id="new-project-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My-Project-0">
                                     </div> <!-- .form-group -->
                                 </div> <!-- .col-md-4 -->
                                 <div class="col-md-4">
@@ -297,11 +297,11 @@
         add: function(e, data) {
             $('.progress .progress-bar').css('width', '0');
             
-            var datasetName     = $('#new-dataset-name').val(),
+            var projectName     = $('#new-project-name').val(),
                 acceptFileTypes = /.*\.(csv)$/i,
                 fileName        = data.originalFiles[0]['name'];
-            if ( !datasetName ) {
-                alert('{{ _('Please name your datasets.') }}');
+            if ( !projectName ) {
+                alert('{{ _('Please name your project.') }}');
                 return;
             }
             if ( !acceptFileTypes.test(fileName) ) {
@@ -325,7 +325,7 @@
                 message        = getFileUploadMessage(response),
                 alertClassName = isSuccessful ? 'success' : 'danger',
                 fileName       = data['files'][0]['name'],
-                datasetName    = $('#dataset-name').val();
+                projectName    = $('#project-name').val();
 
             if ( isSuccessful ) {
                 $('ul#datasets').append(
@@ -341,9 +341,9 @@
         }
     });
     $('.file-upload').bind('fileuploadsubmit', function (e, data) {
-        var datasetName = $('#new-dataset-name').val();
+        var projectName = $('#new-project-name').val();
         data.formData = {
-            'datasetName': datasetName,
+            'projectName': projectName,
             '_xsrf': getCookie("_xsrf")
         };
     });
@@ -383,7 +383,7 @@
     });
 </script>
 <script type="text/javascript">
-    $('#existing-dataset-name').focus(function() {
+    $('#existing-project-name').focus(function() {
         var currentValue        = $(this).val().toLowerCase(),
             suggestionsControl  = $('.search-suggestions', $(this).parent());
 
@@ -392,7 +392,7 @@
     });
 
     $(document).mouseup(function(e) {
-        var container = $('.search-suggestions, #existing-dataset-name');
+        var container = $('.search-suggestions, #existing-project-name');
         // if the target of the click isn't the container nor a descendant of the container
         if ( !container.is(e.target) && container.has(e.target).length === 0 ) {
             $('.search-suggestions').addClass('hide');
@@ -400,7 +400,7 @@
     });
 </script>
 <script type="text/javascript">
-    $('#existing-dataset-name').keyup(function() {
+    $('#existing-project-name').keyup(function() {
         var currentValue        = $(this).val().toLowerCase(),
             suggestionsControl  = $('.search-suggestions', $(this).parent());
 
@@ -417,7 +417,7 @@
 
         $.ajax({
             type: 'GET',
-            url: '{{ base_url('/datasets/suggestions') }}',
+            url: '{{ base_url('/projects/suggestions') }}',
             data: request,
             dataType: 'JSON',
             success: function(suggestions) {
@@ -426,9 +426,13 @@
                     return;                    
                 }
                 for ( var i = 0; i < suggestions.length; ++ i ) {
-                    var datasetName  = suggestions[i]['datasetName'],
-                        datasetFiles = suggestions[i]['datasetFiles'];
-                    suggestionsControl.append('<li dataset-files=\'%s\'>%s</li>'.format(JSON.stringify(datasetFiles), datasetName));
+                    var projectName     = suggestions[i]['projectName'],
+                        datasetFileName = suggestions[i]['projectFiles']['datasetName'],
+                        metasetFileName = suggestions[i]['projectFiles']['metasetName'],
+                        candidateFiles  = suggestions[i]['projectFiles']['candidateFiles'];
+
+                    suggestionsControl.append('<li candidate-files=\'%s\' dataset-file="%s" metaset-file="%s">%s</li>'
+                        .format(JSON.stringify(candidateFiles), datasetFileName, metasetFileName, projectName));
                 }
                 suggestionsControl.removeClass('hide');
             }
@@ -437,18 +441,24 @@
 </script>
 <script type="text/javascript">
     $('.search-suggestions').on('click', 'li', function() {
-        var datasetName  = $(this).html(),
-            datasetFiles = JSON.parse($(this).attr('dataset-files'));
+        var projectName     = $(this).html(),
+            datasetFileName = $(this).attr('dataset-file'),
+            metasetFileName = $(this).attr('metaset-file'),
+            candidateFiles  = JSON.parse($(this).attr('candidate-files'));
 
+        // Add files of the projects
         $('#existing-dataset-file-name, #existing-metaset-file-name').find('option').remove();
         $('#existing-metaset-file-name').append('<option value=" "></option>');
-        for ( var i = 0; i < datasetFiles.length; ++ i ) {
+        for ( var i = 0; i < candidateFiles.length; ++ i ) {
             $('#existing-dataset-file-name, #existing-metaset-file-name')
                 .append('<option value="%s">%s</option>'
-                    .format(datasetFiles[i], datasetFiles[i]));
-            $('#existing-dataset-file-name, #existing-metaset-file-name').dropdown();
+                    .format(candidateFiles[i], candidateFiles[i]));
         }
-        $('#existing-dataset-name').val(datasetName);
+        // Set up dataset file name and metaset file name
+        $('#existing-dataset-file-name').val(datasetFileName).trigger('change');
+        $('#existing-metaset-file-name').val(metasetFileName).trigger('change');
+        $('#existing-dataset-file-name, #existing-metaset-file-name').dropdown();
+        $('#existing-project-name').val(projectName);
         $('.search-suggestions').addClass('hide');
     });
 </script>
@@ -509,7 +519,7 @@
 </script>
 <script type="text/javascript">
     $('#btn-process').click(function() {
-        var datasetName     = getDatasetName(),
+        var projectName     = getProjectName(),
             datasetFileName = getDatasetFileName(),
             metasetFileName = getMetasetFileName(),
             processFlow     = JSON.stringify(getProcessFlow()),
@@ -520,12 +530,12 @@
         $('#visualization-sidebar, #meta-of-neighbors').addClass('hide');
         $('#btn-process').attr('disabled', 'disabled');
         $('#btn-process').html('{{ _('Please wait...') }}');
-        return processDataset(datasetName, datasetFileName, metasetFileName, processFlow, xsrfToken);
+        return processDataset(projectName, datasetFileName, metasetFileName, processFlow, xsrfToken);
     });
 </script>
 <script type="text/javascript">
-    function getDatasetName() {
-        return isUsingExistingData() ? $('#existing-dataset-name').val() : $('#new-dataset-name').val();
+    function getProjectName() {
+        return isUsingExistingData() ? $('#existing-project-name').val() : $('#new-project-name').val();
     }
 
     function getDatasetFileName() {
@@ -566,9 +576,9 @@
     }
 </script>
 <script type="text/javascript">
-    function processDataset(datasetName, datasetFileName, metasetFileName, processFlow, xsrfToken) {
+    function processDataset(projectName, datasetFileName, metasetFileName, processFlow, xsrfToken) {
         var postData = {
-            'datasetName': datasetName,
+            'projectName': projectName,
             'datasetFileName': datasetFileName,
             'metasetFileName': metasetFileName,
             'processFlow': processFlow,
@@ -750,15 +760,12 @@
     function drawHierarchyTree(dataset, svgOptions) {
         var treeData      = dataset['hierarchy'],
             svgComponents = setUpHierarchyTreeSvg(svgOptions),
-            treeHeight    = svgOptions.height - svgOptions.margin.top - svgOptions.margin.bottom,
-            treeWidth     = svgOptions.width - svgOptions.margin.left - svgOptions.margin.right,
-            hierarchyTree = d3.tree().size([treeHeight, treeWidth]),
             treeRoot      = d3.hierarchy(treeData, function(d) { return d.children; }),
             i             = 0,
             DURATION      = 750;
         
         // Put the root of the tree in the left center of the diagram
-        treeRoot.x0       = treeHeight / 2;
+        treeRoot.x0       = (svgOptions.height - svgOptions.margin.top - svgOptions.margin.bottom) / 2;
         treeRoot.y0       = 0;
         // Collapse after the second level
         // treeRoot.children.forEach(collapseHierarchyTree);
@@ -767,7 +774,7 @@
         // Update the structure of the hierarchy tree
         function updateHierarchyTree(source) {
             // Compute the new tree layout.
-            var treeData = hierarchyTree(treeRoot),
+            var treeData = svgComponents.tree(treeRoot),
                 nodes    = treeData.descendants(),
                 links    = treeData.descendants().slice(1);
 

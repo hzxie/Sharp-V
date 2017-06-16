@@ -3,6 +3,8 @@
 import logging
 
 from concurrent.futures import ThreadPoolExecutor
+from json import dump as dump_json_file
+from json import load as load_json_file
 from os import makedirs
 from os import listdir
 from os.path import isfile as file_exists
@@ -17,53 +19,60 @@ from tornado.gen import coroutine
 from tornado.web import asynchronous
 from re import match
 from re import findall
-import json
 
 from handlers.BaseHandler import BaseHandler
 from utils.Algorithms import Algorithms
 from utils.DatasetParsers import DatasetParser
 from utils.DatasetParsers import MetasetParser
 
-class DatasetSuggestionsHandler(BaseHandler):
+PROJECT_CONFIG_FILE_NAME = 'project-config.json'
+
+class ProjectsSuggestionsHandler(BaseHandler):
     @asynchronous
     def get(self):
-        dataset_keywords     = self.get_argument('keyword', '')
+        project_keywords     = self.get_argument('keyword', '')
         try:
-            dataset_keywords = load_json(dataset_keywords)
+            project_keywords = load_json(project_keywords)
         except:
-            dataset_keywords = []
+            project_keywords = []
 
         current_user         = self.get_current_user()
         base_folder          = join_path(self.application.settings['static_path'], 'uploads', current_user)
-        dataset_names        = Set()
-        datasets             = []
-        for dataset in listdir(base_folder):
-             if folder_exists(join_path(base_folder, dataset)):
-                for keyword in dataset_keywords:
-                    if dataset.lower().find(keyword.lower()) != -1 and not dataset in dataset_names:
-                        dataset_files = [file for file in listdir(join_path(base_folder, dataset))]
-                        dataset_file_name = None
-                        metaset_file_name = None
-                        for file in dataset_files:
-                            if findall(r'\.[^.\\/:*?"<>|\r\n]+$', file)[0].lower() == '.json':
-                                project_info_path = join_path(base_folder, dataset, file)
-                                try:
-                                    with open(project_info_path, 'r') as f:
-                                        project_info = json.load(f)
-                                        dataset_file_name = project_info['dataset_file_name']
-                                        metaset_file_name = project_info['metaset_file_name']
-                                except Exception as ex:
-                                    logging.error('project info reading error occurred: %s' % ex)
-                                dataset_files.remove(file)
+        project_names        = Set()
+        projects             = []
+        for project_name in listdir(base_folder):
+             if folder_exists(join_path(base_folder, project_name)):
+                for keyword in project_keywords:
+                    if project_name.lower().find(keyword.lower()) != -1 and not project_name in project_names:
+                        project_folder_path = join_path(base_folder, project_name) 
+                        project_files       = self.get_project_files(project_folder_path)                       
 
-                        dataset_names.add(dataset)
-                        datasets.append({
-                            'datasetName': dataset,
-                            'datasetFiles': dataset_files,
-                            'datasetFileName': dataset_file_name,
-                            'metasetFileName': metaset_file_name
+                        project_names.add(project_name)
+                        projects.append({
+                            'projectName': project_name,
+                            'projectFiles': project_files
                         })
-        self.finish(dump_json(datasets))
+        self.finish(dump_json(projects))
+
+    def get_project_files(self, project_folder_path):
+        project_files      = [file for file in listdir(project_folder_path)]
+        dataset_file_name  = None
+        metaset_file_name  = None
+        json_file_name     = PROJECT_CONFIG_FILE_NAME
+        project_config     = None
+
+        if json_file_name in project_files:
+            project_files.remove(json_file_name)
+            with open(join_path(project_folder_path, json_file_name)) as json_file:
+                project_config    = load_json_file(json_file)
+                dataset_file_name = project_config['datasetFileName']
+                metaset_file_name = project_config['metasetFileName']
+
+        return {
+            'candidateFiles': project_files,
+            'datasetName': dataset_file_name,
+            'metasetName': metaset_file_name
+        }
 
 class DatasetUploadHandler(BaseHandler):
     def initialize(self):
@@ -76,11 +85,11 @@ class DatasetUploadHandler(BaseHandler):
         content_type = file['content_type']
         file_name    = file['filename']
         current_user = self.get_current_user()
-        dataset_name = self.get_argument('datasetName')
-        result       = self.is_file_acceptable(content_type, file_name, current_user, dataset_name)
+        project_name = self.get_argument('projectName')
+        result       = self.is_file_acceptable(content_type, file_name, current_user, project_name)
 
         if result['isSuccessful']:
-            base_folder  = join_path(self.application.settings['static_path'], 'uploads', current_user, dataset_name)
+            base_folder  = join_path(self.application.settings['static_path'], 'uploads', current_user, project_name)
             file_path    = join_path(base_folder, file_name)
 
             if not path_exists(base_folder):
@@ -99,12 +108,12 @@ class DatasetUploadHandler(BaseHandler):
 
         self.finish(dump_json(result))
 
-    def is_file_acceptable(self, content_type, file_name, current_user, dataset_name):
+    def is_file_acceptable(self, content_type, file_name, current_user, project_name):
         result = {
             'isContentTypeLegal':   True,
-            'isDatasetNameEmpty':   dataset_name == '',
-            'isDatasetNameLegal':   self.is_file_name_legal(dataset_name),
-            'isDatasetNameExists':  False,
+            'isProjectNameEmpty':   project_name == '',
+            'isProjectNameLegal':   self.is_file_name_legal(project_name),
+            'isProjectNameExists':  False,
             'isFileNameLegal':      self.is_file_name_legal(file_name),
             'isFileNameExists':     False,
         }
@@ -126,14 +135,15 @@ class DatasetProcessHandler(BaseHandler):
 
     @coroutine
     def post(self):
-        dataset_name        = self.get_argument('datasetName')
+        project_name        = self.get_argument('projectName')
         dataset_file_name   = self.get_argument('datasetFileName', '')
         metaset_file_name   = self.get_argument('metasetFileName', '')
         process_steps       = self.get_argument('processFlow')
 
         current_user        = self.get_current_user()
-        dataset_file_path   = self.get_file_path(current_user, dataset_name, dataset_file_name)
-        metaset_file_path   = self.get_file_path(current_user, dataset_name, metaset_file_name)
+        dataset_file_path   = self.get_file_path(current_user, project_name, dataset_file_name)
+        metaset_file_path   = self.get_file_path(current_user, project_name, metaset_file_name)
+        config_file_path    = self.get_file_path(current_user, project_name, PROJECT_CONFIG_FILE_NAME)
         dataset             = self.dataset_parser.get_datasets(dataset_file_path, None, None)
         metaset             = self.metaset_parser.get_metaset(metaset_file_path)
 
@@ -147,32 +157,32 @@ class DatasetProcessHandler(BaseHandler):
             try:
                 process_steps       = load_json(process_steps)
                 result['dataset']   = yield self.process_dataset(dataset, process_steps)
-            except Exception as ex:
-                result['isSuccessful'] = False
-                logging.error('Error occurred: %s' % ex)
-
-            result['metaset']   = metaset
-        if result['isSuccessful']:
-            try:
-                project_info = dict(dataset_name=dataset_name, dataset_file_name=dataset_file_name, \
-                    metaset_file_name=metaset_file_name, dataset_files=[dataset_file_name, metaset_file_name])
-                project_info_path = self.get_file_path(current_user, dataset_name, 'project_info.json')
-                json.dump(project_info, open(project_info_path, "w"), indent=4)
+                result['metaset']   = metaset
+                # Save dataset and metaset of the project
+                self.save_project_config(config_file_path, dataset_file_name, metaset_file_name)
             except Exception as ex:
                 result['isSuccessful'] = False
                 logging.error('Error occurred: %s' % ex)
 
         self.finish(dump_json(result))
 
-    def get_file_path(self, current_user, dataset_name, file_name):
-        if not dataset_name:
+    def get_file_path(self, current_user, project_name, file_name):
+        if not project_name:
             return None
 
-        base_folder = join_path(self.application.settings['static_path'], 'uploads', current_user, dataset_name)
+        base_folder = join_path(self.application.settings['static_path'], 'uploads', current_user, project_name)
         return join_path(base_folder, file_name)
 
     def is_parameters_legal(self, process_steps):
         return True
+
+    def save_project_config(self, config_file_path, dataset_file_name, metaset_file_name):
+        project_config = {
+            'datasetFileName': dataset_file_name,
+            'metasetFileName': metaset_file_name
+        }
+        with open(config_file_path, 'w') as json_file:
+            dump_json_file(project_config, json_file)
 
     @run_on_executor
     def process_dataset(self, dataset, process_steps):
