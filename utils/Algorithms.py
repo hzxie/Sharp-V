@@ -280,7 +280,7 @@ class Algorithms(object):
                 if isinstance(children[0], dict) and len(children) > 1:
                     parse_tree(children)
                 elif isinstance(children[0], str) and len(children) == 1:
-                    del root[i]["children"]
+                    root[i]["children"] = []
                 if not isinstance(children[0], dict):
                     for j in range(len(children)):
                         children[j] = dict(name=children[j],children=[])
@@ -289,7 +289,7 @@ class Algorithms(object):
         label_tree(hierarchy['children'][0])
         hierarchy['children'][0]['name'] = 'root'
         parse_tree(hierarchy['children'][0]['children'])
-
+        
         return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, testing_samples = testing_samples, \
                 training_labels = training_labels, testing_labels = testing_labels, hierarchy = hierarchy['children'][0])
 
