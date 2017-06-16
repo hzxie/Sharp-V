@@ -40,6 +40,8 @@ class LoginHandler(BaseHandler):
         keep_signed_in  = self.get_argument("keepSignedIn", default=False, strip=False)
 
         result          = self.is_allow_to_access(username, password)
+        username        = result['username']
+        del result['username']
         if result['isSuccessful']:
             self.set_secure_cookie('user', username)
             logging.info('User [Username=%s] logged in at %s.' % (username, self.get_user_ip_addr()))
@@ -64,6 +66,7 @@ class LoginHandler(BaseHandler):
             'isPasswordEmpty': False if password else True,
             'isAccountValid': is_account_valid,
             'isAllowToAccess': is_allow_to_access,
+            'username': user.username if user else None
         }
 
     def get_user_using_username_or_email(self, username, password):

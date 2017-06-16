@@ -883,7 +883,6 @@
 
         // Toggle children on click.
         function toggle(d) {
-            console.log(d);
             if ( d.children ) {
                 d._children = d.children;
                 d.children = null;
@@ -891,6 +890,7 @@
                 d.children = d._children;
                 d._children = null;
             }
+            console.log(d);
             updateHierarchyTree(d);
         }
     }
