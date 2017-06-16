@@ -16,6 +16,8 @@ from tornado.escape import json_encode as dump_json
 from tornado.gen import coroutine
 from tornado.web import asynchronous
 from re import match
+from re import findall
+import json
 
 from handlers.BaseHandler import BaseHandler
 from utils.Algorithms import Algorithms
@@ -40,10 +42,26 @@ class DatasetSuggestionsHandler(BaseHandler):
                 for keyword in dataset_keywords:
                     if dataset.lower().find(keyword.lower()) != -1 and not dataset in dataset_names:
                         dataset_files = [file for file in listdir(join_path(base_folder, dataset))]
+                        dataset_file_name = None
+                        metaset_file_name = None
+                        for file in dataset_files:
+                            if findall(r'\.[^.\\/:*?"<>|\r\n]+$', file)[0].lower() == '.json':
+                                project_info_path = join_path(base_folder, dataset, file)
+                                try:
+                                    with open(project_info_path, 'r') as f:
+                                        project_info = json.load(f)
+                                        dataset_file_name = project_info['dataset_file_name']
+                                        metaset_file_name = project_info['metaset_file_name']
+                                except Exception as ex:
+                                    logging.error('project info reading error occurred: %s' % ex)
+                                dataset_files.remove(file)
+
                         dataset_names.add(dataset)
                         datasets.append({
                             'datasetName': dataset,
-                            'datasetFiles': dataset_files    
+                            'datasetFiles': dataset_files,
+                            'datasetFileName': dataset_file_name,
+                            'metasetFileName': metaset_file_name
                         })
         self.finish(dump_json(datasets))
 
@@ -134,6 +152,16 @@ class DatasetProcessHandler(BaseHandler):
                 logging.error('Error occurred: %s' % ex)
 
             result['metaset']   = metaset
+        if result['isSuccessful']:
+            try:
+                project_info = dict(dataset_name=dataset_name, dataset_file_name=dataset_file_name, \
+                    metaset_file_name=metaset_file_name, dataset_files=[dataset_file_name, metaset_file_name])
+                project_info_path = self.get_file_path(current_user, dataset_name, 'project_info.json')
+                json.dump(project_info, open(project_info_path, "w"), indent=4)
+            except Exception as ex:
+                result['isSuccessful'] = False
+                logging.error('Error occurred: %s' % ex)
+
         self.finish(dump_json(result))
 
     def get_file_path(self, current_user, dataset_name, file_name):
