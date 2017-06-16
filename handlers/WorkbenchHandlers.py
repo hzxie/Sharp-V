@@ -117,8 +117,8 @@ class DatasetUploadHandler(BaseHandler):
             'isFileNameLegal':      self.is_file_name_legal(file_name),
             'isFileNameExists':     False,
         }
-        result['isSuccessful'] = result['isContentTypeLegal'] and not result['isDatasetNameEmpty'] and \
-                                 result['isDatasetNameLegal'] and not result['isDatasetNameExists'] and \
+        result['isSuccessful'] = result['isContentTypeLegal'] and not result['isProjectNameEmpty'] and \
+                                 result['isProjectNameLegal'] and not result['isProjectNameExists'] and \
                                  result['isFileNameLegal']    and not result['isFileNameExists']
         return result
 
