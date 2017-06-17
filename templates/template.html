@@ -27,14 +27,14 @@
     <div id="header">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-sm-4">
+                <div class="col-md-4">
                     <div id="logo">
                         <a href="{{ base_url('/') }}">
                             <img src="{{ static_url('img/Logo.png') }}" alt="Logo">
                         </a>
                     </div> <!-- #logo -->
                 </div> <!-- .col-md-4 -->
-                <div class="col-sm-8">
+                <div class="col-md-8">
                     <ul class="nav navbar-nav pull-right">
                         <li><a href="{{ base_url('/') }}">{{ _('Home') }}</a></li>
                         <li><a href="{{ base_url('/workbench') }}">{{ _('Workbench') }}</a></li>
@@ -68,9 +68,12 @@
         <div class="container-fluid">
             <div class="row">
             	<div class="col-sm-8">
-            		{{ _('Copyright') }}&copy;
-                    <script type="text/javascript">document.write((new Date()).getFullYear());</script>
-                    <a href="{{ base_url('/') }}">Similar Patient Finder</a>. {{ _('All rights reserved.') }}
+            		<span>
+                        {{ _('Copyright') }}&copy;
+                        <script type="text/javascript">document.write((new Date()).getFullYear());</script>
+                        <a href="{{ base_url('/') }}">Similar Patient Finder</a>.
+                    </span>
+                    <span>{{ _('All rights reserved.') }}</span>
             	</div> <!-- .col-sm-8 -->
             	<div class="col-sm-4 text-right">
             		<i class="fa fa-code"></i> with <a id="github-link" href="https://github.com/hzxie/Sharp-V" target="_blank"><i class="fa fa-heart"></i></a>

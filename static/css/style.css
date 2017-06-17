@@ -101,14 +101,6 @@ div#footer a#github-link:hover {
 
 /* Smaller than standard 960 (devices and browsers) */
 @media only screen and (max-width: 959px) {
-}
-
-/* Tablet Portrait size to standard 960 (devices and browsers) */
-@media only screen and (min-width: 768px) and (max-width: 959px) {
-}
-
-/* All Mobile Sizes (devices and browser) */
-@media only screen and (max-width: 767px) {
 	div#header {
 		height: auto;
 	}
@@ -117,12 +109,24 @@ div#footer a#github-link:hover {
 		text-align: center;
 	}
 
+	div#header div.col-md-8 {
+		text-align: center;
+	}
+
 	div#header ul.nav {
+		display: inline-block;
 		float: none !important;
 		margin-top: 0;
 		text-align: center;
 	}
+}
 
+/* Tablet Portrait size to standard 960 (devices and browsers) */
+@media only screen and (min-width: 768px) and (max-width: 959px) {
+}
+
+/* All Mobile Sizes (devices and browser) */
+@media only screen and (max-width: 767px) {
 	div#footer div {
 		text-align: center;
 	}
@@ -134,4 +138,15 @@ div#footer a#github-link:hover {
 
 /* Mobile Portrait Size to Mobile Landscape Size (devices and browsers) */
 @media only screen and (max-width: 479px) {
+	div#header ul.nav {
+		display: block;
+	}
+
+	div#header ul.nav > li > a {
+		padding: 0;
+	}
+
+	div#footer span {
+		display: block;
+	}
 }

@@ -46,6 +46,13 @@ div#hero div#introduction ul.list-inline li {
 
 /* Smaller than standard 960 (devices and browsers) */
 @media only screen and (max-width: 959px) {
+	div#hero div#introduction {
+		padding: 50px;
+	}
+
+	div#hero div#introduction p {
+		width: 100%;
+	}
 }
 
 /* Tablet Portrait size to standard 960 (devices and browsers) */
@@ -56,10 +63,6 @@ div#hero div#introduction ul.list-inline li {
 @media only screen and (max-width: 767px) {
 	div#hero div#introduction {
 		padding: 10px;
-	}
-
-	div#hero div#introduction p {
-		width: 100%;
 	}
 }
 

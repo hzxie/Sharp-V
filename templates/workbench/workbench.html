@@ -227,6 +227,7 @@
                                 <div class="form-group label-floating">
                                     <input class="form-control" type="text" placeholder="{{ _('Enter sample name here...') }}">
                                 </div> <!-- .form-group -->
+                                <button class="btn btn-raised btn-primary">{{ _('Search') }}</button>
                             </div> <!-- .panel-body -->
                         </div> <!-- .panel -->
                         <div class="panel panel-default">
@@ -752,7 +753,9 @@
 
         // Add event listeners to points
         svgComponents.svg.selectAll('circle').on('click', function(data, index) {
-            console.log(data, index);
+            // var sampleName = 
+            
+            console.log(index, d3.event.ctrlKey, d3.event.metaKey);
         });
     }
 </script>
@@ -1020,5 +1023,7 @@
             $('td.%s'.format(columnName), '#meta-of-neighbors table').addClass('hide');
         }
     });
+</script>
+<script type="text/javascript">
 </script>
 {% end %}
