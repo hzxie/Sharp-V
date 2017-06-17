@@ -2,6 +2,8 @@
 {% block title %}{{ _('Tutorial') }}{% end %}
 {% block header %}
 <link rel="stylesheet" type="text/css" href="{{ static_url('css/default/about.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/jquery.fancybox.min.css') }}">
+<script type="text/javascript" src="{{ static_url('js/jquery.fancybox.min.js') }}"></script>
 {% end %}
 {% block body %}
 <div id="ribbon"></div> <!-- #ribbon -->
@@ -15,14 +17,14 @@
             <div class="section">
                 <h3 id="data-selection">{{ _('Data Selection') }}</h3>
                 <p class="text-center">
-                    <a href="javascript:void(0);">
+                    <a href="{{ static_url('img/tutorial/Select-Dataset-Existing.png') }}" data-fancybox data-caption="Select existing dataset">
                         <img src="{{ static_url('img/tutorial/Select-Dataset-Existing.png') }}" alt="select-existing-dataset">
                     </a>
                     <span class="caption">Figure 1. Select existing dataset</span>
                 </p>
                 <div class="markdown">{{ _('[TODO]: Say something for choosing existing dataset.') }}</div> <!-- .markdown -->
                 <p class="text-center">
-                    <a href="javascript:void(0);">
+                    <a href="{{ static_url('img/tutorial/Select-Dataset-Upload.png') }}" data-fancybox data-caption="Upload new dataset">
                         <img src="{{ static_url('img/tutorial/Select-Dataset-Upload.png') }}" alt="upload-new-dataset">
                     </a>
                     <span class="caption">Figure 2. Upload new dataset</span>
@@ -35,7 +37,7 @@
                     {{ _('After data selection finished, the user could set the parameter values on the biasis of his/her knowledge about the selected data.\n\n') }}
                 </div> <!-- .markdown -->
                 <p class="text-center">
-                    <a href="javascript:void(0);">
+                    <a href="{{ static_url('img/tutorial/Data-Processing.png') }}" data-fancybox data-caption="Data Processing">
                         <img src="{{ static_url('img/tutorial/Data-Processing.png') }}" alt="data-processing">
                     </a>
                     <span class="caption">Figure 3. Data processing</span>
@@ -50,22 +52,22 @@
                 <h3 id="data-visualization">{{ _('Visualization') }}</h3>
                 <div class="markdown">{{ _('Once the data processing step is done, the user could obtain the visualization view of the clustering result shown as follow.') }}</div> <!-- .markdown -->
                 <p class="text-center">
-                    <a href="javascript:void(0);">
+                    <a href="{{ static_url('img/tutorial/Visualization-Scatter-Plot.png') }}" data-fancybox data-caption="Visualization with scatter plots">
                         <img src="{{ static_url('img/tutorial/Visualization-Scatter-Plot.png') }}" alt="scatter-plot">
                     </a>
                     <span class="caption">Figure 4. Visualization with scatter plots</span>
                 </p>
                 <p class="text-center">
-                    <a href="javascript:void(0);">
+                    <a href="{{ static_url('img/tutorial/Visualization-Tree-Plot.png') }}" data-fancybox data-caption="Visualization with tree plots">
                         <img src="{{ static_url('img/tutorial/Visualization-Tree-Plot.png') }}" alt="tree-plot">
                     </a>
                     <span class="caption">Figure 5. Visualization with tree plots</span>
                 </p>
                 <p class="text-center">
-                    <a href="javascript:void(0);">
-                        <img src="{{ static_url('img/tutorial/Visualization-Metaset.png') }}" alt="metaset">
+                    <a href="{{ static_url('img/tutorial/Visualization-Metaset.png') }}" data-fancybox data-caption="Metaset of nearest neighbors">
+                        <img src="{{ static_url('img/tutorial/Visualization-Metaset.png') }}" alt="metaset-of-neighbors">
                     </a>
-                    <span class="caption">Figure 6. Metaset</span>
+                    <span class="caption">Figure 6. Metaset of nearest neighbors</span>
                 </p>
             </div> <!-- .section -->
         </div> <!-- #main-content -->
