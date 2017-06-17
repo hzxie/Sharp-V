@@ -15,7 +15,7 @@ class BaseHandler(RequestHandler):
             exception: the exception pass to this handler
         """
         exception_type_name = type(exception).__name__
-        if exception_type_name == 'HTTPError':
+        if exception_type_name in ['HTTPError', 'MissingArgumentError']:
             self.set_status(exception.status_code)
             logging.warn('HTTPError[Code=%d] occurred: %s.' % \
                 (exception.status_code, exception.log_message))

@@ -33,6 +33,7 @@ from handlers.DefaultHandlers import UpgradeBrowserHandler
 from handlers.WorkbenchHandlers import ProjectsSuggestionsHandler
 from handlers.WorkbenchHandlers import DatasetProcessHandler
 from handlers.WorkbenchHandlers import DatasetUploadHandler
+from handlers.WorkbenchHandlers import DatasetDownloadHandler
 from handlers.WorkbenchHandlers import WorkbenchHandler
 from handlers.WorkbenchHandlers import DatasetUploadHandler
 from helpers import UiMethods
@@ -57,6 +58,7 @@ class Application(tornado.web.Application):
             (r"/accounts/projects", ProjectsHandler, dict(db_session=db_session)),
             (r"/projects/suggestions", ProjectsSuggestionsHandler),
             (r"/datasets/upload", DatasetUploadHandler),
+            (r"/datasets/download", DatasetDownloadHandler),
             (r"/datasets/process", DatasetProcessHandler),
             (r"/workbench", WorkbenchHandler),
             (r"/tutorial", TutorialHandler),
@@ -71,7 +73,8 @@ class Application(tornado.web.Application):
             'default_handler_class': BaseHandler,
             'login_url': '/accounts/login',
             'template_path': join(dirname(__file__), 'templates'),
-            'static_path': join(dirname(__file__), "static"),
+            'static_path': join(dirname(__file__), 'static'),
+            'uploads_path': join(dirname(__file__), 'uploads'),
             'xsrf_cookies': True,
             'compress_response': True,
             'ui_methods': UiMethods

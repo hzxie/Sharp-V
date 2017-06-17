@@ -7,6 +7,7 @@ from json import dump as dump_json_file
 from json import load as load_json_file
 from os import makedirs
 from os import listdir
+from os import stat as file_stat
 from os.path import isfile as file_exists
 from os.path import isdir as folder_exists
 from os.path import join as join_path
@@ -37,23 +38,30 @@ class ProjectsSuggestionsHandler(BaseHandler):
             project_keywords = []
 
         current_user         = self.get_current_user()
-        base_folder          = join_path(self.application.settings['static_path'], 'uploads', current_user)
-        project_names        = Set()
+        user_folder_path     = join_path(self.application.settings['uploads_path'], current_user)
         projects             = []
-        for project_name in listdir(base_folder):
-             if folder_exists(join_path(base_folder, project_name)):
+        
+        if folder_exists(user_folder_path):
+            projects         = self.get_projects(user_folder_path, project_keywords)
+        
+        self.finish(dump_json(projects[:10]))
+
+    def get_projects(self, user_folder_path, project_keywords):
+        projects             = []
+        project_names        = Set()
+        for project_name in listdir(user_folder_path):
+             if folder_exists(join_path(user_folder_path, project_name)):
                 for keyword in project_keywords:
                     if project_name.lower().find(keyword.lower()) != -1 and not project_name in project_names:
-                        project_folder_path = join_path(base_folder, project_name) 
+                        project_folder_path = join_path(user_folder_path, project_name) 
                         project_files       = self.get_project_files(project_folder_path)                       
-
                         project_names.add(project_name)
                         projects.append({
                             'projectName': project_name,
                             'projectFiles': project_files
                         })
-        self.finish(dump_json(projects[:10]))
-
+        return projects
+        
     def get_project_files(self, project_folder_path):
         project_files      = [file for file in listdir(project_folder_path)]
         dataset_file_name  = None
@@ -89,11 +97,11 @@ class DatasetUploadHandler(BaseHandler):
         result       = self.is_file_acceptable(content_type, file_name, current_user, project_name)
 
         if result['isSuccessful']:
-            base_folder  = join_path(self.application.settings['static_path'], 'uploads', current_user, project_name)
-            file_path    = join_path(base_folder, file_name)
+            project_folder = join_path(self.application.settings['uploads_path'], current_user, project_name)
+            file_path      = join_path(project_folder, file_name)
 
-            if not path_exists(base_folder):
-                makedirs(base_folder)
+            if not path_exists(project_folder):
+                makedirs(project_folder)
 
             file = open(file_path, 'w')
             file.write(file_content)
@@ -124,6 +132,49 @@ class DatasetUploadHandler(BaseHandler):
 
     def is_file_name_legal(self, file_name):
         return not match(r'^[0-9a-zA-Z_\-\+\.]{4,64}$', file_name) is None
+
+class DatasetDownloadHandler(BaseHandler):
+    def initialize(self):
+        self.BUFFER_SIZE = 1048576  # 1 MB
+
+    @asynchronous
+    @coroutine
+    def get(self):
+        username     = self.get_argument('username', 'Guest')
+        project_name = self.get_argument('projectName')
+        file_name    = self.get_argument('fileName')
+        current_user = self.get_current_user()
+        file_path    = self.get_file(username, project_name, file_name)
+
+        if not username == current_user or not file_path:
+            raise HTTPError(status_code=404)
+
+        try:
+            self.set_header('Content-Type', 'application/octet-stream')
+            self.set_header('Content-Length', self.get_file_size(file_path))
+            self.set_header('Content-Disposition', 'attachment; filename=%s' % file_name)
+
+            with open(file_path) as file:
+                while True:
+                    file_content = file.read(self.BUFFER_SIZE)
+                    if not file_content:
+                        break
+                    self.write(file_content)
+        except:
+            logging.error('Error occurred while sending file stream: [File=%s]' % file_path)
+        self.finish()
+
+    def get_file(self, username, project_name, file_name):
+        project_folder  = join_path(self.application.settings['uploads_path'], username, project_name)
+        file_path       = join_path(project_folder, file_name)
+
+        if not file_exists(file_path):
+            return None
+        return file_path
+
+    def get_file_size(self, file_path):
+        st = file_stat(file_path)
+        return st.st_size
 
 class DatasetProcessHandler(BaseHandler):
     executor = ThreadPoolExecutor(10)
@@ -170,8 +221,8 @@ class DatasetProcessHandler(BaseHandler):
         if not project_name:
             return None
 
-        base_folder = join_path(self.application.settings['static_path'], 'uploads', current_user, project_name)
-        return join_path(base_folder, file_name)
+        project_folder = join_path(self.application.settings['uploads_path'], current_user, project_name)
+        return join_path(project_folder, file_name)
 
     def is_parameters_legal(self, process_steps):
         return True

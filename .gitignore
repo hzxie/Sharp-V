@@ -92,4 +92,4 @@ ENV/
 .DS_Store
 
 # Sharp-V uploads
-static/uploads/
+uploads/
