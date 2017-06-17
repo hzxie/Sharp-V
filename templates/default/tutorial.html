@@ -50,13 +50,14 @@
             </div> <!-- .section -->
             <div class="section">
                 <h3 id="data-visualization">{{ _('Visualization') }}</h3>
-                <div class="markdown">{{ _('Once the data processing step is done, the user could obtain the visualization view of the clustering result shown as follow.') }}</div> <!-- .markdown -->
+                <div class="markdown">{{ _('Once the data processing step is done, the user could obtain the visualization view of the clustering result shown as follow.\n\nAfter the user searching the target patient, the representative point and its certain neighbor points in the scatter diagram would be highlighted. And the user could drag the views anywhere and zoom in and zoom out to obtain more details about the target patient.') }}</div> <!-- .markdown -->
                 <p class="text-center">
                     <a href="{{ static_url('img/tutorial/Visualization-Scatter-Plot.png') }}" data-fancybox data-caption="Visualization with scatter plots">
                         <img src="{{ static_url('img/tutorial/Visualization-Scatter-Plot.png') }}" alt="scatter-plot">
                     </a>
                     <span class="caption">Figure 4. Visualization with scatter diagram</span>
                 </p>
+                <div class="markdown">{{ _('The dendrogram could be dragged at the user\'s option and also be zoomed in and zoomed out to different focus. Meanwhile, the children of a non-leaf node could be merged to thier parent node with the click on it. The user could hold the CTRL key and click the target patient leaf node to select it for more information.') }}</div> <!-- .markdown -->
                 <p class="text-center">
                     <a href="{{ static_url('img/tutorial/Visualization-Tree-Plot.png') }}" data-fancybox data-caption="Visualization with tree plots">
                         <img src="{{ static_url('img/tutorial/Visualization-Tree-Plot.png') }}" alt="tree-plot">

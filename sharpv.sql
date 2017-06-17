@@ -14,7 +14,7 @@ Date: 2017-04-04 17:01:00
 */
 
 SET FOREIGN_KEY_CHECKS=0;
-
+USE sharpv;
 -- ----------------------------
 -- Table structure for sharpv_email_verification
 -- ----------------------------
