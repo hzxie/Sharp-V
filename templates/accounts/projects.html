@@ -1,0 +1,23 @@
+{% extends "../template.html" %}
+{% block title %}{{ _('My Projects') }}{% end %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/accounts/profile.css') }}">
+{% end %}
+{% block body %}
+<div class="hero">
+    <div class="container">
+        <div class="col-md-12">
+            <h2>{{ _('My Projects'); }}</h2>
+            <p>{{ _('[TODO]: Say something here...') }}</p>
+        </div> <!-- .col-xs-12 -->
+    </div> <!-- .container -->
+</div> <!-- .hero -->
+<div id="main-content">
+    <div class="container">
+        <div class="col-sm-12 col-md-10">
+        </div> <!-- .col-md-10 -->
+    </div> <!-- .container -->
+</div> <!-- #main-content -->
+{% end %}
+{% block scripts %}
+{% end %}

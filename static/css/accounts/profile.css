@@ -1,0 +1,31 @@
+div.hero {
+	background-color: #474747;
+	color: #fff;
+	font-size: 16px;
+	height: 160px;
+	line-height: 22px;
+	overflow: hidden;
+	padding: 20px 0;
+	position: relative;
+}
+
+div.hero::before {
+	background: url('../../img/hero-accounts.png') no-repeat;
+	background-size: 578px 398px;
+	content: '.';
+	display: block;
+	height: 398px;
+	position: absolute;
+	right: -10px;
+	text-indent: -99999px;
+	top: -25px;
+	width: 578px;
+}
+
+div#main-content {
+	padding: 40px 0;
+}
+
+div#main-content div.form-group label {
+	color: #666;
+}

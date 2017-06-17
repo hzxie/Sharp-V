@@ -1,0 +1,49 @@
+{% extends "../template.html" %}
+{% block title %}{{ _('My Profile') }}{% end %}
+{% block header %}
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/accounts/profile.css') }}">
+{% end %}
+{% block body %}
+<div class="hero">
+    <div class="container">
+        <div class="col-md-12">
+            <h2>{{ _('My Profile'); }}</h2>
+            <p>{{ _('[TODO]: Say something here...') }}</p>
+        </div> <!-- .col-xs-12 -->
+    </div> <!-- .container -->
+</div> <!-- .hero -->
+<div id="main-content">
+    <div class="container">
+        <div class="col-sm-offset-3 col-sm-6">
+            <form onSubmit="onSubmit(); return false;" method="POST">
+                <h3>{{ _('My Information') }}</h3>
+                <div class="form-group label-static">
+                    <label>{{ _('Email') }}</label>
+                    <input id="email" class="form-control" type="text" value="{{ user.email }}">
+                </div> <!-- .form-group -->
+                <h3>{{ _('Change Password') }}</h3>
+                <p>{{ _('Leave password blank if you don\'t want to change.') }}</p>
+                <div class="form-group label-static">
+                    <label>{{ _('Old Password') }}</label>
+                    <input id="old-password" class="form-control" type="password">
+                </div> <!-- .form-group -->
+                <div class="form-group label-static">
+                    <label>{{ _('New Password') }}</label>
+                    <input id="new-password" class="form-control" type="password">
+                </div> <!-- .form-group -->
+                <div class="form-group label-static">
+                    <label>{{ _('Confirm New Password') }}</label>
+                    <input id="confirm-password" class="form-control" type="password">
+                </div> <!-- .form-group -->
+                <button class="btn btn-primary btn-raised" type="block">{{ _('Update Profile') }}</button>
+            </form>
+        </div> <!-- .col-md-10 -->
+    </div> <!-- .container -->
+</div> <!-- #main-content -->
+{% end %}
+{% block scripts %}
+<script type="text/javascript">
+    function onSubmit() {
+    }
+</script>
+{% end %}

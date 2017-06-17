@@ -77,8 +77,9 @@ class LoginHandler(BaseHandler):
         else:
             user = self.user_mapper.get_user_using_email(username)
 
-        if user and user.password == password:
-            return user
+        if user and not user.password == password:
+            user = None
+        return user
 
 class RegisterHandler(BaseHandler):
     def initialize(self, db_session):
@@ -249,8 +250,27 @@ class ProfileHandler(BaseHandler):
 
     @asynchronous
     def get(self):
-        current_user     = self.get_current_user()
-        self.render('accounts/profile.html')
+        current_username = self.get_current_user()
+        current_user     = self.get_user_using_username(current_username)
+        self.render('accounts/profile.html', user=current_user)
+
+    @asynchronous
+    def post(self):
+        current_username        = self.get_current_user()
+        result                  = {
+            'isEmailEmpty': False,
+            'isEmailLegal': True,
+            'isEmailExists': False,
+            'isPasswordEmpty': False,
+            'isNewPasswordLegal': True,
+            'isPasswordConfirmed': True
+        }
+        result['isSuccessful']  = True
+        self.write(dump_json(result))
+        self.finish()
+
+    def get_user_using_username(self, username):
+        return self.user_mapper.get_user_using_username(username)
 
 class ProjectsHandler(BaseHandler):
     def initialize(self, db_session):
