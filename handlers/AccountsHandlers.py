@@ -256,21 +256,54 @@ class ProfileHandler(BaseHandler):
 
     @asynchronous
     def post(self):
-        current_username        = self.get_current_user()
-        result                  = {
-            'isEmailEmpty': False,
-            'isEmailLegal': True,
-            'isEmailExists': False,
-            'isPasswordEmpty': False,
-            'isNewPasswordLegal': True,
-            'isPasswordConfirmed': True
-        }
-        result['isSuccessful']  = True
+        current_username    = self.get_current_user()
+        current_user        = self.get_user_using_username(current_username)
+        email               = self.get_argument('email', default=None, strip=False)
+        old_password        = self.get_argument('oldPassword', default=None, strip=False)
+        new_password        = self.get_argument('newPassword', default=None, strip=False)
+        confirm_password    = self.get_argument('confirmPassword', default=None, strip=False)
+        result              = self.get_profile_change_result(current_user, email, old_password, new_password, confirm_password)
+
+        if result['isSuccessful']:
+            user.email   = email 
+            if old_password:
+                user.password = md5(new_password).hexdigest()
+            rows_affected = self.user_mapper.update_user(user)
+            logging.info('User [username=%s] updated profile at %s' % (current_username, self.get_user_ip_addr()))
+        
         self.write(dump_json(result))
         self.finish()
 
+    def get_profile_change_result(self, user, email, old_password, new_password, confirm_password):
+        result = {
+            'isEmailEmpty': False if email else True,
+            'isEmailLegal': self.is_email_legal(email),
+            'isEmailExists': self.is_email_exists(user, email),
+            'isOldPasswordEmpty': False if old_password else True,
+            'isOldPasswordCorrect': self.is_password_correct(user, old_password),
+            'isNewPasswordLegal': len(new_password) >= 6 and len(new_password) <= 16,
+            'isPasswordConfirmed': new_password == confirm_password
+        }
+        result['isSuccessful']  = not result['isEmailEmpty']    and result['isEmailLegal']       and \
+                                  not result['isEmailExists']   and (result['isOldPasswordEmpty'] or result['isOldPasswordCorrect']) and\
+                                      result['isPasswordLegal'] and result['isPasswordConfirmed']
+        return result
+
     def get_user_using_username(self, username):
         return self.user_mapper.get_user_using_username(username)
+
+    def get_user_using_email(self, email):
+        return self.user_mapper.get_user_using_email(email)
+
+    def is_email_legal(self, email):
+        return match_regx(r'^[A-Za-z0-9\._-]+@[A-Za-z0-9_-]+\.[A-Za-z0-9\._-]+$', email)
+
+    def is_email_exists(self, current_user, email):
+        user = self.get_user_using_email(email)
+        return False if (not user or user.username == current_user.username) else True
+
+    def is_password_correct(self, user, password):
+        return user.password == password
 
 class ProjectsHandler(BaseHandler):
     def initialize(self, db_session):

@@ -38,3 +38,7 @@ class UserMapper(object):
             'password': password
         }).rowcount
         return rows_affected
+
+    def update_user(self, user):
+        rows_affected = self.db_session.execute('UPDATE sharpv_users SET email = :email, password = :password WHERE user_id = :user_id', user).rowcount
+        return rows_affected
