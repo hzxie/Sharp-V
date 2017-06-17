@@ -60,4 +60,13 @@
         });
     });
 </script>
+<script type="text/javascript">
+    $('a', '#sidebar-nav').click(function() {
+        var sectionName = $(this).attr('href');
+        
+        $('html, body').animate({
+            scrollTop: $(sectionName).offset().top
+        }, 500);
+    });
+</script>
 {% end %}

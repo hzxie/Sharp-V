@@ -38,6 +38,15 @@ div#content div#main-content div.section p {
 	line-height: 150%;
 }
 
+div#content div#main-content div.section span.caption {
+	display: block;
+	font-size: 12px;
+}
+
+div#content div#main-content div.section img {
+	max-width: 100%;
+}
+
 div#content div#main-content div.section ul {
 	padding-left: 15px;
 }

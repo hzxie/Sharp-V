@@ -14,15 +14,59 @@
             </div> <!-- .section -->
             <div class="section">
                 <h3 id="data-selection">{{ _('Data Selection') }}</h3>
-                <div class="markdown">{{ _('*two screenshots with illustration here*\n\nWhen the user finishing his/her data selection, the SPF validates the input for errors if new data is uploaded and shows the found errors. There is file format description shown in the uploading module.') }}</div> <!-- .markdown -->
+                <p class="text-center">
+                    <a href="javascript:void(0);">
+                        <img src="{{ static_url('img/tutorial/Select-Dataset-Existing.png') }}" alt="select-existing-dataset">
+                    </a>
+                    <span class="caption">Figure 1. Select existing dataset</span>
+                </p>
+                <div class="markdown">{{ _('[TODO]: Say something for choosing existing dataset.') }}</div> <!-- .markdown -->
+                <p class="text-center">
+                    <a href="javascript:void(0);">
+                        <img src="{{ static_url('img/tutorial/Select-Dataset-Upload.png') }}" alt="upload-new-dataset">
+                    </a>
+                    <span class="caption">Figure 2. Upload new dataset</span>
+                </p>
+                <div class="markdown">{{ _('When the user finishing his/her data selection, the SPF validates the input for errors if new data is uploaded and shows the found errors. There is file format description shown in the uploading module.') }}</div> <!-- .markdown -->
             </div> <!-- .section -->
             <div class="section">
                 <h3 id="data-processing">{{ _('Data Processing') }}</h3>
-                <div class="markdown">{{ _('After data selection finished, the user could set the parameter values on the biasis of his/her knowledge about the selected data.\n\n*screenshot with illustration here*\n\nNote: The explanation of some parameter meaning shows as follow:\n\n* Normalization\n\n    * Z-Score: the z-score for each element of X such that columns of X are centered to have mean 0 and scaled to have standard deviation 1.\n\n    * Zero-Centered: the data is zero-centered by subtracting the mean in each dimension.\n\n    * Median-Centered: the data is median-centered by subtracting the median in each dimension.\n\n    * Min-Max: transforms features by scaling each feature to a given range [0,1].\n\n    * Max-Abs: scale each feature to the [-1, 1] range without breaking the sparsity.\n\n* Dimensionality Reduction\n\n    * Number of components: the low-dimensional feature number.\n\n* Clustering\n\n    * Number of clusters: the number of clusters to form as well as the number of centroids to generate, which is set by users.\n\n    * Linkage metric\n\n       * Average: uses the average of the distances of each observation of the two sets, assigned as: $d(u,v)=\sum_{i,j}\\frac{d(u[i],v[j])}{|u|\cdot|v|}$, for all points $i$ and $j$ where $|u|$ and $|v|$ are the cardinalities of clusters $u$ and $v$, respectively.\n\n        * Centroid: uses the centroid of the distance of each observation of the two sets, assigned as: $dist(s,t) = ||c_s-c_t||_2$, where $c_s$ and $c_t$ are the centroids of clusters $s$ and $t$, respectively. When two clusters $s$ and $t$ are combined into a new cluster $u$, the new centroid is computed over all the original objects in clusters $s$ and $t$. The distance then becomes the Euclidean distance between the centroid of $u$ and the centroid of a remaining cluster $v$ in the forest.\n\n        * Minimum: uses the minimum distances between all observations of the two sets, assigned as: $d(u,v)=min(dist(u[i],v[j]))$, for all points $i$ in cluster $u$ and $j$ in cluster $v$.\n\n        * Maximum: uses the maximum distances between all observations of the two sets, assigned as: $d(u,v)=max(dist(u[i],v[j]))$, for all points $i$ in cluster $u$ and $j$ in cluster $v$.\n\n        * Median: assigns $d(s,t)$ like centroid method. When two clusters $s$ and $t$ are combined into a new cluster $u$, the average of centroids $s$ and $t$ give the new centroid $u$.\n\n        * Weighted: assigns $d(u,v) = (dist(s,v) + dist(t,v))/2$, where cluster $u$ was formed with cluster $s$ and $t$ and $v$ is a remaining cluster in the forest.\n\n        * Ward: minimizes the variance of the clusters being merged, the new entry $d(u,v)$ is computed as follows: $d(u,v) = \sqrt{\\frac{|v|+|s|}{T}d(v,s)^2+\\frac{|v|+|t|}{T}d(v,t)^2-\\frac{|v|}{T}d(s,t)^2}$, where $u$ is the newly joined cluster consisting of clusters $s$ and $t$, $v$ is an unused cluster in the forest, $T=|v|+|s|+|t|$, and $|∗|$ is the cardinality of its argument.') }}</div> <!-- .markdown -->
+                <div class="markdown">
+                    {{ _('After data selection finished, the user could set the parameter values on the biasis of his/her knowledge about the selected data.\n\n') }}
+                </div> <!-- .markdown -->
+                <p class="text-center">
+                    <a href="javascript:void(0);">
+                        <img src="{{ static_url('img/tutorial/Data-Processing.png') }}" alt="data-processing">
+                    </a>
+                    <span class="caption">Figure 3. Data processing</span>
+                </p>
+                <div class="markdown">
+                    {{ _('The explanation of some parameter meaning shows as follow:\n\n') }}
+                    {{ _('* Normalization\n\n    * Z-Score: the z-score for each element of X such that columns of X are centered to have mean 0 and scaled to have standard deviation 1.\n\n    * Zero-Centered: the data is zero-centered by subtracting the mean in each dimension.\n\n    * Median-Centered: the data is median-centered by subtracting the median in each dimension.\n\n    * Min-Max: transforms features by scaling each feature to a given range [0,1].\n\n    * Max-Abs: scale each feature to the [-1, 1] range without breaking the sparsity.\n\n') }} 
+                    {{ _('* Dimensionality Reduction\n\n    * Number of components: the number of features in low-dimensional space.\n\n') }}
+                    {{ _('* Clustering\n\n    * Number of clusters: the number of clusters to form as well as the number of centroids to generate, which is set by users.\n\n    * Linkage metric\n\n       * Average: uses the average of the distances of each observation of the two sets, assigned as: $d(u,v)=\sum_{i,j}\\frac{d(u[i],v[j])}{|u|\cdot|v|}$, for all points $i$ and $j$ where $|u|$ and $|v|$ are the cardinalities of clusters $u$ and $v$, respectively.\n\n        * Centroid: uses the centroid of the distance of each observation of the two sets, assigned as: $dist(s,t) = ||c_s-c_t||_2$, where $c_s$ and $c_t$ are the centroids of clusters $s$ and $t$, respectively. When two clusters $s$ and $t$ are combined into a new cluster $u$, the new centroid is computed over all the original objects in clusters $s$ and $t$. The distance then becomes the Euclidean distance between the centroid of $u$ and the centroid of a remaining cluster $v$ in the forest.\n\n        * Minimum: uses the minimum distances between all observations of the two sets, assigned as: $d(u,v)=min(dist(u[i],v[j]))$, for all points $i$ in cluster $u$ and $j$ in cluster $v$.\n\n        * Maximum: uses the maximum distances between all observations of the two sets, assigned as: $d(u,v)=max(dist(u[i],v[j]))$, for all points $i$ in cluster $u$ and $j$ in cluster $v$.\n\n        * Median: assigns $d(s,t)$ like centroid method. When two clusters $s$ and $t$ are combined into a new cluster $u$, the average of centroids $s$ and $t$ give the new centroid $u$.\n\n        * Weighted: assigns $d(u,v) = (dist(s,v) + dist(t,v))/2$, where cluster $u$ was formed with cluster $s$ and $t$ and $v$ is a remaining cluster in the forest.\n\n        * Ward: minimizes the variance of the clusters being merged, the new entry $d(u,v)$ is computed as follows: $d(u,v) = \sqrt{\\frac{|v|+|s|}{T}d(v,s)^2+\\frac{|v|+|t|}{T}d(v,t)^2-\\frac{|v|}{T}d(s,t)^2}$, where $u$ is the newly joined cluster consisting of clusters $s$ and $t$, $v$ is an unused cluster in the forest, $T=|v|+|s|+|t|$, and $|∗|$ is the cardinality of its argument.') }}</div> <!-- .markdown -->
             </div> <!-- .section -->
             <div class="section">
                 <h3 id="data-visualization">{{ _('Visualization') }}</h3>
-                <div class="markdown">{{ _('Once the data processing step is done, the user could obtain the visualization view of the clustering result shown as follow.\n\n*full screenshot with illustration here*') }}</div> <!-- .markdown -->
+                <div class="markdown">{{ _('Once the data processing step is done, the user could obtain the visualization view of the clustering result shown as follow.') }}</div> <!-- .markdown -->
+                <p class="text-center">
+                    <a href="javascript:void(0);">
+                        <img src="{{ static_url('img/tutorial/Visualization-Scatter-Plot.png') }}" alt="scatter-plot">
+                    </a>
+                    <span class="caption">Figure 4. Visualization with scatter plots</span>
+                </p>
+                <p class="text-center">
+                    <a href="javascript:void(0);">
+                        <img src="{{ static_url('img/tutorial/Visualization-Tree-Plot.png') }}" alt="tree-plot">
+                    </a>
+                    <span class="caption">Figure 5. Visualization with tree plots</span>
+                </p>
+                <p class="text-center">
+                    <a href="javascript:void(0);">
+                        <img src="{{ static_url('img/tutorial/Visualization-Metaset.png') }}" alt="metaset">
+                    </a>
+                    <span class="caption">Figure 6. Metaset</span>
+                </p>
             </div> <!-- .section -->
         </div> <!-- #main-content -->
     </div> <!-- .col-sm-8 -->
@@ -59,6 +103,15 @@
             
             $(this).html(markdownContent);
         });
+    });
+</script>
+<script type="text/javascript">
+    $('a', '#sidebar-nav').click(function() {
+        var sectionName = $(this).attr('href');
+        
+        $('html, body').animate({
+            scrollTop: $(sectionName).offset().top
+        }, 500);
     });
 </script>
 {% end %}
