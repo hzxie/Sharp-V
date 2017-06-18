@@ -16,14 +16,42 @@ from mappers.EmailVerificationMapper import EmailVerificationMapper
 from mappers.UserMapper import UserMapper
 from mappers.UserGroupMapper import UserGroupMapper
 
-class LoginHandler(BaseHandler):
+class AccountBaseHandler(BaseHandler):
+    def is_user_logged_in(self):
+        current_username = self.get_secure_cookie('user')
+        return True if current_username and not current_username == 'Guest' else False
+
+    def is_username_legal(self, username):
+        return True if match_regx(r'^[A-Za-z][A-Za-z0-9_]{5,15}$', username) else False
+
+    def is_username_exists(self, username):
+        return True if self.user_mapper.get_user_using_username(username) else False
+
+    def is_password_legal(self, password):
+        return len(password) >= 6 and len(password) <= 16
+
+    def is_email_legal(self, email):
+        return True if match_regx(r'^[A-Za-z0-9\._-]+@[A-Za-z0-9_-]+\.[A-Za-z0-9\._-]+$', email) else False
+
+    def is_email_exists(self, current_user, email):
+        user = self.user_mapper.get_user_using_email(email)
+
+        # Validate while creating a new account
+        if user and current_user == None:
+            return True
+        # Validate while updating profile
+        if user and not user.username == current_user.username:
+            return True
+        return False
+
+class LoginHandler(AccountBaseHandler):
     def initialize(self, db_session):
         self.user_mapper = UserMapper(db_session)
 
     @asynchronous
     def get(self):
         is_logging_out  = self.get_argument("logout", default=False, strip=False)
-        is_logged_in    = self.get_secure_cookie('user')
+        is_logged_in    = self.is_user_logged_in()
 
         if is_logged_in and is_logging_out:
             self.clear_cookie('user')
@@ -31,7 +59,7 @@ class LoginHandler(BaseHandler):
         if not is_logged_in or is_logging_out:
             self.render('accounts/login.html', is_logged_out=is_logging_out)
         else:
-            self.redirect('/')
+            return self.redirect('/')
 
     @asynchronous
     def post(self):
@@ -51,15 +79,14 @@ class LoginHandler(BaseHandler):
     def is_allow_to_access(self, username, password):
         is_account_valid    = False
         is_allow_to_access  = True
+        user                = None
         if username and password:
             user = self.get_user_using_username_or_email(username, password)
 
             if user:
                 is_account_valid = True
-                
                 if user.user_group_slug == 'forbidden':
                     is_allow_to_access = False
-
         return {
             'isSuccessful': is_account_valid and is_allow_to_access,
             'isUsernameEmpty': False if username else True,
@@ -81,19 +108,19 @@ class LoginHandler(BaseHandler):
             user = None
         return user
 
-class RegisterHandler(BaseHandler):
+class RegisterHandler(AccountBaseHandler):
     def initialize(self, db_session):
         self.user_mapper        = UserMapper(db_session)
         self.user_group_mapper  = UserGroupMapper(db_session)
 
     @asynchronous
     def get(self):
-        is_logged_in = self.get_secure_cookie('user')
+        is_logged_in = self.is_user_logged_in()
 
         if not is_logged_in:
             self.render('accounts/register.html')
         else:
-            self.redirect('/')
+            return self.redirect('/')
 
     @asynchronous
     def post(self):
@@ -111,13 +138,13 @@ class RegisterHandler(BaseHandler):
         user_group_id   = user_group.user_group_id
         result          = {
             'isUsernameEmpty': False if username else True,
-            'isUsernameLegal': True if match_regx(r'^[A-Za-z][A-Za-z0-9_]{5,15}$', username) else False,
+            'isUsernameLegal': self.is_username_legal(username),
             'isUsernameExists': self.is_username_exists(username),
             'isPasswordEmpty': False if password else True,
-            'isPasswordLegal': len(password) >= 6 and len(password) <= 16,
+            'isPasswordLegal': self.is_password_legal(password),
             'isEmailEmpty': False if email else True,
-            'isEmailLegal': True if match_regx(r'^[A-Za-z0-9\._-]+@[A-Za-z0-9_-]+\.[A-Za-z0-9\._-]+$', email) else False,
-            'isEmailExists': self.is_email_exists(email)
+            'isEmailLegal': self.is_email_legal(email),
+            'isEmailExists': self.is_email_exists(None, email)
         }
         result['isSuccessful'] = not result['isUsernameEmpty']  and     result['isUsernameLegal'] and \
                                  not result['isUsernameExists'] and not result['isPasswordEmpty'] and \
@@ -129,13 +156,7 @@ class RegisterHandler(BaseHandler):
                 result['isSuccessful'] = False
         return result
 
-    def is_username_exists(self, username):
-        return True if self.user_mapper.get_user_using_username(username) else False
-
-    def is_email_exists(self, email):
-        return True if self.user_mapper.get_user_using_email(email) else False
-
-class ForgotPasswordHandler(BaseHandler):
+class ForgotPasswordHandler(AccountBaseHandler):
     def initialize(self, db_session, mail_sender):
         self.base_url = self.application.settings['base_url']
         self.mail_sender = mail_sender
@@ -144,12 +165,12 @@ class ForgotPasswordHandler(BaseHandler):
 
     @asynchronous
     def get(self):
-        is_logged_in    = self.get_secure_cookie('user')
+        is_logged_in    = self.is_user_logged_in()
 
         if not is_logged_in:
             self.render('accounts/forgot-password.html')
         else:
-            self.redirect('/')
+            return self.redirect('/')
 
     @asynchronous
     def post(self):
@@ -191,14 +212,14 @@ class ForgotPasswordHandler(BaseHandler):
             return True
         return False
 
-class ResetPasswordHandler(BaseHandler):
+class ResetPasswordHandler(AccountBaseHandler):
     def initialize(self, db_session):
         self.user_mapper = UserMapper(db_session)
         self.email_verification_mapper = EmailVerificationMapper(db_session)
 
     @asynchronous
     def get(self):
-        is_logged_in    = self.get_secure_cookie('user')
+        is_logged_in    = self.is_user_logged_in()
         email           = self.get_argument("email", default=None, strip=False)
         token           = self.get_argument("token", default=None, strip=False)
 
@@ -207,7 +228,7 @@ class ResetPasswordHandler(BaseHandler):
             self.render('accounts/reset-password.html', email=email, 
                 token=token, is_token_valid=is_token_valid)
         else:
-            self.redirect('/')
+            return self.redirect('/')
 
     @asynchronous
     def post(self):
@@ -244,12 +265,15 @@ class ResetPasswordHandler(BaseHandler):
             return True
         return False
 
-class ProfileHandler(BaseHandler):
+class ProfileHandler(AccountBaseHandler):
     def initialize(self, db_session):
         self.user_mapper = UserMapper(db_session)
 
     @asynchronous
     def get(self):
+        if not self.is_user_logged_in():
+            return self.redirect('/')
+
         current_username = self.get_current_user()
         current_user     = self.get_user_using_username(current_username)
         self.render('accounts/profile.html', user=current_user)
@@ -262,19 +286,13 @@ class ProfileHandler(BaseHandler):
         old_password        = self.get_argument('oldPassword', default=None, strip=False)
         new_password        = self.get_argument('newPassword', default=None, strip=False)
         confirm_password    = self.get_argument('confirmPassword', default=None, strip=False)
-        result              = self.get_profile_change_result(current_user, email, old_password, new_password, confirm_password)
+        result              = self.update_profile(current_user, email, old_password, new_password, confirm_password)
 
         if result['isSuccessful']:
-            user.email   = email 
-            if old_password:
-                user.password = md5(new_password).hexdigest()
-            rows_affected = self.user_mapper.update_user(user)
             logging.info('User [username=%s] updated profile at %s' % (current_username, self.get_user_ip_addr()))
-        
-        self.write(dump_json(result))
-        self.finish()
+        self.finish(dump_json(result))
 
-    def get_profile_change_result(self, user, email, old_password, new_password, confirm_password):
+    def update_profile(self, user, email, old_password, new_password, confirm_password):
         result = {
             'isEmailEmpty': False if email else True,
             'isEmailLegal': self.is_email_legal(email),
@@ -284,32 +302,31 @@ class ProfileHandler(BaseHandler):
             'isNewPasswordLegal': len(new_password) >= 6 and len(new_password) <= 16,
             'isPasswordConfirmed': new_password == confirm_password
         }
-        result['isSuccessful']  = not result['isEmailEmpty']    and result['isEmailLegal']       and \
-                                  not result['isEmailExists']   and (result['isOldPasswordEmpty'] or result['isOldPasswordCorrect']) and\
-                                      result['isPasswordLegal'] and result['isPasswordConfirmed']
+        result['isSuccessful']  = not result['isEmailEmpty']       and result['isEmailLegal']          and \
+                                  not result['isEmailExists']      and result['isPasswordConfirmed']   and \
+                                     (result['isOldPasswordEmpty'] or  result['isOldPasswordCorrect']) and \
+                                      result['isPasswordLegal']
+        if result['isSuccessful']:
+            user.email = email 
+            if old_password:
+                user.password = md5(new_password).hexdigest()
+            rows_affected = self.user_mapper.update_user(user)
         return result
 
     def get_user_using_username(self, username):
         return self.user_mapper.get_user_using_username(username)
 
-    def get_user_using_email(self, email):
-        return self.user_mapper.get_user_using_email(email)
-
-    def is_email_legal(self, email):
-        return match_regx(r'^[A-Za-z0-9\._-]+@[A-Za-z0-9_-]+\.[A-Za-z0-9\._-]+$', email)
-
-    def is_email_exists(self, current_user, email):
-        user = self.get_user_using_email(email)
-        return False if (not user or user.username == current_user.username) else True
-
     def is_password_correct(self, user, password):
         return user.password == password
 
-class ProjectsHandler(BaseHandler):
+class ProjectsHandler(AccountBaseHandler):
     def initialize(self, db_session):
         self.user_mapper = UserMapper(db_session)
 
     @asynchronous
     def get(self):
+        if not self.is_user_logged_in():
+            return self.redirect('/')
+
         current_user     = self.get_current_user()
         self.render('accounts/projects.html') 
