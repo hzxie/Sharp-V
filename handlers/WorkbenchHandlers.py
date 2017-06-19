@@ -18,6 +18,7 @@ from tornado.escape import json_decode as load_json
 from tornado.escape import json_encode as dump_json
 from tornado.gen import coroutine
 from tornado.web import asynchronous
+from tornado.web import HTTPError
 from re import match
 from re import findall
 
@@ -146,8 +147,9 @@ class DatasetDownloadHandler(BaseHandler):
         current_user = self.get_current_user()
         file_path    = self.get_file(username, project_name, file_name)
 
-        if not username == current_user or not file_path:
-            raise HTTPError(status_code=404)
+        if not file_path:
+            if not username == current_user or not username == 'Guest':
+                raise HTTPError(status_code=404)
 
         try:
             self.set_header('Content-Type', 'application/octet-stream')
