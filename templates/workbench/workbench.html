@@ -228,7 +228,7 @@
                                     <input id="sample-search-box" class="form-control" type="text" placeholder="{{ _('Example: Sample 0') }}">
                                     <ul class="search-suggestions hide"></ul> <!-- .search-suggestions -->
                                 </div> <!-- .form-group -->
-                                <button class="btn btn-raised btn-primary">{{ _('Search') }}</button>
+                                <button id="sample-search-button" class="btn btn-raised btn-primary">{{ _('Search') }}</button>
                             </div> <!-- .panel-body -->
                         </div> <!-- .panel -->
                         <div class="panel panel-default">
@@ -622,7 +622,7 @@
                     window.dataset = result['dataset'];
                     window.metaset = result['metaset'];
 
-                    draw(window.dataset);
+                    draw(window.dataset, processFlow);
                     list(window.metaset);
                     $('#visualization-sidebar').removeClass('hide');
                     $('#no-diagram').addClass('hide');
@@ -640,7 +640,7 @@
     }
 </script>
 <script type="text/javascript">
-    function draw(dataset) {
+    function draw(dataset, processFlow) {
         var containerWidth          = $('#d3-diagram').width(),
             svgOptions              = {
                 height: containerWidth,
@@ -653,7 +653,7 @@
                 }
             };
 
-        if ( isHierarchicalClustering() ) {
+        if ( isHierarchicalClustering(processFlow) ) {
             return drawHierarchyTree(dataset, svgOptions);
         } else {
             return drawScatterPlot(dataset, svgOptions);
@@ -661,9 +661,7 @@
     }
 </script>
 <script type="text/javascript">
-    function isHierarchicalClustering() {
-        var processFlow         = getProcessFlow();
-
+    function isHierarchicalClustering(processFlow) {
         for ( var i = 0; i < processFlow.length; ++ i ) {
             if ( processFlow[i]['algorithmName'] == 'hierarchical-cluster' ) {
                 return true;
@@ -680,6 +678,11 @@
             maxMinPoint             = getPointsStatistics(trainingSamples),
             svgComponents           = setUpScatterSvg(svgOptions, maxMinPoint);
 
+        window.svgComponents        = svgComponents
+        window.svgComponents.center = {
+            'x': window.svgComponents.x(maxMinPoint.xMax + maxMinPoint.xMin),
+            'y': window.svgComponents.y(maxMinPoint.yMax + maxMinPoint.yMin),
+        }
         for ( var i = 0; i < trainingSamples.length; ++ i ) {
             trainingSamples[i]['color'] = CLUSTER_COLORS[trainingPredictedLabels[i]];
         }
@@ -756,15 +759,16 @@
                           view.attr('transform', d3.event.transform);
                           svg.select('#axis-x').call(xAxis.scale(d3.event.transform.rescaleX(x)));
                           svg.select('#axis-y').call(yAxis.scale(d3.event.transform.rescaleY(y)));
-                          svg.selectAll('circle')
-                                  .attr('transform', d3.event.transform);
+                          svg.selectAll('circle').attr('transform', d3.event.transform);
                      });
         svg.call(zoom);
 
         return {
             'svg': svg,
             'x': x,
-            'y': y
+            'y': y,
+            'xAxis': xAxis,
+            'yAxis': yAxis,
         };
     }
 </script>
@@ -777,7 +781,8 @@
            .attr('class', 'dot').attr('r', 4)
            .attr('cx', function (p) { return svgComponents.x(p.x); })
            .attr('cy', function (p) { return svgComponents.y(p.y); })
-           .style('fill', function(p) { return p.color; });
+           .style('fill', function(p) { return p.color; })
+           .style('fill-opacity', .75);
 
         // Add event listeners to points
         svgComponents.svg.selectAll('circle').on('click', function(data, index) {
@@ -1060,5 +1065,55 @@
             $('td.%s'.format(columnName), '#meta-of-neighbors table').addClass('hide');
         }
     });
+</script>
+<script type="text/javascript">
+    $('#sample-search-button').click(function() {
+        var sampleName  = $('#sample-search-box').val(),
+            sampleIndex = getSampleIndex(sampleName);
+
+        if ( sampleIndex == -1 ) {
+            return;
+        }
+        // If the scatter is shown
+        transformScatterPlot(sampleIndex + 1);
+    });
+</script>
+<script type="text/javascript">
+    function getSampleIndex(sampleName) {
+        var samples = window.dataset['ids']['training'];
+
+        for ( var i = 0; i < samples.length; ++ i ) {
+            if ( samples[i].toLowerCase() == sampleName.toLowerCase() ) {
+                return i;
+            }
+        }
+        return -1;
+    }
+</script>
+<script type="text/javascript">
+    function transformScatterPlot(sampleIndex) {
+        var circle      = window.svgComponents.svg.select('circle:nth-child(%s)'.format(sampleIndex)),
+            transform   = d3.zoomIdentity.translate(
+                window.svgComponents.center.x - circle.attr('cx'),
+                window.svgComponents.center.y - circle.attr('cy'));
+
+        window.svgComponents.svg.selectAll('circle').attr('r', 4);
+        circle.attr('r', 15);
+
+        window.svgComponents.svg.select('#axis-x')
+              .transition().duration(750)
+              .call(window.svgComponents.xAxis.scale(
+                transform.rescaleX(window.svgComponents.x)));
+        window.svgComponents.svg.select('#axis-y')
+              .transition().duration(750)
+              .call(window.svgComponents.yAxis.scale(
+                transform.rescaleY(window.svgComponents.y)));
+        window.svgComponents.svg.select('rect')
+              .transition().duration(750)
+              .attr('transform', 'translate(%s, %s)'.format(transform.x, transform.y));
+        window.svgComponents.svg.selectAll('circle')
+              .transition().duration(750)
+              .attr('transform', 'translate(%s, %s)'.format(transform.x, transform.y));
+    }
 </script>
 {% end %}
