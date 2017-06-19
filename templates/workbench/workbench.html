@@ -34,8 +34,7 @@
                                     <div class="form-group label-static">
                                         <label for="existing-project-name">{{ _('Project name') }}</label>
                                         <input id="existing-project-name" class="form-control" type="text" placeholder="{{ _('Example:') }} My-Project-0">
-                                        <ul class="search-suggestions hide">
-                                        </ul> <!-- .search-suggestions -->
+                                        <ul class="search-suggestions hide"></ul> <!-- .search-suggestions -->
                                     </div> <!-- .form-group -->
                                 </div> <!-- .col-md-4 -->
                                 <div class="col-md-4">
@@ -224,8 +223,10 @@
                                 <h5>{{ _('Search') }}</h5>
                             </div> <!-- .panel-heading -->
                             <div class="panel-body">
-                                <div class="form-group label-floating">
-                                    <input class="form-control" type="text" placeholder="{{ _('Enter sample name here...') }}">
+                                <div class="form-group label-static">
+                                    <label for="sample-search-box" class="control-label">Sample Name</label>
+                                    <input id="sample-search-box" class="form-control" type="text" placeholder="{{ _('Example: Sample 0') }}">
+                                    <ul class="search-suggestions hide"></ul> <!-- .search-suggestions -->
                                 </div> <!-- .form-group -->
                                 <button class="btn btn-raised btn-primary">{{ _('Search') }}</button>
                             </div> <!-- .panel-body -->
@@ -384,6 +385,15 @@
     });
 </script>
 <script type="text/javascript">
+    $(document).mouseup(function(e) {
+        var container = $('.search-suggestions, #existing-project-name, #sample-search-box');
+        // if the target of the click isn't the container nor a descendant of the container
+        if ( !container.is(e.target) && container.has(e.target).length === 0 ) {
+            $('.search-suggestions').addClass('hide');
+        }
+    });
+</script>
+<script type="text/javascript">
     $('#existing-project-name').focus(function() {
         var currentValue        = $(this).val().toLowerCase(),
             suggestionsControl  = $('.search-suggestions', $(this).parent());
@@ -392,15 +402,6 @@
         return getSearchSuggestions(currentValue, suggestionsControl);
     });
 
-    $(document).mouseup(function(e) {
-        var container = $('.search-suggestions, #existing-project-name');
-        // if the target of the click isn't the container nor a descendant of the container
-        if ( !container.is(e.target) && container.has(e.target).length === 0 ) {
-            $('.search-suggestions').addClass('hide');
-        }
-    });
-</script>
-<script type="text/javascript">
     $('#existing-project-name').keyup(function() {
         var currentValue        = $(this).val().toLowerCase(),
             suggestionsControl  = $('.search-suggestions', $(this).parent());
@@ -441,7 +442,7 @@
     }
 </script>
 <script type="text/javascript">
-    $('.search-suggestions').on('click', 'li', function() {
+    $('.search-suggestions', '#dataset-selection').on('click', 'li', function() {
         var projectName     = $(this).html(),
             datasetFileName = $(this).attr('dataset-file'),
             metasetFileName = $(this).attr('metaset-file'),
@@ -460,6 +461,31 @@
         $('#existing-metaset-file-name').val(metasetFileName).trigger('change');
         $('#existing-dataset-file-name, #existing-metaset-file-name').dropdown();
         $('#existing-project-name').val(projectName);
+        $('.search-suggestions').addClass('hide');
+    });
+</script>
+<script type="text/javascript">
+    $('#sample-search-box').keyup(function() {
+        var currentValue        = $(this).val().toLowerCase(),
+            suggestionsControl  = $('.search-suggestions', $(this).parent());
+
+        suggestionsControl.addClass('hide');
+        $('.search-suggestions').empty();
+
+        for ( var i = 0; i < window.dataset['ids']['training'].length; ++ i ) {
+            var sampleName = window.dataset['ids']['training'][i];
+
+            if ( sampleName.toLowerCase().indexOf(currentValue) != -1 ) {
+                suggestionsControl.append('<li>%s</li>'.format(sampleName));
+            }
+        }
+        suggestionsControl.removeClass('hide');
+    });
+</script>
+<script type="text/javascript">
+    $('.search-suggestions', '#visualization-sidebar').on('click', 'li', function() {
+        var sampleName     = $(this).html();
+        $('#sample-search-box').val(sampleName);
         $('.search-suggestions').addClass('hide');
     });
 </script>
@@ -1034,7 +1060,5 @@
             $('td.%s'.format(columnName), '#meta-of-neighbors table').addClass('hide');
         }
     });
-</script>
-<script type="text/javascript">
 </script>
 {% end %}

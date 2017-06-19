@@ -7,11 +7,31 @@ body.dragging, body.dragging * {
 }
 
 .form-group {
+	position: relative;
 	margin-top: 15px;
 }
 
 .form-group label {
 	color: #333;
+}
+
+ul.search-suggestions {
+	background-color: #fff;
+	position: absolute;
+	left: 0;
+	right: 0;
+	list-style: none;
+	max-height: 500px;
+	padding: 0;
+	z-index: 1024;
+	-webkit-box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, .08);
+	   -moz-box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, .08);
+	        box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, .08);
+}
+
+ul.search-suggestions li {
+	cursor: pointer;
+	margin: 5px 10px;
 }
 
 button.btn[disabled][disabled] {
@@ -67,23 +87,8 @@ div#main-content div.section h2 {
 	font-family: 'Roboto Slab', sans-serif;
 }
 
-div#main-content div.section ul.search-suggestions {
-	background-color: #fff;
-	position: absolute;
+div#main-content div#dataset-selection ul.search-suggestions {
 	top: 65px;
-	left: 0;
-	right: 0;
-	list-style: none;
-	padding: 0;
-	z-index: 1024;
-	-webkit-box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, .08);
-	   -moz-box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, .08);
-	        box-shadow: 0 3px 8px 0 rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 0, 0, .08);
-}
-
-div#main-content div.section ul.search-suggestions li {
-	cursor: pointer;
-	margin: 5px 10px;
 }
 
 div#main-content div#dataset-selection ul.nav-tabs {
@@ -216,6 +221,10 @@ div#main-content #meta-of-neighbors div.panel {
 
 div#main-content #meta-of-neighbors ul#metaset-columns {
 	padding-left: 0;
+}
+
+div#main-content div#visualization-sidebar ul.search-suggestions {
+	top: 37px;
 }
 
 @media only screen and (max-width: 767px) {
