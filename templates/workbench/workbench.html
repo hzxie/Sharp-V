@@ -593,9 +593,11 @@
             dataType: 'JSON',
             success: function(result) {
                 if ( result['isSuccessful'] ) {
-                    draw(result['dataset']);
-                    list(result['metaset']);
-                    
+                    window.dataset = result['dataset'];
+                    window.metaset = result['metaset'];
+
+                    draw(window.dataset);
+                    list(window.metaset);
                     $('#visualization-sidebar').removeClass('hide');
                     $('#no-diagram').addClass('hide');
                     if ( !jQuery.isEmptyObject(result['metaset']) ) {
@@ -653,8 +655,9 @@
             svgComponents           = setUpScatterSvg(svgOptions, maxMinPoint);
 
         for ( var i = 0; i < trainingSamples.length; ++ i ) {
-            addPointToScatterSvg(svgComponents, [trainingSamples[i]], CLUSTER_COLORS[trainingPredictedLabels[i]]);
+            trainingSamples[i]['color'] = CLUSTER_COLORS[trainingPredictedLabels[i]];
         }
+        addPointsToScatterSvg(svgComponents, trainingSamples);
     }
 </script>
 <script type="text/javascript">
@@ -740,22 +743,30 @@
     }
 </script>
 <script type="text/javascript">
-    function addPointToScatterSvg(svgComponents, point, pointColor) {
+    function addPointsToScatterSvg(svgComponents, points) {
         // Plot points in SVG
-        svgComponents.svg.insert('g', '#axis-x')
-           .attr('id', 'scatter-plot')
-           .selectAll('.dot').data(point)
+        svgComponents.svg.insert('g', 'points')
+           .selectAll('.dot').data(points)
            .enter().append('circle')
            .attr('class', 'dot').attr('r', 4)
            .attr('cx', function (p) { return svgComponents.x(p.x); })
            .attr('cy', function (p) { return svgComponents.y(p.y); })
-           .style('fill', pointColor);
+           .style('fill', function(p) { return p.color; });
 
         // Add event listeners to points
         svgComponents.svg.selectAll('circle').on('click', function(data, index) {
-            // var sampleName = 
-            
-            console.log(index, d3.event.ctrlKey, d3.event.metaKey);
+            var sampleName        = window.dataset['ids']['training'][index],
+                neighbors         = window.dataset['nearest_neighbors'][index],
+                numberOfNeighbors = parseInt($('#number-of-neighbors').val());
+
+            if ( !d3.event.ctrlKey && !d3.event.metaKey ) {
+                svgComponents.svg.selectAll('circle').attr('r', 4);
+            }
+            // NOTE: nth-child selector is start from 1, NOT 0.
+            svgComponents.svg.select('circle:nth-child(%s)'.format(index + 1)).attr('r', 15);
+            for ( var i = 0; i < numberOfNeighbors; ++ i ) {
+                svgComponents.svg.select('circle:nth-child(%s)'.format(neighbors[i] + 1)).attr('r', 10);
+            }
         });
     }
 </script>
