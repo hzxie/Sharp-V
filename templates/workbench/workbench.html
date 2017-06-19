@@ -754,7 +754,7 @@
         // Handling zoom operations
         var zoom = d3.zoom()
                      .scaleExtent([1, 96])
-                     .translateExtent([[-100, -100], [width + 90, height + 100]])
+                     // .translateExtent([[-100, -100], [width + 100, height + 100]])
                      .on('zoom', function() {
                           view.attr('transform', d3.event.transform);
                           svg.select('#axis-x').call(xAxis.scale(d3.event.transform.rescaleX(x)));
@@ -769,6 +769,7 @@
             'y': y,
             'xAxis': xAxis,
             'yAxis': yAxis,
+            'zoom': zoom
         };
     }
 </script>
@@ -1095,25 +1096,13 @@
         var circle      = window.svgComponents.svg.select('circle:nth-child(%s)'.format(sampleIndex)),
             transform   = d3.zoomIdentity.translate(
                 window.svgComponents.center.x - circle.attr('cx'),
-                window.svgComponents.center.y - circle.attr('cy'));
+                window.svgComponents.center.y - circle.attr('cy')).scale(1);
 
         window.svgComponents.svg.selectAll('circle').attr('r', 4);
         circle.attr('r', 15);
-
-        window.svgComponents.svg.select('#axis-x')
+        window.svgComponents.svg
               .transition().duration(750)
-              .call(window.svgComponents.xAxis.scale(
-                transform.rescaleX(window.svgComponents.x)));
-        window.svgComponents.svg.select('#axis-y')
-              .transition().duration(750)
-              .call(window.svgComponents.yAxis.scale(
-                transform.rescaleY(window.svgComponents.y)));
-        window.svgComponents.svg.select('rect')
-              .transition().duration(750)
-              .attr('transform', 'translate(%s, %s)'.format(transform.x, transform.y));
-        window.svgComponents.svg.selectAll('circle')
-              .transition().duration(750)
-              .attr('transform', 'translate(%s, %s)'.format(transform.x, transform.y));
+              .call(window.svgComponents.zoom.transform, transform);
     }
 </script>
 {% end %}
