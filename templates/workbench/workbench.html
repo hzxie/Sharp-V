@@ -220,6 +220,14 @@
                     <div id="visualization-sidebar" class="col-md-4 hide">
                         <div class="panel panel-default">
                             <div class="panel-heading">
+                                <h5>{{ _('Reset Zoom') }}</h5>
+                            </div> <!-- .panel-heading -->
+                            <div class="panel-body">
+                                <button id="reset-button" class="btn btn-raised btn-danger">{{ _('Reset Zoom') }}</button>
+                            </div> <!-- .panel-body -->
+                        </div> <!-- .panel -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
                                 <h5>{{ _('Search') }}</h5>
                             </div> <!-- .panel-heading -->
                             <div class="panel-body">
@@ -231,7 +239,7 @@
                                 <button id="sample-search-button" class="btn btn-raised btn-primary">{{ _('Search') }}</button>
                             </div> <!-- .panel-body -->
                         </div> <!-- .panel -->
-                        <div class="panel panel-default">
+                        <div id="scatter-plot-settings" class="panel panel-default">
                             <div class="panel-heading">
                                 <h5>{{ _('Settings') }}</h5>
                             </div> <!-- .panel-heading -->
@@ -619,10 +627,11 @@
             dataType: 'JSON',
             success: function(result) {
                 if ( result['isSuccessful'] ) {
-                    window.dataset = result['dataset'];
-                    window.metaset = result['metaset'];
+                    window.dataset       = result['dataset'];
+                    window.metaset       = result['metaset'];
+                    window.isScatterPlot = !isHierarchicalClustering(JSON.parse(processFlow));
 
-                    draw(window.dataset, processFlow);
+                    draw(window.dataset);
                     list(window.metaset);
                     $('#visualization-sidebar').removeClass('hide');
                     $('#no-diagram').addClass('hide');
@@ -640,7 +649,7 @@
     }
 </script>
 <script type="text/javascript">
-    function draw(dataset, processFlow) {
+    function draw(dataset) {
         var containerWidth          = $('#d3-diagram').width(),
             svgOptions              = {
                 height: containerWidth,
@@ -653,10 +662,12 @@
                 }
             };
 
-        if ( isHierarchicalClustering(processFlow) ) {
-            return drawHierarchyTree(dataset, svgOptions);
+        if ( window.isScatterPlot ) {
+            $('#scatter-plot-settings').removeClass('hide');
+            drawScatterPlot(dataset, svgOptions);
         } else {
-            return drawScatterPlot(dataset, svgOptions);
+            $('#scatter-plot-settings').addClass('hide');
+            drawHierarchyTree(dataset, svgOptions);
         }
     }
 </script>
@@ -742,8 +753,8 @@
 
         // Create sensing area to detect zoom and drag operations
         var view = svg.append('rect')
-                      .attr('class', 'view').attr('x', 0).attr('y', 0)
-                      .attr('width', width - 1).attr('height', height - 1)
+                      .attr('class', 'view').attr('x', -width * 2).attr('y', -height * 2)
+                      .attr('width', width * 3).attr('height', height * 3)
                       .style('fill', 'transparent');
         
         // Plot X axis and Y axis in SVG
@@ -754,7 +765,7 @@
         // Handling zoom operations
         var zoom = d3.zoom()
                      .scaleExtent([1, 96])
-                     // .translateExtent([[-100, -100], [width + 100, height + 100]])
+                     .translateExtent([[-width, -height], [width * 2, height * 2]])
                      .on('zoom', function() {
                           view.attr('transform', d3.event.transform);
                           svg.select('#axis-x').call(xAxis.scale(d3.event.transform.rescaleX(x)));
@@ -765,11 +776,9 @@
 
         return {
             'svg': svg,
+            'zoom': zoom,
             'x': x,
-            'y': y,
-            'xAxis': xAxis,
-            'yAxis': yAxis,
-            'zoom': zoom
+            'y': y
         };
     }
 </script>
@@ -804,15 +813,16 @@
 </script>
 <script type="text/javascript">
     function drawHierarchyTree(dataset, svgOptions) {
-        var treeData      = dataset['hierarchy'],
-            svgComponents = setUpHierarchyTreeSvg(svgOptions),
-            treeRoot      = d3.hierarchy(treeData, function(d) { return d.children; }),
-            i             = 0,
-            DURATION      = 750;
+        var treeData         = dataset['hierarchy'],
+            svgComponents    = setUpHierarchyTreeSvg(svgOptions),
+            treeRoot         = d3.hierarchy(treeData, function(d) { return d.children; }),
+            i                = 0,
+            DURATION         = 750;
         
+        window.svgComponents = svgComponents
         // Put the root of the tree in the left center of the diagram
-        treeRoot.x0       = (svgOptions.height - svgOptions.margin.top - svgOptions.margin.bottom) / 2;
-        treeRoot.y0       = 0;
+        treeRoot.x0          = (svgOptions.height - svgOptions.margin.top - svgOptions.margin.bottom) / 2;
+        treeRoot.y0          = 0;
         // Collapse after the second level
         // treeRoot.children.forEach(collapseHierarchyTree);
         updateHierarchyTree(treeRoot);
@@ -836,7 +846,7 @@
                             .attr('class', 'node')
                             .attr('transform', function(d) {
                                 return 'translate(%s, %s)'.format(source.y0, source.x0);
-                            }).on('click', toggle);
+                            }).on('click', click);
             // Add Circle for the nodes
             nodeEnter.append('circle')
                 .attr('class', 'node')
@@ -928,16 +938,19 @@
         }
 
         // Toggle children on click.
-        function toggle(d) {
-            if ( d.children ) {
-                d._children = d.children;
-                d.children = null;
+        function click(d) {
+            if ( !d3.event.ctrlKey && !d3.event.metaKey ) {
+                if ( d.children ) {
+                    d._children = d.children;
+                    d.children = null;
+                } else {
+                    d.children = d._children;
+                    d._children = null;
+                }
+                updateHierarchyTree(d);
             } else {
-                d.children = d._children;
-                d._children = null;
+                console.log(d);
             }
-            console.log(d);
-            updateHierarchyTree(d);
         }
     }
 </script>
@@ -957,8 +970,8 @@
         var tree  = d3.cluster().size([height, width]);
         // Create sensing area to detect zoom and drag operations
         var view  = svg.append('rect')
-                      .attr('class', 'view').attr('x', 0).attr('y', 0)
-                      .attr('width', width * 4).attr('height', height * 4)
+                      .attr('class', 'view').attr('x', -width * 2).attr('y', -height * 2)
+                      .attr('width', width * 3).attr('height', height * 3)
                       .style('fill', 'none')
                       .style('pointer-events', 'all'),
             layer = svg.append("g");
@@ -971,6 +984,7 @@
 
         return {
             'svg': layer,
+            'zoom': zoom,
             'tree': tree
         }
     }
@@ -1075,8 +1089,11 @@
         if ( sampleIndex == -1 ) {
             return;
         }
-        // If the scatter is shown
-        transformScatterPlot(sampleIndex + 1);
+        
+        if ( window.isScatterPlot ) {
+            transformScatterPlot(sampleIndex + 1);
+        } else {
+        }
     });
 </script>
 <script type="text/javascript">
@@ -1104,5 +1121,12 @@
               .transition().duration(750)
               .call(window.svgComponents.zoom.transform, transform);
     }
+</script>
+<script type="text/javascript">
+    $('#reset-button').click(function() {
+        window.svgComponents.svg
+              .transition().duration(750)
+              .call(window.svgComponents.zoom.transform, d3.zoomIdentity);
+    });
 </script>
 {% end %}
