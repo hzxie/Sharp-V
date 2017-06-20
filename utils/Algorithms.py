@@ -272,20 +272,30 @@ class Algorithms(object):
             return leaf_names
         
         def parse_tree(root):
+            global id_count
             if not len(root) and not isinstance(root[0], dict):
+                root['id'] = id_count
+                id_count += 1
                 return
             for i in range(len(root)):
                 children = root[i]["children"]
 
                 if isinstance(children[0], dict) and len(children) > 1:
+                    root[i]['id'] = id_count
+                    id_count += 1
                     parse_tree(children)
                 elif isinstance(children[0], str) and len(children) == 1:
                     root[i]["children"] = []
+                    root[i]['id'] = id_count
+                    id_count += 1
                 if not isinstance(children[0], dict):
                     for j in range(len(children)):
-                        children[j] = dict(name=children[j],children=[])
+                        children[j] = dict(name=children[j],children=[],id=id_count)
+                        id_count += 1
 
         add_node(tree, hierarchy)
+        global id_count
+        id_count = 0
         label_tree(hierarchy['children'][0])
         hierarchy['children'][0]['name'] = 'root'
         parse_tree(hierarchy['children'][0]['children'])
