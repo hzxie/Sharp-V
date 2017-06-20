@@ -8,15 +8,17 @@
     <div class="container">
         <div class="col-md-12">
             <h2>{{ _('My Profile'); }}</h2>
-            <p>{{ _('[TODO]: Say something here...') }}</p>
+            <p>{{ _('To edit your account and change password.') }}</p>
         </div> <!-- .col-xs-12 -->
     </div> <!-- .container -->
 </div> <!-- .hero -->
 <div id="main-content">
     <div class="container">
         <div class="col-sm-offset-3 col-sm-6">
-            <form onSubmit="onSubmit(); return false;" method="POST">
+            <form onSubmit="onSubmit(); return false;">
                 <h3>{{ _('My Information') }}</h3>
+                <div class="alert alert-success hide">{{ _('You profile was successfully updated.') }}</div>
+                <div class="alert alert-danger hide"></div>
                 <div class="form-group label-static">
                     <label>{{ _('Email') }}</label>
                     <input id="email" class="form-control" type="text" value="{{ user.email }}">
@@ -35,7 +37,8 @@
                     <label>{{ _('Confirm New Password') }}</label>
                     <input id="confirm-password" class="form-control" type="password">
                 </div> <!-- .form-group -->
-                <button class="btn btn-primary btn-raised" type="block">{{ _('Update Profile') }}</button>
+                {% module xsrf_form_html() %}
+                <button class="btn btn-primary btn-raised" type="submit">{{ _('Update Profile') }}</button>
             </form>
         </div> <!-- .col-md-10 -->
     </div> <!-- .container -->
@@ -44,6 +47,67 @@
 {% block scripts %}
 <script type="text/javascript">
     function onSubmit() {
+        $('.alert').addClass('hide');
+        $('button[type=submit]').attr('disabled', 'disabled');
+        $('button[type=submit]').html('{{ _('Please wait...') }}');
+
+        var email            = $('#email').val(),
+            oldPassword      = $('#old-password').val(),
+            newPassword      = $('#new-password').val(),
+            confirmPassword  = $('#confirm-password').val(),
+            xsrfToken        = getCookie("_xsrf");
+        return doUpdateAction(email, oldPassword, newPassword, confirmPassword, xsrfToken);
+    }
+</script>
+<script type="text/javascript">
+    function doUpdateAction(email, oldPassword, newPassword, confirmPassword, xsrfToken) {
+        var postData = {
+            'email'          : email,
+            'oldPassword'    : oldPassword,
+            'newPassword'    : newPassword,
+            'confirmPassword': confirmPassword,
+            '_xsrf'          : xsrfToken
+        };
+        $.ajax({
+            type: 'POST',
+            url: '{{ base_url('/accounts/profile') }}',
+            data: postData,
+            dataType: 'JSON',
+            success: function(result){
+                return processUpdateResult(result);
+            }
+        });
+    }
+</script>
+<script type="text/javascript">
+    function processUpdateResult(result) {
+        console.log(result)
+        if ( result['isSuccessful'] ) {
+            $('.alert-success').removeClass('hide');
+        } else {
+            var errorMessage = '';
+
+            if ( result['isEmailEmpty'] ) {
+                errorMessage += '{{ _('You cannot leave email empty.') }}<br>';
+            } else if ( !result['isEmailLegal'] ) {
+                errorMessage += '{{ _('The email seems invalid.') }}<br>';
+            } else if ( result['isEmailExists'] ) {
+                errorMessage += '{{ _('Someone already use that email.') }}<br>';
+            }
+            if ( result['isOldPasswordEmpty'] && !result['isOldPasswordCorrect'] ) {
+                errorMessage += '{{ _('Old password is not correct.') }}<br>';
+            } 
+            if ( result['isOldPasswordEmpty'] && !result['isNewPasswordLegal'] ) {
+                errorMessage += '{{ _('The length of new password must between 6 and 16 characters.') }}<br>';
+            }
+            if ( result['isOldPasswordEmpty'] && !result['isPasswordConfirmed'] ) {
+                errorMessage = '{{ _('The new password and confirm new password do not match.') }}<br>';
+            }
+            $('.alert-danger').html(errorMessage);
+            $('.alert-danger').removeClass('hide');
+        }
+        $('button[type=submit]').html('{{ _('Update profile') }}');
+        $('button[type=submit]').removeAttr('disabled');
     }
 </script>
 {% end %}

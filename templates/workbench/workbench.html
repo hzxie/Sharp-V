@@ -845,6 +845,7 @@
             var nodeEnter = node.enter().append('g')
                             .attr('class', 'node')
                             .attr('transform', function(d) {
+                                console.log(d);
                                 return 'translate(%s, %s)'.format(source.y0, source.x0);
                             }).on('click', click);
             // Add Circle for the nodes

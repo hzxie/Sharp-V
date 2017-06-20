@@ -297,19 +297,23 @@ class ProfileHandler(AccountBaseHandler):
             'isEmailEmpty': False if email else True,
             'isEmailLegal': self.is_email_legal(email),
             'isEmailExists': self.is_email_exists(user, email),
-            'isOldPasswordEmpty': False if old_password else True,
+            'isOldPasswordEmpty': True if old_password else False,
             'isOldPasswordCorrect': self.is_password_correct(user, old_password),
             'isNewPasswordLegal': len(new_password) >= 6 and len(new_password) <= 16,
             'isPasswordConfirmed': new_password == confirm_password
         }
-        result['isSuccessful']  = not result['isEmailEmpty']       and result['isEmailLegal']          and \
-                                  not result['isEmailExists']      and result['isPasswordConfirmed']   and \
-                                     (result['isOldPasswordEmpty'] or  result['isOldPasswordCorrect']) and \
-                                      result['isPasswordLegal']
+        result['isSuccessful']      = not result['isEmailEmpty']   and result['isEmailLegal']         and \
+                                      not result['isEmailExists']
+        if old_password and new_password:
+            result['isSuccessful']  = result['isSuccessful']       and result['isOldPasswordCorrect'] and \
+                                      result['isNewPasswordLegal'] and result['isPasswordConfirmed']
         if result['isSuccessful']:
-            user.email = email 
-            if old_password:
-                user.password = md5(new_password).hexdigest()
+            print user
+            user = {
+                'user_id': user.user_id,
+                'email': email,
+                'password': md5(old_password).hexdigest() if old_password else user.password
+            }
             rows_affected = self.user_mapper.update_user(user)
         return result
 
@@ -328,5 +332,5 @@ class ProjectsHandler(AccountBaseHandler):
         if not self.is_user_logged_in():
             return self.redirect('/')
 
-        current_user     = self.get_current_user()
+        current_user = self.get_current_user()
         self.render('accounts/projects.html') 
