@@ -822,26 +822,24 @@
            })
            .on('mouseout', function(data, index) {
                $('.tooltip').addClass('hide');
+           })
+           .on('click', function(data, index) {
+               var sampleName        = window.dataset['ids']['training'][index],
+                   neighbors         = window.dataset['nearest_neighbors'][index],
+                   numberOfNeighbors = parseInt($('#number-of-neighbors').val());
+
+               if ( !d3.event.ctrlKey && !d3.event.metaKey ) {
+                   svgComponents.svg.selectAll('circle').attr('r', 4);
+               }
+               // NOTE: nth-child selector is start from 1, NOT 0.
+               svgComponents.svg.select('circle:nth-child(%s)'.format(index + 1)).attr('r', 15);
+               for ( var i = 0; i < numberOfNeighbors; ++ i ) {
+                   svgComponents.svg.select('circle:nth-child(%s)'.format(neighbors[i] + 1)).attr('r', 10);
+               }
+               // Display metaset of the selected samples
+               var selectedSamples = getSelectedSamplesInScatterPlot(svgComponents);
+               filterMetaset(selectedSamples);
            });
-
-        // Add event listeners to points
-        svgComponents.svg.selectAll('circle').on('click', function(data, index) {
-            var sampleName        = window.dataset['ids']['training'][index],
-                neighbors         = window.dataset['nearest_neighbors'][index],
-                numberOfNeighbors = parseInt($('#number-of-neighbors').val());
-
-            if ( !d3.event.ctrlKey && !d3.event.metaKey ) {
-                svgComponents.svg.selectAll('circle').attr('r', 4);
-            }
-            // NOTE: nth-child selector is start from 1, NOT 0.
-            svgComponents.svg.select('circle:nth-child(%s)'.format(index + 1)).attr('r', 15);
-            for ( var i = 0; i < numberOfNeighbors; ++ i ) {
-                svgComponents.svg.select('circle:nth-child(%s)'.format(neighbors[i] + 1)).attr('r', 10);
-            }
-            // Display metaset of the selected samples
-            var selectedSamples = getSelectedSamplesInScatterPlot(svgComponents);
-            filterMetaset(selectedSamples);
-        });
     }
 </script>
 <script type="text/javascript">
