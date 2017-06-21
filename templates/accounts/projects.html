@@ -14,10 +14,69 @@
 </div> <!-- .hero -->
 <div id="main-content">
     <div class="container">
-        <div class="col-sm-12 col-md-10">
+        <div class="col-sm-offset-3 col-sm-6">
+            <form onSubmit="onSubmit(); return false;">
+                <h3>{{ _('My Project List') }}</h3>
+                <div class="alert alert-success hide">{{ _('Your project was successfully updated.') }}</div>
+                <div class="alert alert-danger hide"></div>
+            </form>
         </div> <!-- .col-md-10 -->
     </div> <!-- .container -->
 </div> <!-- #main-content -->
 {% end %}
 {% block scripts %}
+<script type="text/javascript">
+    function onSubmit() {
+        $('.alert').addClass('hide');
+        $('button[type=submit]').attr('disabled', 'disabled');
+        $('button[type=submit]').html('{{ _('Please wait...') }}');
+
+        var oldProjectName   = $('#old-project-name').val(),
+            newProjectName   = $('#new-project-name').val(),
+            rmProjectName    = $('#rm-project-name').val(),
+            xsrfToken        = getCookie("_xsrf");
+
+        return doUpdateAction(oldProjectName, newProjectName, rmProjectName, xsrfToken);
+    }
+</script>
+<script type="text/javascript">
+    function doUpdateAction(oldProjectName, newProjectName, rmProjectName, xsrfToken) {
+        var postData = {
+            'oldProjectName' : oldPassword,
+            'newProjectName' : newPassword,
+            'rmProjectName'  : confirmPassword,
+            '_xsrf'          : xsrfToken
+        };
+        $.ajax({
+            type: 'POST',
+            url: '{{ base_url('/accounts/projects') }}',
+            data: postData,
+            dataType: 'JSON',
+            success: function(result){
+                return processUpdateResult(result);
+            }
+        });
+    }
+</script>
+<script type="text/javascript">
+    function processUpdateResult(result) {
+        if ( result['isSuccessful'] ) {
+            $('.alert-success').removeClass('hide');
+            $('html, body').animate({scrollTop: 0}, 500);
+        } else {
+            var errorMessage = '';
+
+            if ( result['isNewProjectNameEmpty'] ) {
+                errorMessage += '{{ _('You cannot leave new project name empty.') }}<br>';
+            } else if ( !result['isNewProjectNameLegal'] ) {
+                errorMessage += '{{ _('The new project name seems invalid.') }}<br>';
+            }
+            
+            $('.alert-danger').html(errorMessage);
+            $('.alert-danger').removeClass('hide');
+        }
+        $('button[type=submit]').html('{{ _('Update profile') }}');
+        $('button[type=submit]').removeAttr('disabled');
+    }
+</script>
 {% end %}

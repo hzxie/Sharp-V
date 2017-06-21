@@ -1,4 +1,4 @@
-#!/usr/bin/python
+ #!/usr/bin/python
 # -*- coding: utf-8 -*-
 import logging
 
@@ -26,10 +26,14 @@ from handlers.BaseHandler import BaseHandler
 from utils.Algorithms import Algorithms
 from utils.DatasetParsers import DatasetParser
 from utils.DatasetParsers import MetasetParser
+from utils.ProjectParsers import ProjectParser
 
 PROJECT_CONFIG_FILE_NAME = 'project-config.json'
 
 class ProjectsSuggestionsHandler(BaseHandler):
+    def initialize(self):
+        self.project_parser = ProjectParser()
+
     @asynchronous
     def get(self):
         project_keywords     = self.get_argument('keyword', '')
@@ -43,45 +47,9 @@ class ProjectsSuggestionsHandler(BaseHandler):
         projects             = []
         
         if folder_exists(user_folder_path):
-            projects         = self.get_projects(user_folder_path, project_keywords)
+            projects         = self.project_parser.get_projects(user_folder_path, project_keywords)
         
         self.finish(dump_json(projects[:10]))
-
-    def get_projects(self, user_folder_path, project_keywords):
-        projects             = []
-        project_names        = Set()
-        for project_name in listdir(user_folder_path):
-             if folder_exists(join_path(user_folder_path, project_name)):
-                for keyword in project_keywords:
-                    if project_name.lower().find(keyword.lower()) != -1 and not project_name in project_names:
-                        project_folder_path = join_path(user_folder_path, project_name) 
-                        project_files       = self.get_project_files(project_folder_path)                       
-                        project_names.add(project_name)
-                        projects.append({
-                            'projectName': project_name,
-                            'projectFiles': project_files
-                        })
-        return projects
-        
-    def get_project_files(self, project_folder_path):
-        project_files      = [file for file in listdir(project_folder_path)]
-        dataset_file_name  = None
-        metaset_file_name  = None
-        json_file_name     = PROJECT_CONFIG_FILE_NAME
-        project_config     = None
-
-        if json_file_name in project_files:
-            project_files.remove(json_file_name)
-            with open(join_path(project_folder_path, json_file_name)) as json_file:
-                project_config    = load_json_file(json_file)
-                dataset_file_name = project_config['datasetFileName']
-                metaset_file_name = project_config['metasetFileName']
-
-        return {
-            'candidateFiles': project_files,
-            'datasetName': dataset_file_name,
-            'metasetName': metaset_file_name
-        }
 
 class DatasetUploadHandler(BaseHandler):
     def initialize(self):

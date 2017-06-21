@@ -2,6 +2,11 @@
 # -*- coding: utf-8 -*-
 import logging
 
+from os.path import join as join_path
+from os.path import isdir as folder_exists
+from os import rename as project_rename
+from shutil import rmtree as rm_project
+
 from datetime import datetime
 from datetime import timedelta
 from hashlib import md5
@@ -15,6 +20,7 @@ from handlers.BaseHandler import BaseHandler
 from mappers.EmailVerificationMapper import EmailVerificationMapper
 from mappers.UserMapper import UserMapper
 from mappers.UserGroupMapper import UserGroupMapper
+from utils.ProjectParsers import ProjectParser
 
 class AccountBaseHandler(BaseHandler):
     def is_user_logged_in(self):
@@ -324,12 +330,72 @@ class ProfileHandler(AccountBaseHandler):
 
 class ProjectsHandler(AccountBaseHandler):
     def initialize(self, db_session):
-        self.user_mapper = UserMapper(db_session)
+        self.user_mapper    = UserMapper(db_session)
+        self.project_parser = ProjectParser()
 
     @asynchronous
     def get(self):
         if not self.is_user_logged_in():
             return self.redirect('/')
 
-        current_user = self.get_current_user()
-        self.render('accounts/projects.html') 
+        current_user        = self.get_current_user()
+        user_folder_path    = join_path(self.application.settings['uploads_path'], current_user)
+        projects            = []
+        
+        if folder_exists(user_folder_path):
+            projects        = self.project_parser.get_projects(user_folder_path)
+
+        self.render('accounts/projects.html', projects=projects) 
+
+    @asynchronous
+    def post(self):
+        current_user        = self.get_current_user()
+        user_folder_path    = join_path(self.application.settings['uploads_path'], current_user)
+        old_project_name    = self.get_argument('oldProjectName', default=None, strip=False)
+        new_project_name    = self.get_argument('newProjectName', default=None, strip=False)
+        remove_project_name = self.get_argument('rmProjectName', default=None, strip=False)
+
+        if new_project_name:
+            result = self.update_project(user_folder_path ,old_project_name, new_project_name)
+        if remove_project_name:
+            result = self.remove_project(user_folder_path, remove_project_name)
+
+        if result['isSuccessful']:
+            logging.info('User [username=%s] updated profile at %s' % (current_username, self.get_user_ip_addr()))
+
+        self.finish(dump_json(result))
+
+    def update_project(self, user_folder_path, old_project_name, new_project_name):
+        result = {
+            'isNewProjectNameLegal': self.is_file_name_legal(new_project_name),
+        }
+        result['isSuccessful'] = result['isNewProjectNameLegal']
+        
+        if result['isSuccessful']:
+            try:
+                self.project_rename(join_path(user_folder_path, old_project_name), join_path(user_folder_path, new_project_name))
+            except Exception as ex:
+                result['isSuccessful'] = False
+                logging.error('Error occurred: %s' % ex)
+
+        return result
+
+    def remove_project(self, user_folder_path, remove_project_name):
+        result = {
+            'isSuccessful': True
+        }
+        if result['isSuccessful']:
+            try:
+                self.remove_project(user_folder_path, remove_project_name)
+            except Exception as ex:
+                result['isSuccessful'] = False
+                logging.error('Error occurred: %s' % ex)
+
+        return result
+
+    def is_file_name_legal(self, file_name):
+        return not match(r'^[0-9a-zA-Z_\-\+\.]{4,64}$', file_name) is None
+
+    def remove_project(self, user_folder_path, remove_project_name):
+        rm_project(join_path(user_folder_path, remove_project_name))
+        

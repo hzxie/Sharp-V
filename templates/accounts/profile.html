@@ -17,7 +17,7 @@
         <div class="col-sm-offset-3 col-sm-6">
             <form onSubmit="onSubmit(); return false;">
                 <h3>{{ _('My Information') }}</h3>
-                <div class="alert alert-success hide">{{ _('You profile was successfully updated.') }}</div>
+                <div class="alert alert-success hide">{{ _('Your profile was successfully updated.') }}</div>
                 <div class="alert alert-danger hide"></div>
                 <div class="form-group label-static">
                     <label>{{ _('Email') }}</label>
@@ -81,7 +81,6 @@
 </script>
 <script type="text/javascript">
     function processUpdateResult(result) {
-        console.log(result)
         if ( result['isSuccessful'] ) {
             $('.alert-success').removeClass('hide');
             $('html, body').animate({scrollTop: 0}, 500);
