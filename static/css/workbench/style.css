@@ -195,6 +195,14 @@ div#main-content div.section .algorithm div.panel-body label {
 	margin: 10px 0 0;
 }
 
+div#main-content div#d3-diagram {
+	position: relative;
+}
+
+div#main-content div#d3-diagram div.tooltip {
+	position: absolute;
+}
+
 div#main-content div#d3-diagram .node circle {
     fill: #fff;
     stroke: #03a9f4;

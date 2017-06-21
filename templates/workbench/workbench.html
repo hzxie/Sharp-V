@@ -215,6 +215,7 @@
                     <div class="col-md-8">
                         <div id="d3-diagram">
                             <p id="no-diagram">{{ _('The diagram will be shown after processing.') }}</p>
+                            <div class="tooltip hide"></div>
                         </div> <!-- #d3-diagram -->
                     </div> <!-- .col-md-8 -->
                     <div id="visualization-sidebar" class="col-md-4 hide">
@@ -685,6 +686,7 @@
 <script type="text/javascript">
     function drawScatterPlot(dataset, svgOptions) {
         var CLUSTER_COLORS          = ['#f4394c', '#f6aa4a', '#40a3e7', '#8fbf59', '#6a1b9a', '#795548', '#607d8b', '#283593', '#1b5e20', '#333'],
+            trainingSampleNames     = dataset['ids']['training'],
             trainingSamples         = dataset['samples']['training'],
             trainingPredictedLabels = dataset['predicting']['training'],
             maxMinPoint             = getPointsStatistics(trainingSamples),
@@ -697,6 +699,7 @@
         }
         for ( var i = 0; i < trainingSamples.length; ++ i ) {
             trainingSamples[i]['color'] = CLUSTER_COLORS[trainingPredictedLabels[i]];
+            trainingSamples[i]['name']  = trainingSampleNames[i];
         }
         addPointsToScatterSvg(svgComponents, trainingSamples);
     }
@@ -791,8 +794,20 @@
            .attr('class', 'dot').attr('r', 4)
            .attr('cx', function (p) { return svgComponents.x(p.x); })
            .attr('cy', function (p) { return svgComponents.y(p.y); })
+           .attr('name', function(p) { return p.name; })
            .style('fill', function(p) { return p.color; })
-           .style('fill-opacity', .75);
+           .style('fill-opacity', .75)
+           .on('mouseover', function(data, index) {
+               $('.tooltip').html(data['name']);
+               $('.tooltip').css({
+                   'left': svgComponents.x(data.x),
+                   'top':  svgComponents.y(data.y),
+               });
+               $('.tooltip').removeClass('hide');
+           })
+           .on('mouseout', function(data, index) {
+               $('.tooltip').addClass('hide');
+           });
 
         // Add event listeners to points
         svgComponents.svg.selectAll('circle').on('click', function(data, index) {
@@ -808,7 +823,23 @@
             for ( var i = 0; i < numberOfNeighbors; ++ i ) {
                 svgComponents.svg.select('circle:nth-child(%s)'.format(neighbors[i] + 1)).attr('r', 10);
             }
+            // Display metaset of the selected samples
+            var selectedSamples = getSelectedSamplesInScatterPlot(svgComponents);
+            console.log(selectedSamples);
         });
+    }
+</script>
+<script type="text/javascript">
+    function getSelectedSamplesInScatterPlot(svgComponents) {
+        var selectedSamples = [];
+        
+        svgComponents.svg.selectAll('circle[r="15"]').each(function(data, index) {
+            selectedSamples.push(data['name']);
+        });
+        svgComponents.svg.selectAll('circle[r="10"]').each(function(data, index) {
+            selectedSamples.push(data['name']);
+        });
+        return selectedSamples;
     }
 </script>
 <script type="text/javascript">
