@@ -172,7 +172,7 @@ class DatasetProcessHandler(BaseHandler):
             'isDatasetExists': file_exists(dataset_file_path) if dataset_file_path else False,
             'isParametersLegal': self.is_parameters_legal(process_steps)
         }
-        result['isSuccessful']  = True
+        result['isSuccessful']  = result['isDatasetExists'] and result['isParametersLegal']
 
         if result['isSuccessful']:
             try:
@@ -183,6 +183,7 @@ class DatasetProcessHandler(BaseHandler):
                 self.save_project_config(config_file_path, dataset_file_name, metaset_file_name)
             except Exception as ex:
                 result['isSuccessful'] = False
+                result['errorMessage'] = ex
                 logging.error('Error occurred: %s' % ex)
 
         self.finish(dump_json(result))
