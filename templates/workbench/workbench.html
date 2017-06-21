@@ -825,7 +825,7 @@
             }
             // Display metaset of the selected samples
             var selectedSamples = getSelectedSamplesInScatterPlot(svgComponents);
-            console.log(selectedSamples);
+            filterMetaset(selectedSamples);
         });
     }
 </script>
@@ -975,7 +975,8 @@
             collapseHierarchyTree(d);
             updateHierarchyTree(d);
         } else {
-            console.log(d);
+            var selectedSamples = getSelectedSamplesInTreePlot(d);
+            filterMetaset(selectedSamples);
         }
     }
 
@@ -988,6 +989,28 @@
             d.children = d._children;
             d._children = null;
         }
+    }
+
+    function getSelectedSamplesInTreePlot(d) {
+        var queue           = [d],
+            selectedSamples = [];
+
+        while ( queue.length > 0 ) {
+            var currentNode = queue[0],
+                name        = currentNode.data.name,
+                children    = currentNode._children || currentNode.children;
+            queue.splice(0, 1); // Remove first element in queue
+
+            if ( name && name != 'root' ) {
+                selectedSamples.push(name);
+            }
+            if ( children ) {
+                for ( var i = 0; i < children.length; ++ i ) {
+                    queue.push(children[i]);
+                }
+            }
+        }
+        return selectedSamples;
     }
 </script>
 <script type="text/javascript">
@@ -1219,12 +1242,25 @@
             }
             updateHierarchyTree(window.svgComponents.treeRoot);
         }
-        // Regenerate metaset list
-        list(window.metaset);
+        // Reset metaset list
+        filterMetaset();
         // Set view to initial view
         window.svgComponents.svg
               .transition().duration(750)
               .call(window.svgComponents.zoom.transform, d3.zoomIdentity);
     });
+</script>
+<script type="text/javascript">
+    function filterMetaset(samples) {
+        if ( typeof(samples) == 'undefined' ) {
+            $('#meta-of-neighbors table tbody tr').removeClass('hide');
+        } else {
+            $('#meta-of-neighbors table tbody tr').addClass('hide');
+            for ( var i = 0; i < samples.length; ++ i ) {
+                $('#meta-of-neighbors table tbody tr[data-value="%s"]'
+                    .format(samples[i])).removeClass('hide');
+            }
+        }
+    }
 </script>
 {% end %}
