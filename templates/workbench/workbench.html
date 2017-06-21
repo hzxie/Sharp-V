@@ -220,10 +220,10 @@
                     <div id="visualization-sidebar" class="col-md-4 hide">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h5>{{ _('Reset Zoom') }}</h5>
+                                <h5>{{ _('Reset') }}</h5>
                             </div> <!-- .panel-heading -->
                             <div class="panel-body">
-                                <button id="reset-button" class="btn btn-raised btn-danger">{{ _('Reset Zoom') }}</button>
+                                <button id="reset-button" class="btn btn-raised btn-danger">{{ _('Reset') }}</button>
                             </div> <!-- .panel-body -->
                         </div> <!-- .panel -->
                         <div class="panel panel-default">
@@ -633,6 +633,7 @@
 
                     draw(window.dataset);
                     list(window.metaset);
+                    $('#sample-search-box').val('');
                     $('#visualization-sidebar').removeClass('hide');
                     $('#no-diagram').addClass('hide');
                     if ( !jQuery.isEmptyObject(result['metaset']) ) {
@@ -1164,6 +1165,32 @@
 </script>
 <script type="text/javascript">
     $('#reset-button').click(function() {
+        // Collapse all tree nodes and set all circle to initial state
+        if ( window.isScatterPlot ) {
+            window.svgComponents.svg.selectAll('circle').attr('r', 4);
+        } else {
+            var queue = [window.svgComponents.treeRoot];
+            while ( queue.length > 0 ) {
+                var currentNode     = queue[0],
+                    hiddenChildren  = currentNode._children;
+                queue.splice(0, 1); // Remove first element in queue
+
+                if ( hiddenChildren ) {
+                    collapseHierarchyTree(currentNode);
+                }
+                
+                var children        = currentNode.children;
+                if ( children ) {
+                    for ( var i = 0; i < children.length; ++ i ) {
+                        queue.push(children[i]);
+                    }
+                }
+            }
+            updateHierarchyTree(window.svgComponents.treeRoot);
+        }
+        // Regenerate metaset list
+        list(window.metaset);
+        // Set view to initial view
         window.svgComponents.svg
               .transition().duration(750)
               .call(window.svgComponents.zoom.transform, d3.zoomIdentity);
