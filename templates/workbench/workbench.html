@@ -815,143 +815,147 @@
     function drawHierarchyTree(dataset, svgOptions) {
         var treeData         = dataset['hierarchy'],
             svgComponents    = setUpHierarchyTreeSvg(svgOptions),
-            treeRoot         = d3.hierarchy(treeData, function(d) { return d.children; }),
-            i                = 0,
-            DURATION         = 750;
+            treeRoot         = d3.hierarchy(treeData, function(d) { return d.children; });
         
-        window.svgComponents = svgComponents
+        // Set global variables
+        window.globalIndex            = 0,
+        window.svgComponents          = svgComponents;
+        window.svgComponents.treeRoot = treeRoot;
+        window.svgComponents.center   = {
+            'x': svgOptions.width / 2,
+            'y': svgOptions.height / 2
+        };
+        window.leafNodes              = [];
         // Put the root of the tree in the left center of the diagram
-        treeRoot.x0          = (svgOptions.height - svgOptions.margin.top - svgOptions.margin.bottom) / 2;
-        treeRoot.y0          = 0;
-        // Collapse after the second level
-        // treeRoot.children.forEach(collapseHierarchyTree);
+        treeRoot.x0                   = (svgOptions.height - svgOptions.margin.top - svgOptions.margin.bottom) / 2;
+        treeRoot.y0                   = 0;
+        // Display tree plot
         updateHierarchyTree(treeRoot);
+    }
 
-        // Update the structure of the hierarchy tree
-        function updateHierarchyTree(source) {
-            // Compute the new tree layout.
-            var treeData = svgComponents.tree(treeRoot),
-                nodes    = treeData.descendants(),
-                links    = treeData.descendants().slice(1);
+    // Update the structure of the hierarchy tree
+    function updateHierarchyTree(source) {
+        // Compute the new tree layout.
+        var treeData = window.svgComponents.tree(window.svgComponents.treeRoot),
+            nodes    = treeData.descendants(),
+            links    = treeData.descendants().slice(1);
 
-            // Normalize for fixed-depth.
-            nodes.forEach(function(d) { d.y = d.depth * 180});
-            // Update the nodes...
-            var node  = svgComponents.svg.selectAll('g.node')
-                        .data(nodes, function(d) {
-                            return d.id || (d.id = ++ i); 
-                        });
-            // Enter any new modes at the parent's previous position.
-            var nodeEnter = node.enter().append('g')
-                            .attr('class', 'node')
-                            .attr('transform', function(d) {
-                                console.log(d);
-                                return 'translate(%s, %s)'.format(source.y0, source.x0);
-                            }).on('click', click);
-            // Add Circle for the nodes
-            nodeEnter.append('circle')
-                .attr('class', 'node')
-                .attr('r', 1e-6)
-                .style('fill', function(d) {
-                    return d._children ? '#03a9f4' : '#fff';
-                });
-            // Add labels for the nodes
-            nodeEnter.append('text')
-                .attr('dy', '.35em')
-                .attr('x', function(d) {
-                    return d.children || d._children ? -13 : 13;
-                })
-                .attr('text-anchor', function(d) {
-                    return d.children || d._children ? 'end' : 'start';
-                })
-                .text(function(d) { 
-                    return d.data.name; 
-                });
-            
-            // Transition to the proper position for the node
-            var nodeUpdate = nodeEnter.merge(node);
-            nodeUpdate.transition()
-                .duration(DURATION)
-                .attr('transform', function(d) { 
-                    return 'translate(%s, %s)'.format(d.y, d.x);
-                });
-            // Update the node attributes and style
-            nodeUpdate.select('circle.node')
-                .attr('r', 10)
-                .style('fill', function(d) {
-                    return d._children ? '#03a9f4' : '#fff';
-                }).attr('cursor', 'pointer');
-            // Remove any exiting nodes
-            var nodeExit = node.exit().transition()
-                              .duration(DURATION)
-                              .attr('transform', function(d) {
-                                  return 'translate(%s, %s)'.format(source.y, source.x);
-                              }).remove();
-            // On exit reduce the node circles size to 0
-            nodeExit.select('circle').attr('r', 1e-6);
-            // On exit reduce the opacity of text labels
-            nodeExit.select('text').style('fill-opacity', 1e-6);
-
-            // Update the links...
-            var link = svgComponents.svg.selectAll('path.link')
-                        .data(links, function(d) { return d.id; });
-            // Enter any new links at the parent's previous position.
-            var linkEnter = link.enter().insert('path', "g")
-                                .attr('class', 'link')
-                                .attr('d', function(d){
-                                    var o = {x: source.x0, y: source.y0};
-                                    return diagonal(o, o);
-                                });
-            // Transition back to the parent element position
-            var linkUpdate = linkEnter.merge(link);
-            linkUpdate.transition()
-                      .duration(DURATION)
-                      .attr('d', function(d) { return diagonal(d, d.parent) });
-            // Remove any exiting links
-            var linkExit = link.exit().transition()
-                            .duration(DURATION)
-                            .attr('d', function(d) {
-                                var o = {x: source.x, y: source.y};
-                                return diagonal(o, o);
-                            }).remove();
-            // Store the old positions for transition.
-            nodes.forEach(function(d){
-                d.x0 = d.x;
-                d.y0 = d.y;
+        // Normalize for fixed-depth.
+        nodes.forEach(function(d) { d.y = d.depth * 180});
+        // Update the nodes...
+        var node  = window.svgComponents.svg.selectAll('g.node')
+                    .data(nodes, function(d) {
+                        return d.id || (d.id = ++ globalIndex); 
+                    });
+        // Enter any new modes at the parent's previous position.
+        var nodeEnter = node.enter().append('g')
+                        .attr('class', 'node')
+                        .attr('transform', function(d) {
+                            return 'translate(%s, %s)'.format(source.y0, source.x0);
+                        }).on('click', click);
+        // Add Circle for the nodes
+        nodeEnter.append('circle')
+            .attr('class', 'node')
+            .attr('r', 1e-6)
+            .style('fill', function(d) {
+                return d._children ? '#03a9f4' : '#fff';
             });
-        }
-
-        // Collapse the node and all its children
-        function collapseHierarchyTree(d) {
-            if (d.children) {
-                d._children = d.children;
-                d._children.forEach(collapseHierarchyTree);
-                d.children = null;
-            }
-        }
-
-        // Creates a curved (diagonal) path from parent to the child nodes
-        function diagonal(s, d) {
-            return `M ${s.y} ${s.x}
-                C ${(s.y + d.y) / 2} ${s.x},
-                ${(s.y + d.y) / 2} ${d.x},
-                ${d.y} ${d.x}`;
-        }
-
-        // Toggle children on click.
-        function click(d) {
-            if ( !d3.event.ctrlKey && !d3.event.metaKey ) {
-                if ( d.children ) {
-                    d._children = d.children;
-                    d.children = null;
-                } else {
-                    d.children = d._children;
-                    d._children = null;
+        // Add labels for the nodes
+        nodeEnter.append('text')
+            .attr('dy', '.35em')
+            .attr('x', function(d) {
+                return d.children || d._children ? -13 : 13;
+            })
+            .attr('text-anchor', function(d) {
+                return d.children || d._children ? 'end' : 'start';
+            })
+            .text(function(d) { 
+                var nodeName = d.data.name;
+                if ( nodeName && nodeName != 'root' ) {
+                    window.leafNodes.push(d);
                 }
-                updateHierarchyTree(d);
-            } else {
-                console.log(d);
-            }
+                return nodeName; 
+            });
+        
+        // Transition to the proper position for the node
+        var nodeUpdate = nodeEnter.merge(node);
+        nodeUpdate.transition()
+            .duration(750)
+            .attr('transform', function(d) { 
+                return 'translate(%s, %s)'.format(d.y, d.x);
+            });
+        // Update the node attributes and style
+        nodeUpdate.select('circle.node')
+            .attr('r', 10)
+            .style('fill', function(d) {
+                return d._children ? '#03a9f4' : '#fff';
+            }).attr('cursor', 'pointer');
+        // Remove any exiting nodes
+        var nodeExit = node.exit().transition()
+                          .duration(750)
+                          .attr('transform', function(d) {
+                              return 'translate(%s, %s)'.format(source.y, source.x);
+                          }).remove();
+        // On exit reduce the node circles size to 0
+        nodeExit.select('circle').attr('r', 1e-6);
+        // On exit reduce the opacity of text labels
+        nodeExit.select('text').style('fill-opacity', 1e-6);
+
+        // Update the links...
+        var link = svgComponents.svg.selectAll('path.link')
+                    .data(links, function(d) { return d.id; });
+        // Enter any new links at the parent's previous position.
+        var linkEnter = link.enter().insert('path', "g")
+                            .attr('class', 'link')
+                            .attr('d', function(d){
+                                var o = {x: source.x0, y: source.y0};
+                                return diagonal(o, o);
+                            });
+        // Transition back to the parent element position
+        var linkUpdate = linkEnter.merge(link);
+        linkUpdate.transition()
+                  .duration(750)
+                  .attr('d', function(d) { return diagonal(d, d.parent) });
+        // Remove any exiting links
+        var linkExit = link.exit().transition()
+                        .duration(750)
+                        .attr('d', function(d) {
+                            var o = {x: source.x, y: source.y};
+                            return diagonal(o, o);
+                        }).remove();
+        // Store the old positions for transition.
+        nodes.forEach(function(d){
+            d.x0 = d.x;
+            d.y0 = d.y;
+        });
+    }
+
+    // Creates a curved (diagonal) path from parent to the child nodes
+    function diagonal(s, d) {
+        return `M ${s.y} ${s.x}
+            C ${(s.y + d.y) / 2} ${s.x},
+            ${(s.y + d.y) / 2} ${d.x},
+            ${d.y} ${d.x}`;
+    }
+
+    // Toggle children on click.
+    function click(d) {
+        if ( !d3.event.ctrlKey && !d3.event.metaKey ) {
+            collapseHierarchyTree(d);
+            updateHierarchyTree(d);
+        } else {
+            console.log(d);
+        }
+    }
+
+    // Collapse the node and all its children
+    function collapseHierarchyTree(d) {
+        if ( d.children ) {
+            d._children = d.children;
+            d.children = null;
+        } else {
+            d.children = d._children;
+            d._children = null;
         }
     }
 </script>
@@ -1084,16 +1088,20 @@
 </script>
 <script type="text/javascript">
     $('#sample-search-button').click(function() {
-        var sampleName  = $('#sample-search-box').val(),
-            sampleIndex = getSampleIndex(sampleName);
-
-        if ( sampleIndex == -1 ) {
-            return;
-        }
+        var sampleName  = $('#sample-search-box').val();
         
         if ( window.isScatterPlot ) {
+            var sampleIndex = getSampleIndex(sampleName);
+            if ( sampleIndex == -1 ) {
+                return;
+            }
             transformScatterPlot(sampleIndex + 1);
         } else {
+            var sampleNode = getSampleNode(sampleName);
+            if ( typeof(sampleNode) == 'undefined' ) {
+                return;
+            }
+            transformTreePlot(sampleNode);
         }
     });
 </script>
@@ -1110,6 +1118,15 @@
     }
 </script>
 <script type="text/javascript">
+    function getSampleNode(sampleName) {
+        for ( var i = 0; i < window.leafNodes.length; ++ i ) {
+            if ( window.leafNodes[i].data.name.toLowerCase() == sampleName.toLowerCase() ) {
+                return window.leafNodes[i];
+            }
+        }
+    }
+</script>
+<script type="text/javascript">
     function transformScatterPlot(sampleIndex) {
         var circle      = window.svgComponents.svg.select('circle:nth-child(%s)'.format(sampleIndex)),
             transform   = d3.zoomIdentity.translate(
@@ -1118,6 +1135,28 @@
 
         window.svgComponents.svg.selectAll('circle').attr('r', 4);
         circle.attr('r', 15);
+        window.svgComponents.svg
+              .transition().duration(750)
+              .call(window.svgComponents.zoom.transform, transform);
+    }
+</script>
+<script type="text/javascript">
+    function transformTreePlot(sampleNode) {
+        var currentParent = sampleNode;
+
+        // Collpase nodes
+        while ( currentParent != null ) {
+            currentParent = currentParent.parent;
+            if ( currentParent && currentParent.children == null ) {
+                collapseHierarchyTree(currentParent);
+                updateHierarchyTree(currentParent);
+            }
+        }
+
+        // Move the sample node to center screen
+        var transform   = d3.zoomIdentity.translate(
+                window.svgComponents.center.x - sampleNode.y,
+                window.svgComponents.center.y - sampleNode.x).scale(1);
         window.svgComponents.svg
               .transition().duration(750)
               .call(window.svgComponents.zoom.transform, transform);
