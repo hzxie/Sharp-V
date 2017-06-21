@@ -128,8 +128,9 @@
                     $('#edit-project-modal').modal('hide');
                 } else {
                     var errorMessage = '';
-
-                    // TODO
+                    if ( !result['isNewProjectNameLegal'] ) {
+                        errorMessage += '{{ _('The new project name seems invalid.') }}<br>';
+                    } 
                     $('.alert-danger', '#edit-project-modal').html(errorMessage);
                     $('.alert-danger', '#edit-project-modal').removeClass('hide');
                 }

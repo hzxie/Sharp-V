@@ -345,9 +345,8 @@ class ProjectsHandler(AccountBaseHandler):
         if folder_exists(user_folder_path):
             projects        = self.project_parser.get_projects(user_folder_path)
             for project in projects:
-                # TODO: Remove dataset and metaset from candidateFiles
-                #       Please consider that newly created dataset that has no files
-                pass
+                project['projectFiles']['candidateFiles'].remove(project['projectFiles']['datasetName'])
+                project['projectFiles']['candidateFiles'].remove(project['projectFiles']['metasetName'])
 
         self.render('accounts/projects.html', projects=projects) 
 
