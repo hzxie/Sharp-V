@@ -310,13 +310,24 @@
         add: function(e, data) {
             $('.progress .progress-bar').css('width', '0');
             
-            var projectName     = $('#new-project-name').val(),
-                acceptFileTypes = /.*\.(csv)$/i,
-                fileName        = data.originalFiles[0]['name'];
+            var projectName      = $('#new-project-name').val(),
+                fileName         = data.originalFiles[0]['name'],
+                acceptFileTypes  = /^.*\.(csv)$/i,
+                projectNameRegex = /^[0-9a-zA-Z_\-\+\.]{4,64}$/i;
+
+            // Check whether project name is legal
             if ( !projectName ) {
                 alert('{{ _('Please name your project.') }}');
                 return;
+            } else if ( !projectNameRegex.test(projectName) ) {
+                if ( projectName.length < 4 || projectName > 64 ) {
+                    alert('{{ _('The length of project name should more than 4 characters and no more than 64 characters.') }}');
+                } else {
+                    alert('{{ _('The project name should be consisted of characters, numbers, dashes and underlines.') }}');
+                }
+                return;
             }
+            // Check whether file type is accepted
             if ( !acceptFileTypes.test(fileName) ) {
                 alert('{{ _('You are allow to upload comma seperated CSV files only.') }}');
                 return;
@@ -563,6 +574,10 @@
             processFlow     = JSON.stringify(getProcessFlow()),
             xsrfToken       = getCookie("_xsrf");
 
+        if ( !projectName || !datasetFileName ) {
+            alert('Please select your project and dataset.');
+            return;
+        }
         $('#d3-diagram > svg').remove();
         $('#no-diagram').removeClass('hide');
         $('#visualization-sidebar, #meta-of-neighbors').addClass('hide');
@@ -643,8 +658,11 @@
                         $('#meta-of-neighbors').removeClass('hide');
                     }
                 } else {
-                    // TODO: Why?
-                    alert('Error occurred while processing data.');
+                    if ( result['isDatasetExists'] ) {
+                        alert('{{ _('The dataset you selected is no longer exists.') }}');
+                    } else {
+                        alert('{{ _('Error occurred while processing data.') }}');
+                    }
                 }
                 $('#btn-process').html('{{ _('Process') }}');
                 $('#btn-process').removeAttr('disabled');
