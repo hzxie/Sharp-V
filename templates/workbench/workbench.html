@@ -215,7 +215,9 @@
                     <div class="col-md-8">
                         <div id="d3-diagram">
                             <p id="no-diagram">{{ _('The diagram will be shown after processing.') }}</p>
-                            <div class="tooltip hide"></div>
+                            <div class="tooltip hide">
+                                {{ _('Sample Name:') }} <span class="sample-name"></span>
+                            </div> <!-- .tooltip -->
                         </div> <!-- #d3-diagram -->
                     </div> <!-- .col-md-8 -->
                     <div id="visualization-sidebar" class="col-md-4 hide">
@@ -256,7 +258,7 @@
                 <div id="meta-of-neighbors" class="row hide">
                     <div class="col-md-8">
                         <h4>{{ _('Metaset of Nearest Neighbors') }}</h4>
-                        <table class="table table-striped">
+                        <table class="table">
                             <thead></thead>
                             <tbody></tbody>
                         </table>
@@ -794,15 +796,10 @@
            .attr('class', 'dot').attr('r', 4)
            .attr('cx', function (p) { return svgComponents.x(p.x); })
            .attr('cy', function (p) { return svgComponents.y(p.y); })
-           .attr('name', function(p) { return p.name; })
            .style('fill', function(p) { return p.color; })
            .style('fill-opacity', .75)
            .on('mouseover', function(data, index) {
-               $('.tooltip').html(data['name']);
-               $('.tooltip').css({
-                   'left': svgComponents.x(data.x),
-                   'top':  svgComponents.y(data.y),
-               });
+               $('.sample-name').html(data['name']);
                $('.tooltip').removeClass('hide');
            })
            .on('mouseout', function(data, index) {

@@ -200,7 +200,10 @@ div#main-content div#d3-diagram {
 }
 
 div#main-content div#d3-diagram div.tooltip {
+	background: #fff;
 	position: absolute;
+	right: 20px;
+	top: 20px;
 }
 
 div#main-content div#d3-diagram .node circle {
