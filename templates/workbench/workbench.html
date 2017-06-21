@@ -843,11 +843,17 @@
     function drawHierarchyTree(dataset, svgOptions) {
         var treeData         = dataset['hierarchy'],
             svgComponents    = setUpHierarchyTreeSvg(svgOptions),
+            tree             = d3.tree()
+                                 .nodeSize([30, 90])
+                                 .separation(function(a, b) {
+                                     return a.parent == b.parent ? 1 : 1;
+                                 }),
             treeRoot         = d3.hierarchy(treeData, function(d) { return d.children; });
         
         // Set global variables
         window.globalIndex            = 0,
         window.svgComponents          = svgComponents;
+        window.svgComponents.tree     = tree;
         window.svgComponents.treeRoot = treeRoot;
         window.svgComponents.center   = {
             'x': svgOptions.width / 2,
