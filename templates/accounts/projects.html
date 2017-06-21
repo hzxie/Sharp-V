@@ -37,11 +37,15 @@
                     <div class="body">
                         <div class="row">
                             <div class="col-sm-4">{{ _('Dataset file:') }}</div> <!-- .col-sm-4 -->
-                            <div class="col-sm-8">{{ project['projectFiles']['datasetName'] }}</div> <!-- .col-sm-8 -->
+                            <div class="col-sm-8">
+                                {{ project['projectFiles']['datasetName'] if project['projectFiles']['datasetName'] else _('(Not set)') }}
+                            </div> <!-- .col-sm-8 -->
                         </div> <!-- .row -->
                         <div class="row">
                             <div class="col-sm-4">{{ _('Metaset file:') }}</div> <!-- .col-sm-4 -->
-                            <div class="col-sm-8">{{ project['projectFiles']['metasetName'] }}</div> <!-- .col-sm-8 -->
+                            <div class="col-sm-8">
+                                {{ project['projectFiles']['metasetName'] if project['projectFiles']['metasetName'] else _('(Not set)') }}
+                            </div> <!-- .col-sm-8 -->
                         </div> <!-- .row -->
                         <div class="row">
                             <div class="col-sm-4">{{ _('Other files:') }}</div> <!-- .col-sm-4 -->

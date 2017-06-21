@@ -23,7 +23,6 @@ class ProjectParser(object):
         for project_name in listdir(user_folder_path):
             if folder_exists(join_path(user_folder_path, project_name)):
                 for keyword in project_keywords:
-                    print keyword
                     if (project_name.lower().find(keyword.lower()) != -1) and not project_name in project_names:
                         project_folder_path = join_path(user_folder_path, project_name) 
                         project_files       = self.get_project_files(project_folder_path)                       
