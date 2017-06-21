@@ -1,7 +1,7 @@
 {% extends "../template.html" %}
 {% block title %}{{ _('My Projects') }}{% end %}
 {% block header %}
-<link rel="stylesheet" type="text/css" href="{{ static_url('css/accounts/profile.css') }}">
+<link rel="stylesheet" type="text/css" href="{{ static_url('css/accounts/projects.css') }}">
 {% end %}
 {% block body %}
 <div class="hero">
@@ -15,37 +15,107 @@
 <div id="main-content">
     <div class="container">
         <div class="col-sm-offset-3 col-sm-6">
-            <form onSubmit="onSubmit(); return false;">
-                <h3>{{ _('My Project List') }}</h3>
-                <div class="alert alert-success hide">{{ _('Your project was successfully updated.') }}</div>
-                <div class="alert alert-danger hide"></div>
-            </form>
+            <h3>{{ _('My Projects') }}</h3>
+            <ul id="projects">
+            {% for project in projects %}
+                <li class="project" data-value="{{ project['projectName'] }}">
+                    <div class="header">
+                        <h4>{{ project['projectName'] }}</h4>
+                        <ul class="list-inline">
+                            <li>
+                                <a href="javascript:void(0);" class="action-edit">
+                                    <i class="fa fa-edit"></i>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0);" class="action-trash">
+                                    <i class="fa fa-trash"></i>
+                                </a>
+                            </li>
+                        </ul>
+                    </div> <!-- .header -->
+                    <div class="body">
+                        <div class="row">
+                            <div class="col-sm-4">{{ _('Dataset file:') }}</div> <!-- .col-sm-4 -->
+                            <div class="col-sm-8">{{ project['projectFiles']['datasetName'] }}</div> <!-- .col-sm-8 -->
+                        </div> <!-- .row -->
+                        <div class="row">
+                            <div class="col-sm-4">{{ _('Metaset file:') }}</div> <!-- .col-sm-4 -->
+                            <div class="col-sm-8">{{ project['projectFiles']['metasetName'] }}</div> <!-- .col-sm-8 -->
+                        </div> <!-- .row -->
+                        <div class="row">
+                            <div class="col-sm-4">{{ _('Other files:') }}</div> <!-- .col-sm-4 -->
+                            <div class="col-sm-8">
+                            {% if project['projectFiles']['candidateFiles'] %}
+                                <ul class="other-files">
+                                {% for file in project['projectFiles']['candidateFiles'] %}
+                                    <li>{{ file }}</li>
+                                {% end %}
+                                </ul>
+                            {% else %}
+                                <p>{{ _('(None)') }}</p>
+                            {% end %}
+                            </div> <!-- .col-sm-8 -->
+                        </div> <!-- .row -->
+                    </div> <!-- .body -->
+                </li>
+            {% end %}
+            </ul>
         </div> <!-- .col-md-10 -->
     </div> <!-- .container -->
 </div> <!-- #main-content -->
+<div id="edit-project-modal" class="modal fade">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                <h4 class="modal-title">Update Project</h4>
+            </div> <!-- .modal-header -->
+            <div class="modal-body">
+                <div class="alert alert-danger"></div> <!-- .alert-danger -->
+                <div class="form-group label-static">
+                    <label>{{ _('Project Name') }}</label>
+                    <input id="old-project-name" type="hidden">
+                    <input id="new-project-name" class="form-control" type="text">
+                </div> <!-- .form-group -->
+            </div> <!-- .modal-body -->
+            <div class="modal-footer">
+                {% module xsrf_form_html() %}
+                <button class="btn btn-raised btn-primary">{{ _('Save changes') }}</button>
+                <button class="btn btn-raised btn-default" data-dismiss="modal" aria-hidden="true">{{ _('Cancel') }}</button>
+            </div> <!-- .modal-footer -->
+        </div> <!-- .modal-content -->
+    </div> <!-- .modal-dialog -->
+</div> <!-- .modal -->
 {% end %}
 {% block scripts %}
 <script type="text/javascript">
-    function onSubmit() {
-        $('.alert').addClass('hide');
-        $('button[type=submit]').attr('disabled', 'disabled');
-        $('button[type=submit]').html('{{ _('Please wait...') }}');
-
-        var oldProjectName   = $('#old-project-name').val(),
-            newProjectName   = $('#new-project-name').val(),
-            rmProjectName    = $('#rm-project-name').val(),
-            xsrfToken        = getCookie("_xsrf");
-
-        return doUpdateAction(oldProjectName, newProjectName, rmProjectName, xsrfToken);
-    }
+    $('.action-edit').click(function() {
+        var projectName = $(this).parent().parent().parent().parent().attr('data-value');
+        
+        $('.alert-danger', '#edit-project-modal').addClass('hide');
+        $('#old-project-name', '#edit-project-modal').val(projectName);
+        $('#new-project-name', '#edit-project-modal').val(projectName);
+        $('#edit-project-modal').modal();
+    });
 </script>
 <script type="text/javascript">
-    function doUpdateAction(oldProjectName, newProjectName, rmProjectName, xsrfToken) {
+    $('.btn-primary', '#edit-project-modal').click(function() {
+        var oldProjectName = $('#old-project-name', '#edit-project-modal').val(),
+            newProjectName = $('#new-project-name', '#edit-project-modal').val();
+
+        $('.alert-danger', '#edit-project-modal').addClass('hide');
+        $('.btn-primary', '#edit-project-modal').attr('disabled', 'disabled');
+        $('.btn-primary', '#edit-project-modal').html('{{ _('Please wait ...') }}');
+        return doUpdateProjectAction(oldProjectName, newProjectName);
+    })
+</script>
+<script type="text/javascript">
+    function doUpdateProjectAction(oldProjectName, newProjectName) {
         var postData = {
-            'oldProjectName' : oldPassword,
-            'newProjectName' : newPassword,
-            'rmProjectName'  : confirmPassword,
-            '_xsrf'          : xsrfToken
+            'projectName': oldProjectName,
+            'newProjectName': newProjectName,
+            '_xsrf': getCookie("_xsrf")
         };
         $.ajax({
             type: 'POST',
@@ -53,30 +123,53 @@
             data: postData,
             dataType: 'JSON',
             success: function(result){
-                return processUpdateResult(result);
+                if ( result['isSuccessful'] ) {
+                    $('h4', 'li.project[data-value="%s"]'.format(oldProjectName)).html(newProjectName);
+                    $('#edit-project-modal').modal('hide');
+                } else {
+                    var errorMessage = '';
+
+                    // TODO
+                    $('.alert-danger', '#edit-project-modal').html(errorMessage);
+                    $('.alert-danger', '#edit-project-modal').removeClass('hide');
+                }
+                $('.btn-primary', '#edit-project-modal').removeAttr('disabled');
+                $('.btn-primary', '#edit-project-modal').html('{{ _('Save changes') }}');
             }
         });
     }
 </script>
 <script type="text/javascript">
-    function processUpdateResult(result) {
-        if ( result['isSuccessful'] ) {
-            $('.alert-success').removeClass('hide');
-            $('html, body').animate({scrollTop: 0}, 500);
-        } else {
-            var errorMessage = '';
+    $('.action-trash').click(function() {
+        var projectName = $(this).parent().parent().parent().parent().attr('data-value');
 
-            if ( result['isNewProjectNameEmpty'] ) {
-                errorMessage += '{{ _('You cannot leave new project name empty.') }}<br>';
-            } else if ( !result['isNewProjectNameLegal'] ) {
-                errorMessage += '{{ _('The new project name seems invalid.') }}<br>';
-            }
-            
-            $('.alert-danger').html(errorMessage);
-            $('.alert-danger').removeClass('hide');
+        if ( !confirm('{{ _('Are you sure to remove the project: ') }}%s?'.format(projectName)) ) {
+            return;
         }
-        $('button[type=submit]').html('{{ _('Update profile') }}');
-        $('button[type=submit]').removeAttr('disabled');
+        return doDeleteProjectAction(projectName);
+    });
+</script>
+<script type="text/javascript">
+    function doDeleteProjectAction(projectName) {
+        var postData = {
+            'projectName': projectName,
+            '_xsrf': getCookie("_xsrf")
+        };
+        $.ajax({
+            type: 'POST',
+            url: '{{ base_url('/accounts/projects') }}',
+            data: postData,
+            dataType: 'JSON',
+            success: function(result){
+                if ( result['isSuccessful'] ) {
+                    $('li.project[data-value="%s"]'.format(projectName)).remove();
+                } else {
+                    alert('{{ _('Unknown error occurred while removing this project.') }}');
+                }
+                $('.btn-primary', '#edit-project-modal').removeAttr('disabled');
+                $('.btn-primary', '#edit-project-modal').html('{{ _('Save changes') }}');
+            }
+        });
     }
 </script>
 {% end %}
