@@ -318,7 +318,7 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
         
-        n_components     = 100 if not 'n-components' in params else int(params['n-components'])
+        n_components     = 100 if (not 'n-components' in params or not params['n-components']) else int(params['n-components'])
         rp               = random_projection.SparseRandomProjection(n_components = n_components)
         training_samples = rp.fit_transform(training_samples)
         testing_samples  = rp.fit_transform(testing_samples) if testing_samples.any() else testing_samples
