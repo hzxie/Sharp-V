@@ -94,13 +94,13 @@
             } else if ( result['isEmailExists'] ) {
                 errorMessage += '{{ _('Someone already use that email.') }}<br>';
             }
-            if ( result['isOldPasswordEmpty'] && !result['isOldPasswordCorrect'] ) {
+            if ( !result['isOldPasswordEmpty'] && !result['isOldPasswordCorrect'] ) {
                 errorMessage += '{{ _('Old password is not correct.') }}<br>';
             } 
-            if ( result['isOldPasswordEmpty'] && !result['isNewPasswordLegal'] ) {
+            if ( !result['isOldPasswordEmpty'] && !result['isNewPasswordLegal'] ) {
                 errorMessage += '{{ _('The length of new password must between 6 and 16 characters.') }}<br>';
             }
-            if ( result['isOldPasswordEmpty'] && !result['isPasswordConfirmed'] ) {
+            if ( !result['isOldPasswordEmpty'] && !result['isPasswordConfirmed'] ) {
                 errorMessage = '{{ _('The new password and confirm new password do not match.') }}<br>';
             }
             $('.alert-danger').html(errorMessage);
