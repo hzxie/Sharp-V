@@ -241,7 +241,7 @@
                             <div class="panel-body">
                                 <div class="form-group label-static">
                                     <label for="number-of-neighbors" class="control-label">Number of neighbors to display</label>
-                                    <input id="number-of-neighbors" class="form-control" type="number" min="1" max="10" value="3">
+                                    <input id="number-of-neighbors" class="form-control" type="number" min="1" max="10" placeholder="Default: 3, Max: 10">
                                 </div> <!-- .form-group -->
                             </div> <!-- .panel-body -->
                         </div> <!-- .panel -->
@@ -831,7 +831,7 @@
            .on('click', function(data, index) {
                var sampleName        = window.dataset['ids']['training'][index],
                    neighbors         = window.dataset['nearest_neighbors'][index],
-                   numberOfNeighbors = parseInt($('#number-of-neighbors').val());
+                   numberOfNeighbors = parseInt($('#number-of-neighbors').val()) || 3;
 
                if ( !d3.event.ctrlKey && !d3.event.metaKey ) {
                    svgComponents.svg.selectAll('circle').attr('r', 4);
