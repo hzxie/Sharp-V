@@ -224,7 +224,29 @@ div#main-content #meta-of-neighbors table > thead {
 }
 
 div#main-content #meta-of-neighbors div.panel {
-	margin-top: 40px;
+	margin-top: 39px;
+}
+
+div#main-content #meta-of-neighbors div.panel div.panel-heading {
+	position: relative;
+}
+
+div#main-content #meta-of-neighbors div.panel div.panel-heading ul.list-inline {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+}
+
+div#main-content #meta-of-neighbors div.panel div.panel-heading ul.list-inline a {
+	color: #666;
+}
+
+div#main-content #meta-of-neighbors div.panel.inactive {
+	margin-top: -16px;
+}
+
+div#main-content #meta-of-neighbors div.panel.inactive div.panel-body {
+	display: none;
 }
 
 div#main-content #meta-of-neighbors ul#metaset-columns {

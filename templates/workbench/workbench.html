@@ -267,6 +267,13 @@
                         <div class="panel panel-default">
                             <div class="panel-heading">
                                 <h5>{{ _('Columns to Display') }}</h5>
+                                <ul class="list-inline">
+                                    <li>
+                                        <a href="javascript:void(0);">
+                                            <i class="fa fa-caret-down"></i>
+                                        </a>
+                                    </li>
+                                </ul>
                             </div> <!-- .panel-heading -->
                             <div class="panel-body">
                                 <ul id="metaset-columns"></ul>
@@ -1307,5 +1314,21 @@
                 
         }
     }
+</script>
+<script type="text/javascript">
+    $('div.panel-heading a', '#meta-of-neighbors').click(function() {
+        var panel     = $(this).parent().parent().parent().parent(),
+            isVisible = $('.panel-body', panel).is(':visible');
+
+        if ( isVisible ) {
+            $('i.fa', this).removeClass('fa-caret-down');
+            $('i.fa', this).addClass('fa-caret-right');
+            $(panel).addClass('inactive');
+        } else {
+            $('i.fa', this).removeClass('fa-caret-right');
+            $('i.fa', this).addClass('fa-caret-down');
+            $(panel).removeClass('inactive');
+        }
+    });
 </script>
 {% end %}
