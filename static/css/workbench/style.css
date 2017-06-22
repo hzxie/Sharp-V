@@ -223,6 +223,10 @@ div#main-content #meta-of-neighbors table > thead {
 	color: #fff;
 }
 
+div#main-content #meta-of-neighbors table tr.highlight > td {
+	font-weight: bold;
+}
+
 div#main-content #meta-of-neighbors div.panel {
 	margin-top: 39px;
 }

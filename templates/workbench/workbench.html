@@ -836,22 +836,27 @@
                $('.tooltip').addClass('hide');
            })
            .on('click', function(data, index) {
-               var sampleName        = window.dataset['ids']['training'][index],
-                   neighbors         = window.dataset['nearest_neighbors'][index],
-                   numberOfNeighbors = parseInt($('#number-of-neighbors').val()) || 3;
-
-               if ( !d3.event.ctrlKey && !d3.event.metaKey ) {
-                   svgComponents.svg.selectAll('circle').attr('r', 4);
-               }
-               // NOTE: nth-child selector is start from 1, NOT 0.
-               svgComponents.svg.select('circle:nth-child(%s)'.format(index + 1)).attr('r', 15);
-               for ( var i = 0; i < numberOfNeighbors; ++ i ) {
-                   svgComponents.svg.select('circle:nth-child(%s)'.format(neighbors[i] + 1)).attr('r', 10);
-               }
-               // Display metaset of the selected samples
-               var selectedSamples = getSelectedSamplesInScatterPlot(svgComponents);
-               filterMetaset(selectedSamples);
+               filterMetaset(getNeighborSampleNames(index));
            });
+    }
+</script>
+<script type="text/javascript">
+    function getNeighborSampleNames(sampleIndex) {
+        var sampleName        = window.dataset['ids']['training'][sampleIndex],
+            neighbors         = window.dataset['nearest_neighbors'][sampleIndex],
+            numberOfNeighbors = parseInt($('#number-of-neighbors').val()) || 3;
+ 
+        // d3.event == null when this function invoked by search function
+        if ( !d3.event || (!d3.event.ctrlKey && !d3.event.metaKey) ) {
+            svgComponents.svg.selectAll('circle').attr('r', 4);
+        }
+        // NOTE: nth-child selector is start from 1, NOT 0.
+        svgComponents.svg.select('circle:nth-child(%s)'.format(sampleIndex + 1)).attr('r', 15);
+        for ( var i = 0; i < numberOfNeighbors; ++ i ) {
+            svgComponents.svg.select('circle:nth-child(%s)'.format(neighbors[i] + 1)).attr('r', 10);
+        }
+        // Display metaset of the selected samples
+        return getSelectedSamplesInScatterPlot(svgComponents);
     }
 </script>
 <script type="text/javascript">
@@ -1189,12 +1194,14 @@
                 return;
             }
             transformScatterPlot(sampleIndex + 1);
+            filterMetaset(getNeighborSampleNames(sampleIndex));
         } else {
             var sampleNode = getSampleNode(sampleName);
             if ( typeof(sampleNode) == 'undefined' ) {
                 return;
             }
             transformTreePlot(sampleNode);
+            filterMetaset(getSiblingSampleNames(sampleNode));
         }
     });
 </script>
@@ -1245,7 +1252,6 @@
                 updateHierarchyTree(currentParent);
             }
         }
-
         // Move the sample node to center screen
         var transform   = d3.zoomIdentity.translate(
                 window.svgComponents.center.x - sampleNode.y,
@@ -1253,6 +1259,27 @@
         window.svgComponents.svg
               .transition().duration(750)
               .call(window.svgComponents.zoom.transform, transform);
+    }
+</script>
+<script type="text/javascript">
+    function getSiblingSampleNames(sampleNode) {
+        var sampleName         = sampleNode.data.name,
+            sampleParentNode   = sampleNode.parent,
+            siblingSampleNames = [];
+
+        if ( sampleParentNode ) {
+            var children = sampleParentNode.children;   // children must not be null
+            for ( var i = 0; i < children.length; ++ i ) {
+                var siblingSampleName = children[i].data.name;
+                if ( sampleName != siblingSampleName ) {
+                    siblingSampleNames.push(siblingSampleName);
+                }
+            }
+        }
+        return {
+            'clickedSamples': [sampleName],
+            'neighborSamples': siblingSampleNames
+        }
     }
 </script>
 <script type="text/javascript">
@@ -1270,7 +1297,6 @@
                 if ( hiddenChildren ) {
                     collapseHierarchyTree(currentNode);
                 }
-                
                 var children        = currentNode.children;
                 if ( children ) {
                     for ( var i = 0; i < children.length; ++ i ) {
