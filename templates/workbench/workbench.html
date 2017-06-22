@@ -223,14 +223,6 @@
                     <div id="visualization-sidebar" class="col-md-4 hide">
                         <div class="panel panel-default">
                             <div class="panel-heading">
-                                <h5>{{ _('Reset') }}</h5>
-                            </div> <!-- .panel-heading -->
-                            <div class="panel-body">
-                                <button id="reset-button" class="btn btn-raised btn-danger">{{ _('Reset') }}</button>
-                            </div> <!-- .panel-body -->
-                        </div> <!-- .panel -->
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
                                 <h5>{{ _('Search') }}</h5>
                             </div> <!-- .panel-heading -->
                             <div class="panel-body">
@@ -251,6 +243,14 @@
                                     <label for="number-of-neighbors" class="control-label">Number of neighbors to display</label>
                                     <input id="number-of-neighbors" class="form-control" type="number" min="1" max="10" value="3">
                                 </div> <!-- .form-group -->
+                            </div> <!-- .panel-body -->
+                        </div> <!-- .panel -->
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h5>{{ _('Reset') }}</h5>
+                            </div> <!-- .panel-heading -->
+                            <div class="panel-body">
+                                <button id="reset-button" class="btn btn-raised btn-danger">{{ _('Reset') }}</button>
                             </div> <!-- .panel-body -->
                         </div> <!-- .panel -->
                     </div> <!-- .col-md-4 -->
@@ -666,6 +666,11 @@
                 }
                 $('#btn-process').html('{{ _('Process') }}');
                 $('#btn-process').removeAttr('disabled');
+            },
+            error: function() {
+                alert('{{ _('Error occurred while processing data.') }}');
+                $('#btn-process').html('{{ _('Process') }}');
+                $('#btn-process').removeAttr('disabled');
             }
         });
     }
@@ -844,13 +849,16 @@
 </script>
 <script type="text/javascript">
     function getSelectedSamplesInScatterPlot(svgComponents) {
-        var selectedSamples = [];
+        var selectedSamples = {
+            'clickedSamples': [],
+            'neighborSamples': []
+        };
         
         svgComponents.svg.selectAll('circle[r="15"]').each(function(data, index) {
-            selectedSamples.push(data['name']);
+            selectedSamples['clickedSamples'].push(data['name']);
         });
         svgComponents.svg.selectAll('circle[r="10"]').each(function(data, index) {
-            selectedSamples.push(data['name']);
+            selectedSamples['neighborSamples'].push(data['name']);
         });
         return selectedSamples;
     }
@@ -1029,7 +1037,11 @@
                 }
             }
         }
-        return selectedSamples;
+        // In order to unify with scatter plots
+        return {
+            'clickedSamples': [],
+            'neighborSamples': selectedSamples
+        };
     }
 </script>
 <script type="text/javascript">
@@ -1274,11 +1286,25 @@
         if ( typeof(samples) == 'undefined' ) {
             $('#meta-of-neighbors table tbody tr').removeClass('hide');
         } else {
+            // Display meta of neighbors
             $('#meta-of-neighbors table tbody tr').addClass('hide');
-            for ( var i = 0; i < samples.length; ++ i ) {
-                $('#meta-of-neighbors table tbody tr[data-value="%s"]'
-                    .format(samples[i])).removeClass('hide');
+            $('#meta-of-neighbors table tbody tr').removeClass('highlight');
+            
+            for ( var i = 0; i < samples['neighborSamples'].length; ++ i ) {
+                var sample = samples['neighborSamples'][i];
+                $('#meta-of-neighbors table tbody tr[data-value="%s"]'.format(sample)).removeClass('hide');
             }
+            // Highlight the clicked sample in scatter
+            for ( var i = 0; i < samples['clickedSamples'].length; ++ i ) {
+                var sample      = samples['clickedSamples'][i],
+                    targetRow   = $('#meta-of-neighbors table tbody tr[data-value="%s"]'.format(sample)),
+                    firstRow    = $('#meta-of-neighbors table tbody tr:first-child');
+
+                targetRow.removeClass('hide').addClass('highlight');
+                firstRow.before(targetRow.clone().addClass('highlight'));
+                targetRow.remove();
+            }
+                
         }
     }
 </script>
