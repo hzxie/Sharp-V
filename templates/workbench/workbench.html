@@ -131,6 +131,7 @@
                                     <select class="algorithm-name form-control dropdown">
                                         <option value="pca">{{ _('Principle Component Analysis (PCA)') }}</option>
                                         <option value="random-projection">{{ _('Random Projection') }}</option>
+                                        <option value="mds">{{ _('Muiti-dimensional Scaling (MDS)') }}</option>
                                     </select>
                                 </div> <!-- .form-group -->
                             </div> <!-- .col-sm-6 -->
@@ -141,6 +142,9 @@
                                 <div class="random-projection parameters hide">
                                     <label>{{ _('Number of components: ') }}</label>
                                 </div> <!-- .random-projection.parameters -->
+                                <div class="mds parameters hide">
+                                    <label>{{ _('Number of components: ') }}</label>
+                                </div> <!-- .mds.parameters -->
                             </div> <!-- .col-sm-3 -->
                             <div class="col-sm-3">
                                 <div class="pca parameters hide">
@@ -149,6 +153,11 @@
                                     </div> <!-- .form-group -->
                                 </div> <!-- .pca.parameters -->
                                 <div class="random-projection parameters hide">
+                                    <div class="form-group label-static">
+                                        <input parameter-name="n-components" class="form-control" type="number" min="1" placeholder="{{ _('Default:') }} 100">
+                                    </div> <!-- .form-group -->
+                                </div> <!-- .random-projection.parameters -->
+                                <div class="mds parameters hide">
                                     <div class="form-group label-static">
                                         <input parameter-name="n-components" class="form-control" type="number" min="1" placeholder="{{ _('Default:') }} 100">
                                     </div> <!-- .form-group -->

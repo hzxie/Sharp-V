@@ -319,6 +319,10 @@ class Algorithms(object):
         training_labels, testing_labels   = self.unpack_labels(data)
         
         n_components     = 100 if (not 'n-components' in params or not params['n-components']) else int(params['n-components'])
+        if n_components > training_samples.shape[1]:
+            return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, \
+                testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+
         rp               = random_projection.SparseRandomProjection(n_components = n_components)
         training_samples = rp.fit_transform(training_samples)
         testing_samples  = rp.fit_transform(testing_samples) if testing_samples.any() else testing_samples
@@ -344,7 +348,7 @@ class Algorithms(object):
         training_labels, testing_labels   = self.unpack_labels(data)
         
         n_components     = 2
-        n_iter           = 2500 if not 'n-iterations' in params else int(params['n-iterations'])
+        n_iter           = 2500 if (not 'n-iterations' in params or not params['n-iterations']) else int(params['n-iterations'])
         high_data        = np.concatenate((training_samples, testing_samples), axis = 0) if testing_samples.any() else training_samples
         low_data         = manifold.TSNE(n_components = n_components, n_iter = n_iter).fit_transform(high_data)
         training_samples = low_data[0:training_samples.shape[0]]
@@ -358,9 +362,14 @@ class Algorithms(object):
         training_samples, testing_samples = self.unpack_samples(data)
         training_labels, testing_labels   = self.unpack_labels(data)
        
-        n_components     = 2
-        n_init           = 1
-        max_iter         = 300 if not 'max-iterations' in params else int(params['max-iterations'])
+        n_components     = 100 if (not 'n-components' in params or not params['n-components']) else int(params['n-components'])
+        n_init           = 3
+        max_iter         = 300 if (not 'max-iterations' in params or not params['max-iterations']) else int(params['max-iterations'])
+        
+        if n_components > training_samples.shape[1]:
+            return self.pack_data(training_ids = training_ids, testing_ids = testing_ids, training_samples = training_samples, \
+                testing_samples = testing_samples, training_labels = training_labels, testing_labels = testing_labels)
+
         high_data        = np.concatenate((training_samples, testing_samples), axis = 0) if testing_samples.any() else training_samples
         low_data         = manifold.MDS(n_components = n_components, max_iter = max_iter, n_init = n_init).fit_transform(high_data)
         training_samples = low_data[0:training_samples.shape[0]]
