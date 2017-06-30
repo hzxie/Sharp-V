@@ -86,7 +86,7 @@ def main():
     define('base_url', default='https://mlg.hit.edu.cn/spf', help='The URL of the application', type=str)
     define('http_port', default=8000, help='The port of the application', type=int)
     define('mysql_host', default='127.0.0.1:3306', help='The host of MySQL', type=str)
-    define('mysql_database', default='sharpv', help='The database name of MySQL', type=str)
+    define('mysql_database', default='spf', help='The database name of MySQL', type=str)
     define('mysql_username', default='root', help='The user of MySQL', type=str)
     define('mysql_password', default='', help='The password of MySQL', type=str)
     define('mysql_pool_size', default=10, help='The pool size of MySQL', type=int)
@@ -119,7 +119,7 @@ def main():
     # Start HTTP Server
     http_server = HTTPServer(Application(options.base_url, db_session, mail_sender), max_buffer_size=10485760000)
     http_server.listen(options.http_port)
-    logging.info('Sharp-V web application is running on port: %d.' % options.http_port)
+    logging.info('SimilarPatientFinder web application is running on port: %d.' % options.http_port)
     IOLoop.current().start()
 
 if __name__ == "__main__":

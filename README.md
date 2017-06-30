@@ -19,7 +19,7 @@ Then you need to edit configuration of the application in `server.conf`.
 After that, use following command to start web server:
 
 ```
-python Sharp-V.py
+python SimilarPatientFinder.py
 ```
 
 ## License

@@ -1,4 +1,4 @@
-# Requirements of Share-V
+# Requirements of SimilarPatientFinder
 
 tornado
 futures

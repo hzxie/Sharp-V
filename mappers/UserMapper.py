@@ -6,25 +6,25 @@ class UserMapper(object):
         self.db_session = db_session
 
     def get_user_using_user_id(self, user_id):
-        result_proxy =  self.db_session.execute('SELECT * FROM sharpv_users NATURAL JOIN sharpv_user_groups WHERE user_id = :user_id', {
+        result_proxy =  self.db_session.execute('SELECT * FROM spf_users NATURAL JOIN spf_user_groups WHERE user_id = :user_id', {
             'user_id': user_id
         }).fetchone()
         return result_proxy
 
     def get_user_using_username(self, username):
-        result_proxy = self.db_session.execute('SELECT * FROM sharpv_users NATURAL JOIN sharpv_user_groups WHERE username = :username', {
+        result_proxy = self.db_session.execute('SELECT * FROM spf_users NATURAL JOIN spf_user_groups WHERE username = :username', {
             'username': username
         }).fetchone()
         return result_proxy
 
     def get_user_using_email(self, email):
-        result_proxy = self.db_session.execute('SELECT * FROM sharpv_users NATURAL JOIN sharpv_user_groups WHERE email = :email', {
+        result_proxy = self.db_session.execute('SELECT * FROM spf_users NATURAL JOIN spf_user_groups WHERE email = :email', {
             'email': email
         }).fetchone()
         return result_proxy
 
     def create_user(self, username, password, email, user_group_id):
-        rows_affected = self.db_session.execute('INSERT INTO sharpv_users (username, password, email, user_group_id) VALUES (:username, :password, :email, :user_group_id)', {
+        rows_affected = self.db_session.execute('INSERT INTO spf_users (username, password, email, user_group_id) VALUES (:username, :password, :email, :user_group_id)', {
             'username': username,
             'password': password,
             'email': email,
@@ -33,12 +33,12 @@ class UserMapper(object):
         return rows_affected
 
     def update_password_using_email(self, email, password):
-        rows_affected = self.db_session.execute('UPDATE sharpv_users SET password = :password WHERE email = :email', {
+        rows_affected = self.db_session.execute('UPDATE spf_users SET password = :password WHERE email = :email', {
             'email': email,
             'password': password
         }).rowcount
         return rows_affected
 
     def update_user(self, user):
-        rows_affected = self.db_session.execute('UPDATE sharpv_users SET email = :email, password = :password WHERE user_id = :user_id', user).rowcount
+        rows_affected = self.db_session.execute('UPDATE spf_users SET email = :email, password = :password WHERE user_id = :user_id', user).rowcount
         return rows_affected
