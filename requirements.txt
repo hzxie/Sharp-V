@@ -1,8 +1,7 @@
 # Requirements of SimilarPatientFinder
 
-tornado
-futures
-mysql-python
+tornado==4.5
+mysqlclient
 sqlalchemy
 git+https://github.com/equeny/tornadomail.git
 

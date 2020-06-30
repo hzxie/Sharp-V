@@ -83,7 +83,7 @@ class Application(tornado.web.Application):
 
 def main():
     """ The entrance of the application."""
-    define('base_url', default='https://mlg.hit.edu.cn/spf', help='The URL of the application', type=str)
+    define('base_url', default='https://spf.infinitescript.com', help='The URL of the application', type=str)
     define('http_port', default=8000, help='The port of the application', type=int)
     define('mysql_host', default='127.0.0.1:3306', help='The host of MySQL', type=str)
     define('mysql_database', default='spf', help='The database name of MySQL', type=str)
@@ -95,7 +95,7 @@ def main():
     define('mail_port', default=587, help='The port of mail server', type=int)
     define('mail_username', default='', help='The username of mail server', type=str)
     define('mail_password', default='', help='The password of mail server', type=str)
-    define('dataset_directory', default='/var/datasets', help="The path of original dataset files", type=str)
+    define('dataset_directory', default='/tmp/datasets', help="The path of original dataset files", type=str)
     parse_config_file(join(dirname(__file__), 'server.conf'))
 
     # Setup MySQL connection

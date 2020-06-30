@@ -5,6 +5,7 @@ import numpy as np
 import scipy.spatial
 import scipy.cluster
 
+from functools import reduce
 from sklearn import preprocessing       # Imputer, Scale
 from sklearn import neighbors           # KNeighborsClassifier
 from sklearn import svm                 # SVC

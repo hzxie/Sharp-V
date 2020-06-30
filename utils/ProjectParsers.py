@@ -12,14 +12,13 @@ from os.path import isfile as file_exists
 from os.path import isdir as folder_exists
 from os.path import join as join_path
 from os.path import exists as path_exists
-from sets import Set
 
 PROJECT_CONFIG_FILE_NAME = 'project-config.json'
 
 class ProjectParser(object):
     def get_projects(self, user_folder_path, project_keywords = ['']):
         projects             = []
-        project_names        = Set()
+        project_names        = set()
         for project_name in listdir(user_folder_path):
             if folder_exists(join_path(user_folder_path, project_name)):
                 for keyword in project_keywords:

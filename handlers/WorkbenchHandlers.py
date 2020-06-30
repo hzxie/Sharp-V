@@ -12,7 +12,6 @@ from os.path import isfile as file_exists
 from os.path import isdir as folder_exists
 from os.path import join as join_path
 from os.path import exists as path_exists
-from sets import Set
 from tornado.concurrent import run_on_executor
 from tornado.escape import json_decode as load_json
 from tornado.escape import json_encode as dump_json
@@ -184,7 +183,7 @@ class DatasetProcessHandler(BaseHandler):
             except Exception as ex:
                 result['isSuccessful'] = False
                 result['errorMessage'] = ex
-                logging.error('Error occurred: %s' % ex)
+                logging.exception(ex)
 
         self.finish(dump_json(result))
 
